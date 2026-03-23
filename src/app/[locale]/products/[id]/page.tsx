@@ -2,13 +2,13 @@ import { getTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getProductById } from "@/lib/db/queries";
 import { initializeDatabase } from "@/lib/db";
 import { formatPrice, getLocalizedField } from "@/lib/utils";
 import { CATEGORY_LABELS, CONDITION_LABELS, type Category, type Condition } from "@/lib/constants";
 import ProductGallery from "@/components/products/ProductGallery";
-import ProductDetailFavorite from "./ProductDetailFavorite";
+import ProductDetailActions from "./ProductDetailActions";
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string; locale: string }>;
@@ -39,7 +39,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       {/* 戻るリンク */}
       <Link
         href="/products"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-white"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
         {t("common.products")}
@@ -52,41 +52,32 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         {/* 商品情報 */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-white sm:text-3xl">{name}</h1>
-            <p className="mt-3 text-3xl font-bold text-white">{formatPrice(product.price)}</p>
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{name}</h1>
+            <p className="mt-3 text-3xl font-bold text-foreground">{formatPrice(product.price)}</p>
           </div>
 
           {/* メタ情報 */}
           <div className="space-y-3 border-t border-border pt-6">
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted">{t("products.category")}</span>
-              <span className="text-sm text-white">{categoryLabel}</span>
+              <span className="text-sm text-foreground">{categoryLabel}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted">{t("products.condition")}</span>
-              <span className="text-sm text-white">{conditionLabel}</span>
+              <span className="text-sm text-foreground">{conditionLabel}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted">{t("products.inStock")}</span>
-              <span className="text-sm text-white">{product.stock}</span>
+              <span className="text-sm text-foreground">{product.stock}</span>
             </div>
           </div>
 
-          {/* アクションボタン */}
-          <div className="flex gap-3 border-t border-border pt-6">
-            <button
-              disabled={product.stock === 0}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-black transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              {product.stock === 0 ? t("products.outOfStock") : t("products.addToCart")}
-            </button>
-            <ProductDetailFavorite productId={product.id} />
-          </div>
+          {/* アクションボタン（カート追加 + お気に入り） */}
+          <ProductDetailActions product={product} />
 
           {/* 説明文 */}
           <div className="border-t border-border pt-6">
-            <h2 className="mb-3 text-lg font-semibold text-white">{t("products.description")}</h2>
+            <h2 className="mb-3 text-lg font-semibold text-foreground">{t("products.description")}</h2>
             <p className="text-sm leading-relaxed text-muted">{description}</p>
           </div>
         </div>
