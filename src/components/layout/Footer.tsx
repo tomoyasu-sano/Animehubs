@@ -1,5 +1,8 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import { ExternalLink } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 
 export default function Footer() {
   const t = useTranslations();
@@ -8,7 +11,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-neutral-800 bg-[var(--color-footer)]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
           {/* ブランド */}
           <div>
             <h3 className="text-lg font-bold text-white">{t("common.siteName")}</h3>
@@ -21,7 +24,7 @@ export default function Footer() {
             <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
               {t("footer.followUs")}
             </h4>
-            <div className="mt-4">
+            <div className="mt-4 space-y-2">
               <a
                 href={instagramUrl}
                 target="_blank"
@@ -31,6 +34,14 @@ export default function Footer() {
                 <ExternalLink className="h-4 w-4" />
                 {t("footer.instagram")}
               </a>
+            </div>
+            <div className="mt-4">
+              <Link
+                href="/privacy"
+                className="text-sm text-muted transition-colors hover:text-white"
+              >
+                {t("footer.privacyPolicy")}
+              </Link>
             </div>
           </div>
 

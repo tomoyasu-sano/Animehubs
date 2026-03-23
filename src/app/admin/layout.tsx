@@ -12,11 +12,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-
-interface AdminUser {
-  id: string;
-  username: string;
-}
+import "@/app/globals.css";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -32,7 +28,7 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<AdminUser | null>(null);
+  const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -44,7 +40,6 @@ export default function AdminLayout({
       return;
     }
 
-    // 認証チェック: ダッシュボード API でトークンが有効か確認
     fetch("/api/admin/dashboard")
       .then((res) => {
         if (res.status === 401) {
@@ -55,9 +50,7 @@ export default function AdminLayout({
       })
       .then((data) => {
         if (data) {
-          // ユーザー情報は Cookie に保存されたトークンから取得するので、
-          // ここではダミーでセット
-          setUser({ id: "admin", username: "Admin" });
+          setAuthenticated(true);
         }
       })
       .catch(() => {
@@ -73,7 +66,7 @@ export default function AdminLayout({
     router.push("/admin/login");
   };
 
-  // ログインページ: レイアウトなしで表示
+  // ログインページ: サイドバーなしで表示
   if (isLoginPage) {
     return (
       <html lang="en">
@@ -151,9 +144,6 @@ export default function AdminLayout({
             </nav>
 
             <div className="absolute bottom-0 w-full border-t border-gray-700 p-4">
-              <div className="mb-2 text-sm text-gray-400">
-                Logged in as <span className="text-white">{user?.username}</span>
-              </div>
               <button
                 onClick={handleLogout}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-400 transition-colors hover:bg-gray-800 hover:text-white"

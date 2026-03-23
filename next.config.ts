@@ -4,7 +4,15 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  /* ここに追加設定を記述 */
+  images: {
+    formats: ["image/webp", "image/avif"],
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [64, 128, 256, 384],
+  },
+  // パフォーマンス最適化
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
 };
 
 export default withNextIntl(nextConfig);

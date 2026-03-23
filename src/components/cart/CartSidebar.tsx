@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/utils";
 import CartItemComponent from "./CartItem";
+import { useEffect } from "react";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -16,6 +17,18 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const t = useTranslations("cart");
   const locale = useLocale();
   const { items, updateQuantity, removeItem, totalAmount, totalItems, isEmpty } = useCart();
+
+  // スクロールロック（モバイルでフルスクリーン時のスクロール防止）
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   return (
     <>
@@ -28,9 +41,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         />
       )}
 
-      {/* サイドパネル */}
+      {/* サイドパネル - モバイルではフルスクリーン */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-md flex-col bg-background shadow-xl transition-transform duration-300 ease-in-out ${
+        className={`fixed right-0 top-0 z-50 flex h-full w-full flex-col bg-background shadow-xl transition-transform duration-300 ease-in-out sm:max-w-md ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
@@ -86,7 +99,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
         {/* フッター */}
         {!isEmpty && (
-          <div className="border-t border-border p-4">
+          <div className="border-t border-border p-4 pb-safe">
             <div className="mb-4 flex items-center justify-between">
               <span className="text-base font-semibold text-foreground">{t("total")}</span>
               <span className="text-lg font-bold text-foreground">

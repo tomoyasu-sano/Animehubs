@@ -1,53 +1,43 @@
 import { describe, it, expect } from "vitest";
 import {
-  hashPassword,
-  verifyPassword,
+  verifyAdminPassword,
   generateToken,
   verifyToken,
 } from "./auth";
 
 describe("auth", () => {
-  describe("hashPassword / verifyPassword", () => {
-    it("should hash and verify a password correctly", () => {
-      const password = "testPassword123";
-      const hash = hashPassword(password);
-
-      expect(hash).not.toBe(password);
-      expect(verifyPassword(password, hash)).toBe(true);
+  describe("verifyAdminPassword", () => {
+    it("正しいパスワードでtrueを返す", () => {
+      // デフォルトのパスワード（環境変数未設定時）
+      expect(verifyAdminPassword("animehubs-admin")).toBe(true);
     });
 
-    it("should return false for incorrect password", () => {
-      const hash = hashPassword("correct");
-      expect(verifyPassword("wrong", hash)).toBe(false);
+    it("間違ったパスワードでfalseを返す", () => {
+      expect(verifyAdminPassword("wrong-password")).toBe(false);
     });
 
-    it("should generate different hashes for same password", () => {
-      const password = "samePassword";
-      const hash1 = hashPassword(password);
-      const hash2 = hashPassword(password);
-      expect(hash1).not.toBe(hash2); // bcrypt uses random salt
+    it("空文字列でfalseを返す", () => {
+      expect(verifyAdminPassword("")).toBe(false);
     });
   });
 
   describe("generateToken / verifyToken", () => {
-    it("should generate a valid token and verify it", () => {
-      const payload = { userId: "user-1", username: "admin1" };
-      const token = generateToken(payload);
+    it("有効なトークンを生成し検証できる", () => {
+      const token = generateToken();
 
       expect(typeof token).toBe("string");
       expect(token.split(".")).toHaveLength(3); // JWT format
 
       const decoded = verifyToken(token);
       expect(decoded).not.toBeNull();
-      expect(decoded!.userId).toBe("user-1");
-      expect(decoded!.username).toBe("admin1");
+      expect(decoded!.role).toBe("admin");
     });
 
-    it("should return null for invalid token", () => {
+    it("無効なトークンでnullを返す", () => {
       expect(verifyToken("invalid-token")).toBeNull();
     });
 
-    it("should return null for empty token", () => {
+    it("空のトークンでnullを返す", () => {
       expect(verifyToken("")).toBeNull();
     });
   });

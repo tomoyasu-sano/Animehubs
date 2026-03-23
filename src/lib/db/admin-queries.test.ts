@@ -9,8 +9,7 @@ import {
   adminGetReservations,
   getDashboardStats,
 } from "./admin-queries";
-import { hashPassword } from "../auth";
-import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 
 // テスト前にDBを初期化しシードデータを投入
 beforeEach(() => {
@@ -29,7 +28,7 @@ beforeEach(() => {
     .values({
       id: "admin-test-1",
       username: "testadmin",
-      passwordHash: hashPassword("testpass"),
+      passwordHash: bcrypt.hashSync("testpass", 10),
       createdAt: new Date().toISOString(),
     })
     .run();

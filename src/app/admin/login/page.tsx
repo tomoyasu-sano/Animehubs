@@ -6,7 +6,6 @@ import { LogIn } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +19,7 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await res.json();
@@ -44,7 +43,7 @@ export default function AdminLoginPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900">AnimeHubs Admin</h1>
           <p className="mt-2 text-sm text-gray-500">
-            Sign in to manage your store
+            Enter password to access admin panel
           </p>
         </div>
 
@@ -54,24 +53,6 @@ export default function AdminLoginPage() {
               {error}
             </div>
           )}
-
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Username
-            </label>
-            <input
-              id="username"
-              type="text"
-              required
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
-              placeholder="Enter your username"
-            />
-          </div>
 
           <div>
             <label
@@ -87,7 +68,8 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-gray-900 shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
-              placeholder="Enter your password"
+              placeholder="Enter admin password"
+              autoFocus
             />
           </div>
 

@@ -103,6 +103,45 @@
     "followUs": "Follow Us",
     "instagram": "Instagram",
     "rightsReserved": "All rights reserved",
-    "localPickup": "Local pickup in Uppsala, Sweden"
+    "localPickup": "Local pickup in Uppsala, Sweden",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy"
+  },
+  "seo": {
+    "homeTitle": "AnimeHubs - Premium Anime Figures in Uppsala, Sweden",
+    "homeDescription": "Hand-picked anime collectibles from Japan, available for local pickup in Uppsala, Sweden. Browse figures, nendoroids, scale figures, and more.",
+    "productsTitle": "Collection - AnimeHubs",
+    "productsDescription": "Browse our collection of premium anime figures. Nendoroids, scale figures, figma, and more available for local pickup in Uppsala.",
+    "productDetailDescription": "Buy {name} at AnimeHubs. {condition} condition, {price}. Local pickup in Uppsala, Sweden.",
+    "cartTitle": "Shopping Cart - AnimeHubs",
+    "cartDescription": "Review your shopping cart and proceed to checkout.",
+    "checkoutTitle": "Checkout - AnimeHubs",
+    "checkoutDescription": "Complete your reservation for anime figures with local pickup in Uppsala.",
+    "privacyTitle": "Privacy Policy - AnimeHubs",
+    "privacyDescription": "Learn how AnimeHubs handles your personal data in compliance with GDPR."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: {date}",
+    "intro": "At AnimeHubs, we take your privacy seriously. This policy explains how we collect, use, and protect your personal data in compliance with the General Data Protection Regulation (GDPR).",
+    "section1Title": "1. Data Controller",
+    "section1Content": "AnimeHubs operates in Uppsala, Sweden. For questions about your data, contact us via Instagram.",
+    "section2Title": "2. Data We Collect",
+    "section2Content": "When you make a reservation, we collect your name and email address. We also use cookies for essential site functionality.",
+    "section3Title": "3. How We Use Your Data",
+    "section3Content": "Your data is used solely for processing your reservation and sending confirmation emails. We do not sell or share your data with third parties.",
+    "section4Title": "4. Data Retention",
+    "section4Content": "Reservation data is kept for up to 12 months after the reservation date, after which it is deleted.",
+    "section5Title": "5. Your Rights",
+    "section5Content": "Under GDPR, you have the right to access, correct, delete, or port your personal data. You can also object to processing. Contact us via Instagram to exercise these rights.",
+    "section6Title": "6. Cookies",
+    "section6Content": "We use essential cookies for site functionality (e.g., cart data, language preference). We do not use tracking or advertising cookies.",
+    "section7Title": "7. Changes to This Policy",
+    "section7Content": "We may update this policy from time to time. Any changes will be posted on this page."
+  },
+  "cookie": {
+    "message": "We use essential cookies to make this site work. No tracking cookies are used.",
+    "accept": "Accept",
+    "learnMore": "Learn More"
   }
 }

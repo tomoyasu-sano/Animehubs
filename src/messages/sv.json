@@ -103,6 +103,45 @@
     "followUs": "Folj oss",
     "instagram": "Instagram",
     "rightsReserved": "Alla rattigheter forbehallna",
-    "localPickup": "Lokal avhamtning i Uppsala, Sverige"
+    "localPickup": "Lokal avhamtning i Uppsala, Sverige",
+    "privacyPolicy": "Integritetspolicy",
+    "cookiePolicy": "Cookiepolicy"
+  },
+  "seo": {
+    "homeTitle": "AnimeHubs - Premium animefigurer i Uppsala, Sverige",
+    "homeDescription": "Handplockade anime samlarfigurer fran Japan, tillgangliga for lokal avhamtning i Uppsala, Sverige. Blaeddra bland figurer, nendoroids, skalfigurer och mer.",
+    "productsTitle": "Kollektion - AnimeHubs",
+    "productsDescription": "Blaeddra i vart sortiment av premium animefigurer. Nendoroids, skalfigurer, figma och mer tillgangligt for lokal avhamtning i Uppsala.",
+    "productDetailDescription": "Kop {name} pa AnimeHubs. {condition} skick, {price}. Lokal avhamtning i Uppsala, Sverige.",
+    "cartTitle": "Varukorg - AnimeHubs",
+    "cartDescription": "Granska din varukorg och ga vidare till kassan.",
+    "checkoutTitle": "Kassa - AnimeHubs",
+    "checkoutDescription": "Slutfor din bokning av animefigurer med lokal avhamtning i Uppsala.",
+    "privacyTitle": "Integritetspolicy - AnimeHubs",
+    "privacyDescription": "Las om hur AnimeHubs hanterar dina personuppgifter i enlighet med GDPR."
+  },
+  "privacy": {
+    "title": "Integritetspolicy",
+    "lastUpdated": "Senast uppdaterad: {date}",
+    "intro": "Pa AnimeHubs tar vi din integritet pa allvar. Denna policy forklarar hur vi samlar in, anvander och skyddar dina personuppgifter i enlighet med dataskyddsforordningen (GDPR).",
+    "section1Title": "1. Personuppgiftsansvarig",
+    "section1Content": "AnimeHubs verkar i Uppsala, Sverige. For fragor om dina uppgifter, kontakta oss via Instagram.",
+    "section2Title": "2. Uppgifter vi samlar in",
+    "section2Content": "Nar du gor en bokning samlar vi in ditt namn och din e-postadress. Vi anvander ocksa cookies for viktig webbplatsfunktionalitet.",
+    "section3Title": "3. Hur vi anvander dina uppgifter",
+    "section3Content": "Dina uppgifter anvands enbart for att behandla din bokning och skicka bekraftelsemail. Vi saljer eller delar inte dina uppgifter med tredje part.",
+    "section4Title": "4. Lagring av uppgifter",
+    "section4Content": "Bokningsdata sparas i upp till 12 manader efter bokningsdatumet, varefter den raderas.",
+    "section5Title": "5. Dina rattigheter",
+    "section5Content": "Enligt GDPR har du ratt att fa tillgang till, ratta, radera eller flytta dina personuppgifter. Du kan ocksa invanda mot behandling. Kontakta oss via Instagram for att utova dessa rattigheter.",
+    "section6Title": "6. Cookies",
+    "section6Content": "Vi anvander nodvandiga cookies for webbplatsens funktionalitet (t.ex. varukorg, sprakval). Vi anvander inga sparnings- eller reklamcookies.",
+    "section7Title": "7. Andringar av denna policy",
+    "section7Content": "Vi kan uppdatera denna policy fran tid till annan. Eventuella andringar publiceras pa denna sida."
+  },
+  "cookie": {
+    "message": "Vi anvander nodvandiga cookies for att webbplatsen ska fungera. Inga sparningscookies anvands.",
+    "accept": "Acceptera",
+    "learnMore": "Las mer"
   }
 }

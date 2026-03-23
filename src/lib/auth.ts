@@ -1,34 +1,27 @@
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 
 const JWT_SECRET = process.env.JWT_SECRET || "animehubs-admin-secret-key-change-in-production";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "animehubs-admin";
 const JWT_EXPIRES_IN = "24h";
 const COOKIE_NAME = "admin_token";
 
 export interface AdminTokenPayload {
-  userId: string;
-  username: string;
+  role: "admin";
 }
 
 /**
- * パスワードをハッシュ化
+ * 管理者パスワードを検証
  */
-export function hashPassword(password: string): string {
-  return bcrypt.hashSync(password, 10);
-}
-
-/**
- * パスワードを検証
- */
-export function verifyPassword(password: string, hash: string): boolean {
-  return bcrypt.compareSync(password, hash);
+export function verifyAdminPassword(password: string): boolean {
+  return password === ADMIN_PASSWORD;
 }
 
 /**
  * JWT トークンを生成
  */
-export function generateToken(payload: AdminTokenPayload): string {
+export function generateToken(): string {
+  const payload: AdminTokenPayload = { role: "admin" };
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
 
@@ -48,10 +41,8 @@ export function verifyToken(token: string): AdminTokenPayload | null {
  * リクエストから管理者トークンを取得・検証
  */
 export function getAdminFromRequest(request: NextRequest): AdminTokenPayload | null {
-  // Cookie からトークンを取得
   const token = request.cookies.get(COOKIE_NAME)?.value;
   if (!token) {
-    // Authorization ヘッダーからも試行
     const authHeader = request.headers.get("authorization");
     if (authHeader?.startsWith("Bearer ")) {
       return verifyToken(authHeader.slice(7));

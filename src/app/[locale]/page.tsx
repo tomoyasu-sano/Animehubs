@@ -4,6 +4,25 @@ import { ArrowRight } from "lucide-react";
 import { getProducts } from "@/lib/db/queries";
 import { initializeDatabase } from "@/lib/db";
 import ProductGrid from "@/components/products/ProductGrid";
+import { generatePageMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
+
+interface HomePageProps {
+  params: Promise<{ locale: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: HomePageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "seo" });
+
+  return generatePageMetadata({
+    title: t("homeTitle"),
+    description: t("homeDescription"),
+    locale,
+  });
+}
 
 export default async function HomePage() {
   const t = await getTranslations();

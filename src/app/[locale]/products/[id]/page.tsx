@@ -9,9 +9,48 @@ import { formatPrice, getLocalizedField } from "@/lib/utils";
 import { CATEGORY_LABELS, CONDITION_LABELS, type Category, type Condition } from "@/lib/constants";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductDetailActions from "./ProductDetailActions";
+import { generatePageMetadata, generateProductJsonLd, getSiteUrl } from "@/lib/seo";
+import type { Metadata } from "next";
 
 interface ProductDetailPageProps {
   params: Promise<{ id: string; locale: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProductDetailPageProps): Promise<Metadata> {
+  const { id, locale } = await params;
+
+  initializeDatabase();
+  const product = getProductById(id);
+
+  if (!product) {
+    return { title: "Not Found" };
+  }
+
+  const name = getLocalizedField(product, "name", locale);
+  const description = getLocalizedField(product, "description", locale);
+  const images: string[] = JSON.parse(product.images);
+  const siteUrl = getSiteUrl();
+  const conditionLabel =
+    CONDITION_LABELS[product.condition as Condition]?.[locale as "en" | "sv"] || product.condition;
+
+  return generatePageMetadata({
+    title: `${name} - AnimeHubs`,
+    description: description.slice(0, 160),
+    locale,
+    path: `/products/${id}`,
+    images: images.length > 0
+      ? [
+          {
+            url: images[0].startsWith("http") ? images[0] : `${siteUrl}${images[0]}`,
+            width: 1200,
+            height: 630,
+            alt: name,
+          },
+        ]
+      : undefined,
+  });
 }
 
 export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
@@ -34,8 +73,27 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const conditionLabel =
     CONDITION_LABELS[product.condition as Condition]?.[locale as "en" | "sv"] || product.condition;
 
+  const siteUrl = getSiteUrl();
+  const productJsonLd = generateProductJsonLd({
+    name,
+    description,
+    price: product.price,
+    condition: product.condition,
+    images,
+    url: `${siteUrl}/${locale}/products/${id}`,
+    inStock: product.stock > 0,
+  });
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* JSON-LD 構造化データ */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(productJsonLd),
+        }}
+      />
+
       {/* 戻るリンク */}
       <Link
         href="/products"

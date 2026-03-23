@@ -4,13 +4,30 @@ import { initializeDatabase } from "@/lib/db";
 import ProductGrid from "@/components/products/ProductGrid";
 import ProductSearch from "@/components/products/ProductSearch";
 import CategoryFilter from "@/components/products/CategoryFilter";
+import { generatePageMetadata } from "@/lib/seo";
 import { Suspense } from "react";
+import type { Metadata } from "next";
 
 interface ProductsPageProps {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<{
     q?: string;
     category?: string;
   }>;
+}
+
+export async function generateMetadata({
+  params,
+}: ProductsPageProps): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "seo" });
+
+  return generatePageMetadata({
+    title: t("productsTitle"),
+    description: t("productsDescription"),
+    locale,
+    path: "/products",
+  });
 }
 
 export default async function ProductsPage({ searchParams }: ProductsPageProps) {

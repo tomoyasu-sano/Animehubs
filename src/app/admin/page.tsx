@@ -1,31 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Package, CalendarCheck, DollarSign, Clock, CheckCircle, AlertCircle } from "lucide-react";
+// lucide-react アイコンは不要（シンプルなテキストベースUIに変更）
 import type { DashboardStats } from "@/lib/db/admin-queries";
 
 function StatCard({
   title,
   value,
-  icon: Icon,
-  color,
 }: {
   title: string;
   value: string | number;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
 }) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
-          <p className="mt-1 text-2xl font-bold text-gray-900">{value}</p>
-        </div>
-        <div className={`rounded-lg p-3 ${color}`}>
-          <Icon className="h-6 w-6 text-white" />
-        </div>
-      </div>
+    <div className="rounded-lg border border-gray-200 bg-white px-5 py-4">
+      <p className="text-xs font-medium uppercase tracking-wide text-gray-400">{title}</p>
+      <p className="mt-1 text-xl font-semibold text-gray-900">{value}</p>
     </div>
   );
 }
@@ -83,30 +72,10 @@ export default function AdminDashboardPage() {
 
       {/* 統計カード */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          title="Total Products"
-          value={stats.totalProducts}
-          icon={Package}
-          color="bg-blue-500"
-        />
-        <StatCard
-          title="Total Reservations"
-          value={stats.totalReservations}
-          icon={CalendarCheck}
-          color="bg-green-500"
-        />
-        <StatCard
-          title="Total Revenue"
-          value={formatSEK(stats.totalRevenue)}
-          icon={DollarSign}
-          color="bg-purple-500"
-        />
-        <StatCard
-          title="Pending"
-          value={stats.pendingReservations}
-          icon={Clock}
-          color="bg-yellow-500"
-        />
+        <StatCard title="Products" value={stats.totalProducts} />
+        <StatCard title="Reservations" value={stats.totalReservations} />
+        <StatCard title="Revenue" value={formatSEK(stats.totalRevenue)} />
+        <StatCard title="Pending" value={stats.pendingReservations} />
       </div>
 
       {/* 予約ステータスサマリー */}
@@ -117,33 +86,19 @@ export default function AdminDashboardPage() {
             Reservation Status
           </h2>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-yellow-500" />
-                <span className="text-sm text-gray-600">Pending</span>
+            {[
+              { label: "Pending", value: stats.pendingReservations, dot: "bg-yellow-400" },
+              { label: "Confirmed", value: stats.confirmedReservations, dot: "bg-blue-400" },
+              { label: "Completed", value: stats.completedReservations, dot: "bg-green-400" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`h-2 w-2 rounded-full ${item.dot}`} />
+                  <span className="text-sm text-gray-600">{item.label}</span>
+                </div>
+                <span className="text-sm font-medium text-gray-900">{item.value}</span>
               </div>
-              <span className="font-medium text-gray-900">
-                {stats.pendingReservations}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-blue-500" />
-                <span className="text-sm text-gray-600">Confirmed</span>
-              </div>
-              <span className="font-medium text-gray-900">
-                {stats.confirmedReservations}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                <span className="text-sm text-gray-600">Completed</span>
-              </div>
-              <span className="font-medium text-gray-900">
-                {stats.completedReservations}
-              </span>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -199,7 +154,7 @@ export default function AdminDashboardPage() {
                   <span className="w-20 text-sm text-gray-500">{m.month}</span>
                   <div className="flex-1">
                     <div
-                      className="h-6 rounded bg-blue-500"
+                      className="h-5 rounded bg-gray-800"
                       style={{ width: `${Math.max(widthPercent, 2)}%` }}
                     />
                   </div>

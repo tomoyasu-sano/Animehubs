@@ -5,11 +5,14 @@ import { Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import CookieBanner from "@/components/layout/CookieBanner";
+import { generateWebSiteJsonLd, generateLocalBusinessJsonLd } from "@/lib/seo";
 import "@/app/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
 });
 
 export default async function LocaleLayout({
@@ -26,9 +29,25 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
+  const webSiteJsonLd = generateWebSiteJsonLd();
+  const localBusinessJsonLd = generateLocalBusinessJsonLd();
 
   return (
     <html lang={locale} className={`dark ${inter.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(webSiteJsonLd),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(localBusinessJsonLd),
+          }}
+        />
+      </head>
       <body className="min-h-screen bg-background font-sans antialiased">
         <NextIntlClientProvider messages={messages}>
           <div className="flex min-h-screen flex-col">
@@ -36,6 +55,7 @@ export default async function LocaleLayout({
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
+          <CookieBanner />
         </NextIntlClientProvider>
       </body>
     </html>
