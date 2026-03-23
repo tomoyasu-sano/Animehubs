@@ -2,7 +2,7 @@ import { getDb } from "./index";
 import { products, reservations } from "./schema";
 import { eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import type { Reservation, Product } from "./schema";
+import type { Reservation } from "./schema";
 import type { ReservationItemInput } from "../validation";
 
 export interface CreateReservationInput {

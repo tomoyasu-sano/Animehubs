@@ -34,18 +34,14 @@ export default function ConfirmPage() {
   const searchParams = useSearchParams();
   const reservationId = searchParams.get("id");
   const [reservation, setReservation] = useState<ReservationData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(!!reservationId);
+  const [error, setError] = useState(!reservationId);
 
   const instagramUrl =
     process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/animehubs_placeholder";
 
   useEffect(() => {
-    if (!reservationId) {
-      setLoading(false);
-      setError(true);
-      return;
-    }
+    if (!reservationId) return;
 
     fetch(`/api/reservations/${reservationId}`)
       .then((res) => {

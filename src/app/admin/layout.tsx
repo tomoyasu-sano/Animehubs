@@ -28,37 +28,29 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [authenticated, setAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const isLoginPage = pathname === "/admin/login";
+  const [loading, setLoading] = useState(!isLoginPage);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const isLoginPage = pathname === "/admin/login";
-
   useEffect(() => {
-    if (isLoginPage) {
-      setLoading(false);
-      return;
-    }
+    if (isLoginPage) return;
 
+    let cancelled = false;
     fetch("/api/admin/dashboard")
       .then((res) => {
+        if (cancelled) return;
         if (res.status === 401) {
           router.push("/admin/login");
-          return null;
         }
         return res.json();
       })
-      .then((data) => {
-        if (data) {
-          setAuthenticated(true);
-        }
-      })
       .catch(() => {
-        router.push("/admin/login");
+        if (!cancelled) router.push("/admin/login");
       })
       .finally(() => {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       });
+    return () => { cancelled = true; };
   }, [isLoginPage, router]);
 
   const handleLogout = async () => {

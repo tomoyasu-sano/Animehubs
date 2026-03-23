@@ -32,8 +32,6 @@ export async function generateMetadata({
   const description = getLocalizedField(product, "description", locale);
   const images: string[] = JSON.parse(product.images);
   const siteUrl = getSiteUrl();
-  const conditionLabel =
-    CONDITION_LABELS[product.condition as Condition]?.[locale as "en" | "sv"] || product.condition;
 
   return generatePageMetadata({
     title: `${name} - AnimeHubs`,

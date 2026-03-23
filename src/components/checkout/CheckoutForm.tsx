@@ -31,11 +31,6 @@ export default function CheckoutForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const instagramUrl =
-    typeof window !== "undefined"
-      ? process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/animehubs_placeholder"
-      : "https://www.instagram.com/animehubs_placeholder";
-
   function validate(): FormErrors {
     const newErrors: FormErrors = {};
     if (!name || name.trim().length < 2) {

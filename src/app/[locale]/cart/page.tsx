@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
@@ -9,7 +9,6 @@ import CartSummary from "@/components/cart/CartSummary";
 
 export default function CartPage() {
   const t = useTranslations("cart");
-  const locale = useLocale();
   const { items, updateQuantity, removeItem, totalAmount, totalItems, isEmpty } = useCart();
 
   return (

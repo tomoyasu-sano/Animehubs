@@ -283,6 +283,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
               key={index}
               className="relative h-24 w-24 rounded-lg border border-gray-200 bg-gray-50"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={img}
                 alt={`Product ${index + 1}`}

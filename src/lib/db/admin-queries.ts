@@ -1,6 +1,6 @@
 import { getDb } from "./index";
 import { products, reservations, adminUsers } from "./schema";
-import { eq, like, and, or, sql, desc, asc } from "drizzle-orm";
+import { eq, like, and, or, sql, desc } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import type { Product, NewProduct, Reservation, AdminUser } from "./schema";
 

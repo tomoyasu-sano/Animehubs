@@ -60,16 +60,6 @@ const mockProduct = {
   updatedAt: "2026-01-01T00:00:00Z",
 };
 
-const mockProduct2 = {
-  ...mockProduct,
-  id: "product-2",
-  nameEn: "Goku Figure",
-  nameSv: "Goku Figur",
-  price: 199900,
-  stock: 1,
-  images: '["/images/goku.jpg"]',
-};
-
 describe("Cart ロジック（ユニットテスト）", () => {
   beforeEach(() => {
     localStorageMock.clear();

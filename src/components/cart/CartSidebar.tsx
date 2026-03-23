@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { X, ShoppingCart } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/hooks/useCart";
@@ -15,7 +15,6 @@ interface CartSidebarProps {
 
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const t = useTranslations("cart");
-  const locale = useLocale();
   const { items, updateQuantity, removeItem, totalAmount, totalItems, isEmpty } = useCart();
 
   // スクロールロック（モバイルでフルスクリーン時のスクロール防止）

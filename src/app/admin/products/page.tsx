@@ -155,6 +155,7 @@ export default function AdminProductsPage() {
                     <td className="px-4 py-3">
                       <div className="h-10 w-10 rounded-lg bg-gray-200">
                         {images[0] && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
                           <img
                             src={images[0]}
                             alt=""
