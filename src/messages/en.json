@@ -1,0 +1,52 @@
+{
+  "common": {
+    "siteName": "AnimeHubs",
+    "tagline": "Premium Anime Figures in Uppsala",
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "favorites": "Favorites",
+    "search": "Search",
+    "allCategories": "All Categories",
+    "language": "Language",
+    "currency": "SEK",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "notFound": "Not found",
+    "backToHome": "Back to Home"
+  },
+  "home": {
+    "heroTitle": "Curated Anime Figures",
+    "heroSubtitle": "Hand-picked collectibles from Japan, available for local pickup in Uppsala",
+    "browseAll": "Browse Collection",
+    "featuredTitle": "Featured Items",
+    "viewAll": "View All"
+  },
+  "products": {
+    "title": "Collection",
+    "searchPlaceholder": "Search figures...",
+    "noResults": "No figures found",
+    "tryDifferent": "Try a different search or filter",
+    "addToCart": "Add to Cart",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock",
+    "condition": "Condition",
+    "category": "Category",
+    "details": "Details",
+    "description": "Description",
+    "gallery": "Gallery",
+    "items": "items"
+  },
+  "favorites": {
+    "add": "Add to favorites",
+    "remove": "Remove from favorites",
+    "empty": "No favorites yet"
+  },
+  "footer": {
+    "contact": "Contact Us",
+    "followUs": "Follow Us",
+    "instagram": "Instagram",
+    "rightsReserved": "All rights reserved",
+    "localPickup": "Local pickup in Uppsala, Sweden"
+  }
+}

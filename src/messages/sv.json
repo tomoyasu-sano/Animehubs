@@ -1,0 +1,52 @@
+{
+  "common": {
+    "siteName": "AnimeHubs",
+    "tagline": "Premium animefigurer i Uppsala",
+    "home": "Hem",
+    "products": "Produkter",
+    "cart": "Varukorg",
+    "favorites": "Favoriter",
+    "search": "Sok",
+    "allCategories": "Alla kategorier",
+    "language": "Sprak",
+    "currency": "SEK",
+    "loading": "Laddar...",
+    "error": "Nagot gick fel",
+    "notFound": "Hittades inte",
+    "backToHome": "Tillbaka till startsidan"
+  },
+  "home": {
+    "heroTitle": "Utvalda animefigurer",
+    "heroSubtitle": "Handplockade samlarfigurer fran Japan, tillgangliga for lokal avhamtning i Uppsala",
+    "browseAll": "Utforska kollektionen",
+    "featuredTitle": "Utvalda artiklar",
+    "viewAll": "Visa alla"
+  },
+  "products": {
+    "title": "Kollektion",
+    "searchPlaceholder": "Sok figurer...",
+    "noResults": "Inga figurer hittades",
+    "tryDifferent": "Forsok med en annan sokning eller filter",
+    "addToCart": "Lagg i varukorgen",
+    "outOfStock": "Slutsald",
+    "inStock": "I lager",
+    "condition": "Skick",
+    "category": "Kategori",
+    "details": "Detaljer",
+    "description": "Beskrivning",
+    "gallery": "Galleri",
+    "items": "artiklar"
+  },
+  "favorites": {
+    "add": "Lagg till i favoriter",
+    "remove": "Ta bort fran favoriter",
+    "empty": "Inga favoriter annu"
+  },
+  "footer": {
+    "contact": "Kontakta oss",
+    "followUs": "Folj oss",
+    "instagram": "Instagram",
+    "rightsReserved": "Alla rattigheter forbehallna",
+    "localPickup": "Lokal avhamtning i Uppsala, Sverige"
+  }
+}
