@@ -1,5 +1,6 @@
 import { initializeDatabase, getDb, schema } from "./index";
 import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 
 // シードデータ: サンプル商品
 const sampleProducts = [
@@ -158,20 +159,19 @@ async function seed() {
     db.insert(schema.products).values(product).run();
   }
 
-  // 管理者データを挿入（パスワードはプレースホルダー）
+  // 管理者データを挿入（bcrypt ハッシュで保存）
   console.log("Seeding admin users...");
-  // bcrypt ハッシュは Phase 2 で実装するため、プレースホルダーを使用
   const adminData = [
     {
       id: uuidv4(),
       username: "admin1",
-      passwordHash: "placeholder_hash_admin1",
+      passwordHash: bcrypt.hashSync("admin1pass", 10),
       createdAt: new Date().toISOString(),
     },
     {
       id: uuidv4(),
       username: "admin2",
-      passwordHash: "placeholder_hash_admin2",
+      passwordHash: bcrypt.hashSync("admin2pass", 10),
       createdAt: new Date().toISOString(),
     },
   ];

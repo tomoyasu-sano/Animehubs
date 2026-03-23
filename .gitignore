@@ -44,3 +44,4 @@ next-env.d.ts
 # uploaded images (keep placeholder)
 /public/images/products/*
 !/public/images/products/.gitkeep
+/public/uploads/*
