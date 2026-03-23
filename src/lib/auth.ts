@@ -1,8 +1,23 @@
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 
-const JWT_SECRET = process.env.JWT_SECRET || "animehubs-admin-secret-key-change-in-production";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "animehubs-admin";
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is required");
+  }
+  return secret;
+}
+
+function getAdminPasswordHash(): string {
+  const hash = process.env.ADMIN_PASSWORD_HASH;
+  if (!hash) {
+    throw new Error("ADMIN_PASSWORD_HASH environment variable is required. Generate with: npx bcryptjs hash <password>");
+  }
+  return hash;
+}
+
 const JWT_EXPIRES_IN = "24h";
 const COOKIE_NAME = "admin_token";
 
@@ -11,10 +26,11 @@ export interface AdminTokenPayload {
 }
 
 /**
- * 管理者パスワードを検証
+ * 管理者パスワードを検証（bcryptハッシュ比較）
  */
-export function verifyAdminPassword(password: string): boolean {
-  return password === ADMIN_PASSWORD;
+export async function verifyAdminPassword(password: string): Promise<boolean> {
+  const hash = getAdminPasswordHash();
+  return bcrypt.compare(password, hash);
 }
 
 /**
@@ -22,7 +38,7 @@ export function verifyAdminPassword(password: string): boolean {
  */
 export function generateToken(): string {
   const payload: AdminTokenPayload = { role: "admin" };
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign(payload, getJwtSecret(), { expiresIn: JWT_EXPIRES_IN });
 }
 
 /**
@@ -30,7 +46,7 @@ export function generateToken(): string {
  */
 export function verifyToken(token: string): AdminTokenPayload | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as AdminTokenPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as AdminTokenPayload;
     return decoded;
   } catch {
     return null;

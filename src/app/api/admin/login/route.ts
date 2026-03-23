@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminPassword, generateToken, getAdminCookieName } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+// 1分間に5回まで
+const LOGIN_RATE_LIMIT = 5;
+const LOGIN_WINDOW_MS = 60_000;
 
 export async function POST(request: NextRequest) {
+  if (!checkRateLimit(request, "admin-login", LOGIN_RATE_LIMIT, LOGIN_WINDOW_MS)) {
+    return NextResponse.json(
+      { error: "Too many login attempts. Please try again later." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { password } = body;
@@ -13,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!verifyAdminPassword(password)) {
+    if (!(await verifyAdminPassword(password))) {
       return NextResponse.json(
         { error: "Invalid password" },
         { status: 401 }

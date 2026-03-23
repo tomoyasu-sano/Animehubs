@@ -68,6 +68,7 @@ export function initializeDatabase(): void {
       status TEXT NOT NULL DEFAULT 'pending',
       total_amount INTEGER NOT NULL,
       items TEXT NOT NULL,
+      access_token TEXT NOT NULL DEFAULT '',
       notes TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL

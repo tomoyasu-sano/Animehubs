@@ -83,6 +83,7 @@ beforeEach(() => {
       items: JSON.stringify([
         { productId: "prod-1", nameEn: "Test Figure 1", nameSv: "Testfigur 1", quantity: 1, price: 10000 },
       ]),
+      accessToken: "test-token",
       createdAt: "2026-03-01T00:00:00.000Z",
       updatedAt: "2026-03-01T00:00:00.000Z",
     })

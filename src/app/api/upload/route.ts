@@ -4,9 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 import path from "path";
 import fs from "fs";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public/uploads");
+const UPLOAD_DIR = path.resolve(process.cwd(), "public/uploads");
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "gif"];
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,9 +57,15 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const ext = file.name.split(".").pop() || "jpg";
+      const rawExt = file.name.split(".").pop()?.toLowerCase() || "";
+      const ext = ALLOWED_EXTENSIONS.includes(rawExt) ? rawExt : "jpg";
       const filename = `${uuidv4()}.${ext}`;
-      const filepath = path.join(UPLOAD_DIR, filename);
+      const filepath = path.resolve(UPLOAD_DIR, filename);
+
+      // パストラバーサル防止
+      if (!filepath.startsWith(UPLOAD_DIR)) {
+        return NextResponse.json({ error: "Invalid filename" }, { status: 400 });
+      }
 
       // ファイルを保存
       const buffer = Buffer.from(await file.arrayBuffer());

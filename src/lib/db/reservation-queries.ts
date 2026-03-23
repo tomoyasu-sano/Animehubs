@@ -2,6 +2,7 @@ import { getDb } from "./index";
 import { products, reservations } from "./schema";
 import { eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
+import crypto from "crypto";
 import type { Reservation } from "./schema";
 import type { ReservationItemInput } from "../validation";
 
@@ -111,6 +112,7 @@ export function createReservation(input: CreateReservationInput): {
       }
 
       // 予約作成
+      const accessToken = crypto.randomBytes(16).toString("hex");
       tx.insert(reservations)
         .values({
           id,
@@ -121,6 +123,7 @@ export function createReservation(input: CreateReservationInput): {
           status: "pending",
           totalAmount: input.totalAmount,
           items: JSON.stringify(input.items),
+          accessToken,
           notes: input.notes || null,
           createdAt: now,
           updatedAt: now,

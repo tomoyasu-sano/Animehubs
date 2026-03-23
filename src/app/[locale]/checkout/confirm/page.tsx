@@ -33,6 +33,7 @@ export default function ConfirmPage() {
   const locale = useLocale();
   const searchParams = useSearchParams();
   const reservationId = searchParams.get("id");
+  const accessToken = searchParams.get("token");
   const [reservation, setReservation] = useState<ReservationData | null>(null);
   const [loading, setLoading] = useState(!!reservationId);
   const [error, setError] = useState(!reservationId);
@@ -43,7 +44,8 @@ export default function ConfirmPage() {
   useEffect(() => {
     if (!reservationId) return;
 
-    fetch(`/api/reservations/${reservationId}`)
+    const tokenParam = accessToken ? `?token=${accessToken}` : "";
+    fetch(`/api/reservations/${reservationId}${tokenParam}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
         return res.json();
@@ -56,7 +58,7 @@ export default function ConfirmPage() {
         setError(true);
         setLoading(false);
       });
-  }, [reservationId]);
+  }, [reservationId, accessToken]);
 
   if (loading) {
     return (

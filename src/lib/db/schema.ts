@@ -27,6 +27,7 @@ export const reservations = sqliteTable("reservations", {
   status: text("status").notNull().default("pending"),
   totalAmount: integer("total_amount").notNull(),
   items: text("items").notNull(), // JSON
+  accessToken: text("access_token").notNull(),
   notes: text("notes"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull(),

@@ -96,7 +96,7 @@ export default function CheckoutForm() {
 
       // カートをクリアして確認ページへ
       clearCart();
-      router.push(`/checkout/confirm?id=${data.id}`);
+      router.push(`/checkout/confirm?id=${data.id}&token=${data.accessToken}`);
     } catch {
       setServerError(t("errors.serverError"));
     } finally {
