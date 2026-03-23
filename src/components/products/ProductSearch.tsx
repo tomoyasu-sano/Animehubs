@@ -41,7 +41,7 @@ export default function ProductSearch() {
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder={t("searchPlaceholder")}
-        className="w-full rounded-lg border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-muted-foreground focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+        className="w-full rounded-lg border border-border bg-card py-2.5 pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
       />
     </div>
   );

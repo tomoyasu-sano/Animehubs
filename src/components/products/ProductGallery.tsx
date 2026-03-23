@@ -25,7 +25,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
   return (
     <div className="space-y-4">
       {/* メイン画像 */}
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-card">
+      <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-card">
         <Image
           src={displayImages[selectedIndex]}
           alt={`${alt} - ${selectedIndex + 1}`}
@@ -66,7 +66,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
               className={cn(
                 "relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md transition-all",
                 selectedIndex === index
-                  ? "ring-2 ring-white"
+                  ? "ring-2 ring-foreground"
                   : "opacity-60 hover:opacity-100"
               )}
             >

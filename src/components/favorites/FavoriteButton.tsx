@@ -29,8 +29,8 @@ export default function FavoriteButton({
       className={cn(
         "rounded-full p-2 transition-all duration-200",
         isFavorite
-          ? "bg-white text-black hover:bg-accent"
-          : "bg-black/50 text-white hover:bg-black/70",
+          ? "bg-white text-red-500 ring-2 ring-white shadow-md hover:bg-neutral-100"
+          : "bg-white/80 text-neutral-600 shadow-sm hover:bg-white hover:text-red-400",
         className
       )}
       aria-label={isFavorite ? t("remove") : t("add")}

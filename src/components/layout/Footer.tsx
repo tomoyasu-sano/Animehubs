@@ -6,7 +6,7 @@ export default function Footer() {
   const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/animehubs_placeholder";
 
   return (
-    <footer className="border-t border-border bg-black">
+    <footer className="border-t border-neutral-800 bg-[var(--color-footer)]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* ブランド */}

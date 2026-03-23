@@ -29,7 +29,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* ページヘッダー */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">{t("products.title")}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{t("products.title")}</h1>
         <p className="mt-1 text-sm text-muted">
           {total} {t("products.items")}
         </p>

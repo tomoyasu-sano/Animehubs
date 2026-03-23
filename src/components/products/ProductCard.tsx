@@ -25,7 +25,7 @@ export default function ProductCard({ product, isFavorite, onToggleFavorite }: P
 
   return (
     <Link href={`/products/${product.id}`} className="group block">
-      <div className="relative aspect-square overflow-hidden rounded-lg bg-card transition-colors group-hover:bg-card-hover">
+      <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-card transition-colors group-hover:bg-card-hover">
         {/* 商品画像 */}
         <Image
           src={firstImage}
@@ -36,7 +36,7 @@ export default function ProductCard({ product, isFavorite, onToggleFavorite }: P
         />
 
         {/* お気に入りボタン */}
-        <div className="absolute right-3 top-3 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div className="absolute right-3 top-3">
           <FavoriteButton
             productId={product.id}
             isFavorite={isFavorite}
@@ -56,11 +56,11 @@ export default function ProductCard({ product, isFavorite, onToggleFavorite }: P
 
       {/* 商品情報 */}
       <div className="mt-3 space-y-1">
-        <h3 className="text-sm font-medium text-white line-clamp-2 transition-colors group-hover:text-accent">
+        <h3 className="text-sm font-medium text-foreground line-clamp-2 transition-colors group-hover:text-muted">
           {name}
         </h3>
         <div className="flex items-center justify-between">
-          <p className="text-base font-semibold text-white">{formatPrice(product.price)}</p>
+          <p className="text-base font-semibold text-foreground">{formatPrice(product.price)}</p>
           <span className="text-xs text-muted">{conditionLabel}</span>
         </div>
       </div>

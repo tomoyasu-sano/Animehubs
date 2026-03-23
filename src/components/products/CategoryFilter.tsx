@@ -32,8 +32,8 @@ export default function CategoryFilter() {
         className={cn(
           "rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
           !activeCategory
-            ? "bg-white text-black"
-            : "border border-border text-muted hover:border-accent hover:text-white"
+            ? "bg-foreground text-background"
+            : "border border-border text-muted hover:border-foreground hover:text-foreground"
         )}
       >
         {t("common.allCategories")}
@@ -45,8 +45,8 @@ export default function CategoryFilter() {
           className={cn(
             "rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
             activeCategory === category
-              ? "bg-white text-black"
-              : "border border-border text-muted hover:border-accent hover:text-white"
+              ? "bg-foreground text-background"
+              : "border border-border text-muted hover:border-foreground hover:text-foreground"
           )}
         >
           {CATEGORY_LABELS[category as Category]?.[locale as "en" | "sv"] || category}

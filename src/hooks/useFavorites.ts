@@ -4,17 +4,25 @@ import { useState, useCallback, useSyncExternalStore } from "react";
 
 const FAVORITES_KEY = "animehubs_favorites";
 
+const EMPTY_ARRAY: string[] = [];
+let cachedSnapshot: string[] = EMPTY_ARRAY;
+let cachedRaw: string | null = null;
+
 function getSnapshot(): string[] {
   try {
-    const stored = localStorage.getItem(FAVORITES_KEY);
-    return stored ? JSON.parse(stored) : [];
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    if (raw !== cachedRaw) {
+      cachedRaw = raw;
+      cachedSnapshot = raw ? JSON.parse(raw) : EMPTY_ARRAY;
+    }
+    return cachedSnapshot;
   } catch {
-    return [];
+    return EMPTY_ARRAY;
   }
 }
 
 function getServerSnapshot(): string[] {
-  return [];
+  return EMPTY_ARRAY;
 }
 
 function subscribe(callback: () => void): () => void {
