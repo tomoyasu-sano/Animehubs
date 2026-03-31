@@ -21,7 +21,7 @@ export default function AdminSalesPage() {
           router.push("/admin/login");
           return null;
         }
-        return res.json();
+        return res.json() as Promise<DashboardStats>;
       })
       .then((data) => {
         if (data) setStats(data);

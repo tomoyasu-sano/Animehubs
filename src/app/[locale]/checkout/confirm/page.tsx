@@ -48,7 +48,7 @@ export default function ConfirmPage() {
     fetch(`/api/reservations/${reservationId}${tokenParam}`)
       .then((res) => {
         if (!res.ok) throw new Error("Not found");
-        return res.json();
+        return res.json() as Promise<ReservationData>;
       })
       .then((data) => {
         setReservation(data);

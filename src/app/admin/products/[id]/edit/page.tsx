@@ -29,7 +29,7 @@ export default function AdminEditProductPage({
           setError("Product not found.");
           return null;
         }
-        return res.json();
+        return res.json() as Promise<Product>;
       })
       .then((data) => {
         if (data) setProduct(data);

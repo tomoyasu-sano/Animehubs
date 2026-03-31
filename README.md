@@ -10,9 +10,9 @@
 
 | 領域 | 技術 |
 |------|------|
-| フロントエンド | Next.js 15 (App Router) + TypeScript |
+| フロントエンド | Next.js 16 (App Router) + TypeScript |
 | スタイル | Tailwind CSS v4 + shadcn/ui |
-| DB | SQLite + Drizzle ORM (better-sqlite3) |
+| DB | Cloudflare D1 (SQLite互換) + Drizzle ORM |
 | メール | Resend + React Email |
 | 多言語 | next-intl (en / sv) |
 | テスト | Vitest + React Testing Library |
@@ -59,7 +59,46 @@ npm run db:seed      # シードデータ投入
 
 ## デプロイ
 
-Cloudflare Pages + D1 へのデプロイ手順は [docs/cloudflare-deployment.md](docs/cloudflare-deployment.md) を参照。
+Cloudflare Workers + D1 構成。`@opennextjs/cloudflare` を使用。
+
+### 自動デプロイ（通常の開発フロー）
+
+```
+git push origin main
+    ↓
+GitHub webhook → Cloudflare がトリガー
+    ↓
+npm ci → npx @opennextjs/cloudflare build → npx wrangler deploy
+    ↓
+デプロイ完了
+```
+
+**main ブランチに push するだけで自動ビルド＆デプロイされる。**
+進捗は Cloudflare ダッシュボード「Deployments」タブで確認。
+
+### 初回セットアップ済み内容（備忘録）
+
+| 項目 | 内容 |
+|------|------|
+| Cloudflare プロジェクト名 | `animehubs` |
+| D1 データベース名 | `animehubs-db` |
+| D1 データベース ID | `6193c47d-7779-46b8-a5a0-14adb909ed99` |
+| Build command | `npx @opennextjs/cloudflare build` |
+| Deploy command | `npx wrangler deploy` |
+| 設定ファイル | `wrangler.toml`, `open-next.config.ts` |
+
+### D1 マイグレーション（初回のみ）
+
+```bash
+npx wrangler d1 execute animehubs-db --file=./src/lib/db/migrations/0000_init.sql --remote
+```
+
+### 画像アップロードについて
+
+現在 `/api/upload` は **503** を返す（Cloudflare R2 未設定）。
+画像を追加したい場合は `public/uploads/` にファイルを置いて commit & push する。
+
+詳細手順は [docs/cloudflare-deployment.md](docs/cloudflare-deployment.md) を参照。
 
 ## 受け渡し場所
 

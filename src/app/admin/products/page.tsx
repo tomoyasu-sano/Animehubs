@@ -33,7 +33,7 @@ export default function AdminProductsPage() {
         router.push("/admin/login");
         return;
       }
-      const data = await res.json();
+      const data = await res.json() as { items: Product[]; total: number };
       setProducts(data.items || []);
       setTotal(data.total || 0);
     } catch (error) {

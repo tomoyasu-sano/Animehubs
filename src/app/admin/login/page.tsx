@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ password }),
       });
 
-      const data = await res.json();
+      const data = await res.json() as { error?: string };
 
       if (!res.ok) {
         setError(data.error || "Login failed");

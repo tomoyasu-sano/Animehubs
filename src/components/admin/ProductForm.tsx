@@ -55,12 +55,12 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.json() as { error?: string };
         setError(data.error || "Upload failed");
         return;
       }
 
-      const data = await res.json();
+      const data = await res.json() as { paths: string[] };
       setImages((prev) => [...prev, ...data.paths]);
     } catch {
       setError("Upload failed. Please try again.");
@@ -115,7 +115,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await res.json() as { error?: string };
         setError(data.error || "Failed to save product.");
         return;
       }

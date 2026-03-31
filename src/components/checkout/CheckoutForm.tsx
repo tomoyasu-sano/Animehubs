@@ -87,7 +87,7 @@ export default function CheckoutForm() {
         body: JSON.stringify(body),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string; id?: string; accessToken?: string };
 
       if (!response.ok) {
         setServerError(data.error || t("errors.serverError"));
