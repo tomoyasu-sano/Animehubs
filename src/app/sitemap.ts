@@ -1,14 +1,12 @@
 import type { MetadataRoute } from "next";
 import { getProducts } from "@/lib/db/queries";
-import { initializeDatabase } from "@/lib/db";
 import { getSiteUrl } from "@/lib/seo";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
   const locales = ["en", "sv"];
   const now = new Date();
 
-  // 静的ページ
   const staticPages = ["", "/products", "/cart", "/checkout", "/privacy"];
 
   const staticEntries: MetadataRoute.Sitemap = staticPages.flatMap((page) =>
@@ -20,11 +18,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }))
   );
 
-  // 動的ページ（商品詳細）
   let productEntries: MetadataRoute.Sitemap = [];
   try {
-    initializeDatabase();
-    const { items: allProducts } = getProducts({});
+    const { items: allProducts } = await getProducts({});
     productEntries = allProducts.flatMap((product) =>
       locales.map((locale) => ({
         url: `${siteUrl}/${locale}/products/${product.id}`,
@@ -34,7 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       }))
     );
   } catch {
-    // DB未初期化時はスキップ
+    // DB未接続時はスキップ
   }
 
   return [...staticEntries, ...productEntries];

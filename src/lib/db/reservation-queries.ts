@@ -2,7 +2,6 @@ import { getDb } from "./index";
 import { products, reservations } from "./schema";
 import { eq, sql } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import crypto from "crypto";
 import type { Reservation } from "./schema";
 import type { ReservationItemInput } from "../validation";
 
@@ -102,7 +101,9 @@ export async function createReservation(input: CreateReservationInput): Promise<
           .run();
       }
 
-      const accessToken = crypto.randomBytes(16).toString("hex");
+      const bytes = new Uint8Array(16);
+      globalThis.crypto.getRandomValues(bytes);
+      const accessToken = Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
       await tx.insert(reservations)
         .values({
           id,
