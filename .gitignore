@@ -45,3 +45,4 @@ next-env.d.ts
 /public/images/products/*
 !/public/images/products/.gitkeep
 /public/uploads/*
+.wrangler/

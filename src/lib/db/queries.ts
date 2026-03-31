@@ -11,14 +11,11 @@ interface GetProductsOptions {
   offset?: number;
 }
 
-/**
- * 商品一覧を取得
- */
-export function getProducts(options: GetProductsOptions = {}): {
+export async function getProducts(options: GetProductsOptions = {}): Promise<{
   items: Product[];
   total: number;
-} {
-  const db = getDb();
+}> {
+  const db = await getDb();
   const conditions = [];
 
   if (options.category) {
@@ -43,8 +40,7 @@ export function getProducts(options: GetProductsOptions = {}): {
 
   const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-  // 総件数を取得
-  const countResult = db
+  const countResult = await db
     .select({ count: sql<number>`count(*)` })
     .from(products)
     .where(whereClause)
@@ -52,7 +48,6 @@ export function getProducts(options: GetProductsOptions = {}): {
 
   const total = countResult?.count || 0;
 
-  // 商品を取得
   let query = db
     .select()
     .from(products)
@@ -67,15 +62,12 @@ export function getProducts(options: GetProductsOptions = {}): {
     query = query.offset(options.offset) as typeof query;
   }
 
-  const items = query.all();
+  const items = await query.all();
 
   return { items, total };
 }
 
-/**
- * 商品をIDで取得
- */
-export function getProductById(id: string): Product | undefined {
-  const db = getDb();
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const db = await getDb();
   return db.select().from(products).where(eq(products.id, id)).get();
 }

@@ -21,15 +21,12 @@ export interface StockCheckResult {
   outOfStock: { productId: string; nameEn: string; requested: number; available: number }[];
 }
 
-/**
- * 在庫チェック（トランザクション外で事前確認用）
- */
-export function checkStock(items: ReservationItemInput[]): StockCheckResult {
-  const db = getDb();
+export async function checkStock(items: ReservationItemInput[]): Promise<StockCheckResult> {
+  const db = await getDb();
   const outOfStock: StockCheckResult["outOfStock"] = [];
 
   for (const item of items) {
-    const product = db.select().from(products).where(eq(products.id, item.productId)).get();
+    const product = await db.select().from(products).where(eq(products.id, item.productId)).get();
     if (!product) {
       outOfStock.push({
         productId: item.productId,
@@ -52,26 +49,21 @@ export function checkStock(items: ReservationItemInput[]): StockCheckResult {
   return { ok: outOfStock.length === 0, outOfStock };
 }
 
-/**
- * 予約を作成（在庫確認 + 在庫減算をアトミックに実行）
- */
-export function createReservation(input: CreateReservationInput): {
+export async function createReservation(input: CreateReservationInput): Promise<{
   ok: boolean;
   reservation?: Reservation;
   outOfStock?: StockCheckResult["outOfStock"];
-} {
-  const db = getDb();
+}> {
+  const db = await getDb();
   const now = new Date().toISOString();
   const id = uuidv4();
 
-  // SQLite は better-sqlite3 で同期的にトランザクション実行
-  // drizzle-orm の transaction を使用
   try {
-    const result = db.transaction((tx) => {
-      // 在庫確認
+    const result = await db.transaction(async (tx) => {
       const outOfStock: StockCheckResult["outOfStock"] = [];
+
       for (const item of input.items) {
-        const product = tx
+        const product = await tx
           .select()
           .from(products)
           .where(eq(products.id, item.productId))
@@ -100,9 +92,8 @@ export function createReservation(input: CreateReservationInput): {
         return { ok: false as const, outOfStock };
       }
 
-      // 在庫減算
       for (const item of input.items) {
-        tx.update(products)
+        await tx.update(products)
           .set({
             stock: sql`${products.stock} - ${item.quantity}`,
             updatedAt: now,
@@ -111,9 +102,8 @@ export function createReservation(input: CreateReservationInput): {
           .run();
       }
 
-      // 予約作成
       const accessToken = crypto.randomBytes(16).toString("hex");
-      tx.insert(reservations)
+      await tx.insert(reservations)
         .values({
           id,
           customerName: input.customerName,
@@ -137,8 +127,7 @@ export function createReservation(input: CreateReservationInput): {
       return { ok: false, outOfStock: result.outOfStock };
     }
 
-    // 作成した予約を取得して返す
-    const reservation = db
+    const reservation = await db
       .select()
       .from(reservations)
       .where(eq(reservations.id, id))
@@ -151,25 +140,19 @@ export function createReservation(input: CreateReservationInput): {
   }
 }
 
-/**
- * 予約をIDで取得
- */
-export function getReservationById(id: string): Reservation | undefined {
-  const db = getDb();
+export async function getReservationById(id: string): Promise<Reservation | undefined> {
+  const db = await getDb();
   return db.select().from(reservations).where(eq(reservations.id, id)).get();
 }
 
-/**
- * 予約ステータスを更新
- */
-export function updateReservationStatus(
+export async function updateReservationStatus(
   id: string,
   status: "pending" | "confirmed" | "completed" | "cancelled"
-): Reservation | undefined {
-  const db = getDb();
+): Promise<Reservation | undefined> {
+  const db = await getDb();
   const now = new Date().toISOString();
 
-  db.update(reservations)
+  await db.update(reservations)
     .set({ status, updatedAt: now })
     .where(eq(reservations.id, id))
     .run();

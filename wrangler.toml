@@ -1,0 +1,10 @@
+name = "animehubs"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+pages_build_output_dir = ".open-next/assets"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "animehubs-db"
+database_id = "6193c47d-7779-46b8-a5a0-14adb909ed99"

@@ -14,16 +14,20 @@
     "test:coverage": "vitest run --coverage",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx src/lib/db/seed.ts"
+    "db:seed": "tsx src/lib/db/seed.ts",
+    "build:cf": "npx @opennextjs/cloudflare build",
+    "preview:cf": "npx wrangler pages dev",
+    "db:migrate:cf": "npx wrangler d1 execute animehubs-db --file=./src/lib/db/migrations/0000_init.sql --remote",
+    "db:seed:cf": "npx wrangler d1 execute animehubs-db --file=./src/lib/db/seed.sql --remote"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.18.0",
     "@react-email/components": "^1.0.10",
     "@tailwindcss/postcss": "^4.2.2",
     "@types/node": "^25.5.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.8.0",
     "drizzle-orm": "^0.45.1",
     "jsonwebtoken": "^9.0.3",
     "next": "^16.2.1",
@@ -33,17 +37,15 @@
     "react-dom": "^19.2.4",
     "react-email": "^5.2.10",
     "resend": "^6.9.4",
-    "sharp": "^0.34.5",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260331.1",
     "@eslint/eslintrc": "^3.3.5",
     "@types/bcryptjs": "^2.4.6",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/sharp": "^0.31.1",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.0",
@@ -55,6 +57,7 @@
     "lucide-react": "^1.0.1",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.0",
+    "wrangler": "^4.79.0"
   }
 }

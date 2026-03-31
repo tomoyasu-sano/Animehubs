@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProducts } from "@/lib/db/queries";
 
+export const runtime = "edge";
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
@@ -10,7 +12,7 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : undefined;
     const offset = searchParams.get("offset") ? parseInt(searchParams.get("offset")!) : undefined;
 
-    const result = getProducts({ search, category, featured, limit, offset });
+    const result = await getProducts({ search, category, featured, limit, offset });
 
     return NextResponse.json(result);
   } catch (error) {

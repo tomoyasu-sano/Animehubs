@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
 import { getProducts } from "@/lib/db/queries";
-import { initializeDatabase } from "@/lib/db";
 import ProductGrid from "@/components/products/ProductGrid";
 import { generatePageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
@@ -27,11 +26,7 @@ export async function generateMetadata({
 export default async function HomePage() {
   const t = await getTranslations();
 
-  // DB初期化（テーブルが無い場合に作成）
-  initializeDatabase();
-
-  // 注目商品を取得
-  const { items: featuredProducts } = getProducts({ featured: true, limit: 6 });
+  const { items: featuredProducts } = await getProducts({ featured: true, limit: 6 });
 
   return (
     <div>

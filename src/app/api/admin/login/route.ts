@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminPassword, generateToken, getAdminCookieName } from "@/lib/auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-// 1分間に5回まで
+export const runtime = "edge";
+
 const LOGIN_RATE_LIMIT = 5;
 const LOGIN_WINDOW_MS = 60_000;
 
@@ -15,28 +16,20 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
-    const { password } = body;
+    const body = await request.json() as Record<string, unknown>;
+    const { password } = body as { password: string };
 
     if (!password) {
-      return NextResponse.json(
-        { error: "Password is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Password is required" }, { status: 400 });
     }
 
     if (!(await verifyAdminPassword(password))) {
-      return NextResponse.json(
-        { error: "Invalid password" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
     const token = generateToken();
 
-    const response = NextResponse.json({
-      message: "Login successful",
-    });
+    const response = NextResponse.json({ message: "Login successful" });
 
     response.cookies.set(getAdminCookieName(), token, {
       httpOnly: true,
@@ -49,9 +42,6 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Login error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

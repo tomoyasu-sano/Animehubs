@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { initializeDatabase } from "@/lib/db";
 import { getAdminFromRequest } from "@/lib/auth";
 import { updateProduct, deleteProduct } from "@/lib/db/admin-queries";
 import { getProductById } from "@/lib/db/queries";
+
+export const runtime = "edge";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    initializeDatabase();
-
     const admin = getAdminFromRequest(request);
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
-    const product = getProductById(id);
+    const product = await getProductById(id);
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
@@ -25,10 +24,7 @@ export async function GET(
     return NextResponse.json(product);
   } catch (error) {
     console.error("Admin product GET error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -37,15 +33,13 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    initializeDatabase();
-
     const admin = getAdminFromRequest(request);
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown>;
 
     const updateData: Record<string, unknown> = {};
     if (body.nameEn !== undefined) updateData.nameEn = body.nameEn;
@@ -59,7 +53,7 @@ export async function PUT(
     if (body.images !== undefined) updateData.images = body.images;
     if (body.featured !== undefined) updateData.featured = body.featured ? 1 : 0;
 
-    const product = updateProduct(id, updateData);
+    const product = await updateProduct(id, updateData);
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
@@ -67,10 +61,7 @@ export async function PUT(
     return NextResponse.json(product);
   } catch (error) {
     console.error("Admin product PUT error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
@@ -79,15 +70,13 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    initializeDatabase();
-
     const admin = getAdminFromRequest(request);
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
-    const deleted = deleteProduct(id);
+    const deleted = await deleteProduct(id);
     if (!deleted) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
@@ -95,9 +84,6 @@ export async function DELETE(
     return NextResponse.json({ message: "Product deleted successfully" });
   } catch (error) {
     console.error("Admin product DELETE error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

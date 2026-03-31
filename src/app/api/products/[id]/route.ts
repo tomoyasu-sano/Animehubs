@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProductById } from "@/lib/db/queries";
 
+export const runtime = "edge";
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const product = getProductById(id);
+    const product = await getProductById(id);
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });

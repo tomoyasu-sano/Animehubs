@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getProductById } from "@/lib/db/queries";
-import { initializeDatabase } from "@/lib/db";
 import { formatPrice, getLocalizedField } from "@/lib/utils";
 import { CATEGORY_LABELS, CONDITION_LABELS, type Category, type Condition } from "@/lib/constants";
 import ProductGallery from "@/components/products/ProductGallery";
@@ -21,8 +20,7 @@ export async function generateMetadata({
 }: ProductDetailPageProps): Promise<Metadata> {
   const { id, locale } = await params;
 
-  initializeDatabase();
-  const product = getProductById(id);
+  const product = await getProductById(id);
 
   if (!product) {
     return { title: "Not Found" };
@@ -56,9 +54,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const locale = await getLocale();
   const { id } = await params;
 
-  initializeDatabase();
-
-  const product = getProductById(id);
+  const product = await getProductById(id);
   if (!product) {
     notFound();
   }

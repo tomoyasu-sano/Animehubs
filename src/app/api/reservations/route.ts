@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { initializeDatabase } from "@/lib/db";
 import { createReservation } from "@/lib/db/reservation-queries";
 import { validateReservation, type ReservationInput } from "@/lib/validation";
 import { sendConfirmationEmail } from "@/lib/email/send-confirmation";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-// 1分間に5件まで
+export const runtime = "edge";
+
 const RESERVATION_RATE_LIMIT = 5;
 const RESERVATION_WINDOW_MS = 60_000;
 
@@ -18,20 +18,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    initializeDatabase();
+    const body = await request.json() as Record<string, unknown>;
 
-    const body = await request.json();
-
-    // バリデーション
     const input: ReservationInput = {
-      customerName: body.customerName,
-      customerEmail: body.customerEmail,
-      location: body.location,
-      timeSlot: body.timeSlot,
-      items: body.items || [],
-      totalAmount: body.totalAmount,
-      notes: body.notes,
-      locale: body.locale || "en",
+      customerName: body.customerName as string,
+      customerEmail: body.customerEmail as string,
+      location: body.location as string,
+      timeSlot: body.timeSlot as string,
+      items: (body.items as ReservationInput["items"]) || [],
+      totalAmount: body.totalAmount as number,
+      notes: body.notes as string | undefined,
+      locale: (body.locale as string) || "en",
     };
 
     const validationErrors = validateReservation(input);
@@ -42,8 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 予約作成（在庫確認 + 減算をトランザクションで）
-    const result = createReservation({
+    const result = await createReservation({
       customerName: input.customerName,
       customerEmail: input.customerEmail,
       location: input.location,
@@ -55,15 +51,11 @@ export async function POST(request: NextRequest) {
 
     if (!result.ok) {
       return NextResponse.json(
-        {
-          error: "Out of stock",
-          outOfStock: result.outOfStock,
-        },
+        { error: "Out of stock", outOfStock: result.outOfStock },
         { status: 409 }
       );
     }
 
-    // メール送信（失敗しても予約自体は成功として扱う）
     if (result.reservation) {
       const emailResult = await sendConfirmationEmail({
         reservation: result.reservation,
@@ -86,9 +78,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Reservation API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

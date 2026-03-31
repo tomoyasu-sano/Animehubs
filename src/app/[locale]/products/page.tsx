@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import { getProducts } from "@/lib/db/queries";
-import { initializeDatabase } from "@/lib/db";
 import ProductGrid from "@/components/products/ProductGrid";
 import ProductSearch from "@/components/products/ProductSearch";
 import CategoryFilter from "@/components/products/CategoryFilter";
@@ -34,10 +33,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   const t = await getTranslations();
   const params = await searchParams;
 
-  // DB初期化（テーブルが無い場合に作成）
-  initializeDatabase();
-
-  const { items: productsList, total } = getProducts({
+  const { items: productsList, total } = await getProducts({
     search: params.q,
     category: params.category,
   });
