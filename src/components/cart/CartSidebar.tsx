@@ -105,22 +105,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 {formatPrice(totalAmount)}
               </span>
             </div>
-            <div className="flex flex-col gap-2">
-              <Link
-                href="/checkout"
-                onClick={onClose}
-                className="block w-full rounded-lg bg-foreground py-3 text-center text-sm font-semibold text-background transition-colors hover:bg-accent"
-              >
-                {t("checkout")}
-              </Link>
-              <Link
-                href="/cart"
-                onClick={onClose}
-                className="block w-full rounded-lg border border-border py-3 text-center text-sm font-medium text-foreground transition-colors hover:bg-card"
-              >
-                {t("viewCart")}
-              </Link>
-            </div>
+            <Link
+              href="/cart"
+              onClick={onClose}
+              className="block w-full rounded-lg bg-foreground py-3 text-center text-sm font-semibold text-background transition-colors hover:bg-accent"
+            >
+              {t("checkout")}
+            </Link>
           </div>
         )}
       </div>

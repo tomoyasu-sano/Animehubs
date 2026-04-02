@@ -11,6 +11,9 @@ export const PROTECTED_PATHS = [
   "/account",
 ] as const;
 
+// 保護対象から除外するパス（Stripe リダイレクト先など）
+const PROTECTED_EXCEPTIONS = ["/checkout/complete"] as const;
+
 // 管理者専用パス
 export const ADMIN_PATHS = ["/admin"] as const;
 
@@ -35,6 +38,14 @@ function extractLocale(pathname: string): string {
  */
 export function isProtectedPath(pathname: string): boolean {
   const stripped = stripLocale(pathname);
+  // 例外パスは保護対象外
+  if (
+    PROTECTED_EXCEPTIONS.some(
+      (p) => stripped === p || stripped.startsWith(p + "/"),
+    )
+  ) {
+    return false;
+  }
   return PROTECTED_PATHS.some(
     (p) => stripped === p || stripped.startsWith(p + "/"),
   );

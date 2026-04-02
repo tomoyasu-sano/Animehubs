@@ -82,6 +82,10 @@ export const DEFAULT_LOCALE: Locale = "en";
 export const CURRENCY = "SEK" as const;
 export const CURRENCY_SYMBOL = "kr";
 
+// 送料設定（öre単位: 1 SEK = 100 öre）
+export const FREE_SHIPPING_THRESHOLD_ORE = 79900; // 799 SEK
+export const SHIPPING_FEE_ORE = 7900; // 79 SEK
+
 // 管理者メールアドレス（Googleログイン時に自動で role='admin' 付与）
 export const ADMIN_EMAILS = [
   "anytimes.sano@gmail.com",
