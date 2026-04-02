@@ -11,7 +11,7 @@ interface ProductGridProps {
 
 export default function ProductGrid({ products }: ProductGridProps) {
   const t = useTranslations("products");
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorite, toggleFavorite, getLikesDelta } = useFavorites();
 
   if (products.length === 0) {
     return (
@@ -30,6 +30,7 @@ export default function ProductGrid({ products }: ProductGridProps) {
           product={product}
           isFavorite={isFavorite(product.id)}
           onToggleFavorite={toggleFavorite}
+          likesDelta={getLikesDelta(product.id)}
         />
       ))}
     </div>

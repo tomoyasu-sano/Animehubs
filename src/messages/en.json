@@ -13,7 +13,10 @@
     "loading": "Loading...",
     "error": "Something went wrong",
     "notFound": "Not found",
-    "backToHome": "Back to Home"
+    "backToHome": "Back to Home",
+    "login": "Log in",
+    "logout": "Log out",
+    "myPage": "My Page"
   },
   "home": {
     "heroTitle": "Curated Anime Figures",
@@ -37,7 +40,8 @@
     "details": "Details",
     "description": "Description",
     "gallery": "Gallery",
-    "items": "items"
+    "items": "items",
+    "onlyLeft": "Only {count} left"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -96,7 +100,13 @@
   "favorites": {
     "add": "Add to favorites",
     "remove": "Remove from favorites",
-    "empty": "No favorites yet"
+    "empty": "No favorites yet",
+    "title": "My Favorites",
+    "addToCart": "Add to Cart",
+    "addedToCart": "Added!",
+    "stockLimit": "Max quantity reached",
+    "outOfStock": "Out of Stock",
+    "onlyLeft": "Only {count} left"
   },
   "footer": {
     "contact": "Contact Us",

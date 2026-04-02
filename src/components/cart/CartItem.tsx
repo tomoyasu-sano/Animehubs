@@ -54,7 +54,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemP
             </span>
             <button
               onClick={() => onUpdateQuantity(item.productId, item.quantity + 1)}
-              disabled={item.quantity >= item.stock}
+              disabled={item.quantity >= item.stock - item.reservedStock}
               className="flex h-7 w-7 items-center justify-center rounded border border-border text-muted transition-colors hover:border-foreground hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
               aria-label={t("increase")}
             >

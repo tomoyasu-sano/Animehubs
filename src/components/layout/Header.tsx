@@ -2,8 +2,9 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { Heart, ShoppingCart, Menu, X, Globe } from "lucide-react";
+import { Heart, ShoppingCart, Menu, X, Globe, LogIn, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 import CartSidebar from "@/components/cart/CartSidebar";
@@ -16,6 +17,8 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const { totalItems } = useCart();
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
 
   const handleLocaleSwitch = () => {
     const newLocale = locale === "en" ? "sv" : "en";
@@ -66,7 +69,7 @@ export default function Header() {
 
             {/* お気に入り */}
             <Link
-              href="/products"
+              href="/favorites"
               className="rounded-md p-2 text-muted transition-colors hover:text-white"
               aria-label={t("common.favorites")}
             >
@@ -86,6 +89,26 @@ export default function Header() {
                 </span>
               )}
             </button>
+
+            {/* ログイン/ログアウト */}
+            {isAuthenticated ? (
+              <button
+                onClick={() => signOut({ callbackUrl: `/${locale}` })}
+                className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-colors hover:text-white"
+                aria-label={t("common.logout")}
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("common.logout")}</span>
+              </button>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-colors hover:text-white"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="hidden sm:inline">{t("common.login")}</span>
+              </Link>
+            )}
 
             {/* モバイルメニュートグル */}
             <button

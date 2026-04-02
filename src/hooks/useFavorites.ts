@@ -1,75 +1,119 @@
 "use client";
 
-import { useState, useCallback, useSyncExternalStore } from "react";
-
-const FAVORITES_KEY = "animehubs_favorites";
-
-const EMPTY_ARRAY: string[] = [];
-let cachedSnapshot: string[] = EMPTY_ARRAY;
-let cachedRaw: string | null = null;
-
-function getSnapshot(): string[] {
-  try {
-    const raw = localStorage.getItem(FAVORITES_KEY);
-    if (raw !== cachedRaw) {
-      cachedRaw = raw;
-      cachedSnapshot = raw ? JSON.parse(raw) : EMPTY_ARRAY;
-    }
-    return cachedSnapshot;
-  } catch {
-    return EMPTY_ARRAY;
-  }
-}
-
-function getServerSnapshot(): string[] {
-  return EMPTY_ARRAY;
-}
-
-function subscribe(callback: () => void): () => void {
-  // storage イベントで他タブの変更も検知
-  window.addEventListener("storage", callback);
-  return () => window.removeEventListener("storage", callback);
-}
+import { useState, useCallback, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 
 export function useFavorites() {
-  const externalFavorites = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const [localFavorites, setLocalFavorites] = useState<string[] | null>(null);
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const pathname = usePathname();
+  const locale = useLocale();
 
-  // ローカル状態がある場合はそちらを優先（即時反映のため）
-  const favorites = localFavorites ?? externalFavorites;
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  // likesCount の楽観的更新差分（productId → delta）
+  const [likesDeltas, setLikesDeltas] = useState<Record<string, number>>({});
 
-  const saveFavorites = useCallback((newFavorites: string[]) => {
-    try {
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
-    } catch {
-      // 保存失敗時は無視
+  // 認証済みの場合、APIからお気に入り一覧を取得
+  /* eslint-disable react-hooks/set-state-in-effect -- 未認証時リセットはstatus変化起因でカスケード問題なし */
+  useEffect(() => {
+    if (status !== "authenticated") {
+      setFavoriteIds([]);
+      setIsLoaded(status === "unauthenticated");
+      return;
     }
-    setLocalFavorites(newFavorites);
-  }, []);
+
+    let cancelled = false;
+
+    async function fetchFavorites() {
+      try {
+        const res = await fetch("/api/favorites");
+        if (!res.ok) return;
+        const data = (await res.json()) as { productId: string }[];
+        if (!cancelled) {
+          setFavoriteIds(data.map((f) => f.productId));
+          setIsLoaded(true);
+        }
+      } catch {
+        if (!cancelled) setIsLoaded(true);
+      }
+    }
+
+    fetchFavorites();
+    return () => {
+      cancelled = true;
+    };
+  }, [status]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const isFavorite = useCallback(
+    (productId: string) => favoriteIds.includes(productId),
+    [favoriteIds],
+  );
 
   const toggleFavorite = useCallback(
     (productId: string) => {
-      const current = localFavorites ?? externalFavorites;
-      const newFavorites = current.includes(productId)
-        ? current.filter((id) => id !== productId)
-        : [...current, productId];
-      saveFavorites(newFavorites);
+      // 未認証の場合はログインページへリダイレクト
+      if (status !== "authenticated" || !session?.user) {
+        const loginUrl = `/${locale}/auth/login?callbackUrl=${encodeURIComponent(pathname)}`;
+        router.push(loginUrl);
+        return;
+      }
+
+      const isCurrentlyFavorite = favoriteIds.includes(productId);
+
+      // 楽観的更新
+      if (isCurrentlyFavorite) {
+        setFavoriteIds((prev) => prev.filter((id) => id !== productId));
+        setLikesDeltas((prev) => ({ ...prev, [productId]: (prev[productId] ?? 0) - 1 }));
+      } else {
+        setFavoriteIds((prev) => [...prev, productId]);
+        setLikesDeltas((prev) => ({ ...prev, [productId]: (prev[productId] ?? 0) + 1 }));
+      }
+
+      // API呼び出し（バックグラウンド）
+      const apiCall = isCurrentlyFavorite
+        ? fetch(`/api/favorites/${productId}`, { method: "DELETE" })
+        : fetch("/api/favorites", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId }),
+          });
+
+      const rollback = () => {
+        if (isCurrentlyFavorite) {
+          setFavoriteIds((prev) => [...prev, productId]);
+          setLikesDeltas((prev) => ({ ...prev, [productId]: (prev[productId] ?? 0) + 1 }));
+        } else {
+          setFavoriteIds((prev) => prev.filter((id) => id !== productId));
+          setLikesDeltas((prev) => ({ ...prev, [productId]: (prev[productId] ?? 0) - 1 }));
+        }
+      };
+
+      apiCall
+        .then((res) => {
+          if (!res.ok) rollback();
+        })
+        .catch(() => {
+          rollback();
+        });
     },
-    [localFavorites, externalFavorites, saveFavorites]
+    [status, session, favoriteIds, locale, pathname, router],
   );
 
-  const isFavorite = useCallback(
-    (productId: string) => {
-      return favorites.includes(productId);
-    },
-    [favorites]
+  const getLikesDelta = useCallback(
+    (productId: string) => likesDeltas[productId] ?? 0,
+    [likesDeltas],
   );
 
   return {
-    favorites,
-    isLoaded: true,
+    favorites: favoriteIds,
+    isLoaded,
     toggleFavorite,
     isFavorite,
-    count: favorites.length,
+    getLikesDelta,
+    count: favoriteIds.length,
   };
 }

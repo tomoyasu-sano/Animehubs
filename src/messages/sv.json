@@ -13,7 +13,10 @@
     "loading": "Laddar...",
     "error": "Nagot gick fel",
     "notFound": "Hittades inte",
-    "backToHome": "Tillbaka till startsidan"
+    "backToHome": "Tillbaka till startsidan",
+    "login": "Logga in",
+    "logout": "Logga ut",
+    "myPage": "Min sida"
   },
   "home": {
     "heroTitle": "Utvalda animefigurer",
@@ -37,7 +40,8 @@
     "details": "Detaljer",
     "description": "Beskrivning",
     "gallery": "Galleri",
-    "items": "artiklar"
+    "items": "artiklar",
+    "onlyLeft": "Bara {count} kvar"
   },
   "cart": {
     "title": "Varukorg",
@@ -96,7 +100,13 @@
   "favorites": {
     "add": "Lagg till i favoriter",
     "remove": "Ta bort fran favoriter",
-    "empty": "Inga favoriter annu"
+    "empty": "Inga favoriter annu",
+    "title": "Mina favoriter",
+    "addToCart": "Lagg i varukorg",
+    "addedToCart": "Tillagd!",
+    "stockLimit": "Max antal natt",
+    "outOfStock": "Slutsald",
+    "onlyLeft": "Bara {count} kvar"
   },
   "footer": {
     "contact": "Kontakta oss",

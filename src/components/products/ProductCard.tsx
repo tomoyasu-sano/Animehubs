@@ -12,16 +12,29 @@ interface ProductCardProps {
   product: Product;
   isFavorite: boolean;
   onToggleFavorite: (productId: string) => void;
+  likesDelta?: number;
 }
 
-export default function ProductCard({ product, isFavorite, onToggleFavorite }: ProductCardProps) {
+export default function ProductCard({ product, isFavorite, onToggleFavorite, likesDelta = 0 }: ProductCardProps) {
   const locale = useLocale();
   const t = useTranslations("products");
   const name = getLocalizedField(product, "name", locale);
-  const images: string[] = JSON.parse(product.images);
+  let images: string[] = [];
+  try {
+    const parsed: unknown = JSON.parse(product.images);
+    if (Array.isArray(parsed)) {
+      images = parsed.filter((v): v is string => typeof v === "string");
+    }
+  } catch {
+    // 不正なJSON — フォールバック
+  }
   const firstImage = images[0] || "/placeholder/no-image.svg";
   const conditionLabel =
     CONDITION_LABELS[product.condition as Condition]?.[locale as "en" | "sv"] || product.condition;
+
+  const availableStock = product.stock - product.reservedStock;
+  const isOutOfStock = availableStock <= 0;
+  const isLowStock = !isOutOfStock && availableStock <= 3;
 
   return (
     <Link href={`/products/${product.id}`} className="group block">
@@ -41,11 +54,21 @@ export default function ProductCard({ product, isFavorite, onToggleFavorite }: P
             productId={product.id}
             isFavorite={isFavorite}
             onToggle={onToggleFavorite}
+            likesCount={Math.max(0, product.likesCount + likesDelta)}
           />
         </div>
 
+        {/* 在庫ステータスバッジ */}
+        {isLowStock && (
+          <div className="absolute left-3 top-3">
+            <span className="rounded-md bg-amber-500/90 px-2 py-1 text-xs font-medium text-white">
+              {t("onlyLeft", { count: availableStock })}
+            </span>
+          </div>
+        )}
+
         {/* 在庫切れオーバーレイ */}
-        {product.stock === 0 && (
+        {isOutOfStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/60">
             <span className="rounded-md bg-black px-3 py-1 text-sm font-medium text-white">
               {t("outOfStock")}

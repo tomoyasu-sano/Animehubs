@@ -10,7 +10,7 @@ interface ProductDetailActionsProps {
 }
 
 export default function ProductDetailActions({ product }: ProductDetailActionsProps) {
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFavorite, toggleFavorite, getLikesDelta } = useFavorites();
 
   return (
     <div className="flex gap-3 border-t border-border pt-6">
@@ -19,6 +19,7 @@ export default function ProductDetailActions({ product }: ProductDetailActionsPr
         productId={product.id}
         isFavorite={isFavorite(product.id)}
         onToggle={toggleFavorite}
+        likesCount={Math.max(0, product.likesCount + getLikesDelta(product.id))}
         className="!rounded-lg !p-3"
       />
     </div>

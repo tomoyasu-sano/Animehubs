@@ -77,3 +77,13 @@ export const CONDITION_LABELS: Record<Condition, { en: string; sv: string }> = {
 export const LOCALES = ["en", "sv"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
+
+// 通貨設定（将来EUR切り替え時はここだけ変更）
+export const CURRENCY = "SEK" as const;
+export const CURRENCY_SYMBOL = "kr";
+
+// 管理者メールアドレス（Googleログイン時に自動で role='admin' 付与）
+export const ADMIN_EMAILS = [
+  "anytimes.sano@gmail.com",
+  "asa5ng13@gmail.com",
+] as const;

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:cf": "npx wrangler dev",
     "build": "next build",
     "start": "next start",
     "lint": "npx eslint src/",
@@ -21,6 +22,7 @@
     "db:seed:cf": "npx wrangler d1 execute animehubs-db --file=./src/lib/db/seed.sql --remote"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^1.11.1",
     "@opennextjs/cloudflare": "^1.18.0",
     "@react-email/components": "^1.0.10",
     "@tailwindcss/postcss": "^4.2.2",
@@ -31,6 +33,7 @@
     "drizzle-orm": "^0.45.1",
     "jsonwebtoken": "^9.0.3",
     "next": "^16.2.1",
+    "next-auth": "^5.0.0-beta.30",
     "next-intl": "^4.8.3",
     "postcss": "^8.5.8",
     "react": "^19.2.4",
@@ -44,6 +47,8 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260331.1",
     "@eslint/eslintrc": "^3.3.5",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/uuid": "^10.0.0",
@@ -54,6 +59,7 @@
     "drizzle-kit": "^0.31.10",
     "eslint-config-next": "^16.2.1",
     "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^29.0.1",
     "lucide-react": "^1.0.1",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
