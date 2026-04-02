@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, X, Save } from "lucide-react";
+import { Plus, X, Save } from "lucide-react";
 import { CATEGORIES, CATEGORY_LABELS, CONDITIONS, CONDITION_LABELS } from "@/lib/constants";
 import type { Product } from "@/lib/db/schema";
 
@@ -13,7 +13,6 @@ interface ProductFormProps {
 
 export default function ProductForm({ product, mode }: ProductFormProps) {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [nameEn, setNameEn] = useState(product?.nameEn || "");
   const [nameSv, setNameSv] = useState(product?.nameSv || "");
@@ -27,49 +26,26 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
   const [images, setImages] = useState<string[]>(
     product ? JSON.parse(product.images || "[]") : []
   );
-  const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    if (images.length + files.length > 5) {
+  const addImageUrl = () => {
+    const url = imageUrl.trim();
+    if (!url) return;
+    if (images.length >= 5) {
       setError("Maximum 5 images allowed.");
       return;
     }
-
-    setUploading(true);
-    setError("");
-
-    const formData = new FormData();
-    for (const file of Array.from(files)) {
-      formData.append("files", file);
-    }
-
     try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const data = await res.json() as { error?: string };
-        setError(data.error || "Upload failed");
-        return;
-      }
-
-      const data = await res.json() as { paths: string[] };
-      setImages((prev) => [...prev, ...data.paths]);
+      new URL(url);
     } catch {
-      setError("Upload failed. Please try again.");
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      setError("Invalid URL format.");
+      return;
     }
+    setImages((prev) => [...prev, url]);
+    setImageUrl("");
+    setError("");
   };
 
   const removeImage = (index: number) => {
@@ -272,7 +248,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
         </div>
       </div>
 
-      {/* 画像アップロード */}
+      {/* 画像URL入力 */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Images (max 5)
@@ -298,28 +274,27 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
               </button>
             </div>
           ))}
-          {images.length < 5 && (
+        </div>
+        {images.length < 5 && (
+          <div className="mt-2 flex gap-2">
+            <input
+              type="text"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImageUrl(); } }}
+              placeholder="https://example.com/image.jpg"
+              className="block flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+            />
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
-              className="flex h-24 w-24 flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 text-gray-400 transition-colors hover:border-gray-400 hover:text-gray-500 disabled:opacity-50"
+              onClick={addImageUrl}
+              className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
             >
-              <Upload className="h-5 w-5" />
-              <span className="mt-1 text-xs">
-                {uploading ? "Uploading..." : "Upload"}
-              </span>
+              <Plus className="h-4 w-4" />
+              Add
             </button>
-          )}
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/gif"
-          multiple
-          onChange={handleImageUpload}
-          className="hidden"
-        />
+          </div>
+        )}
       </div>
 
       {/* 保存ボタン */}

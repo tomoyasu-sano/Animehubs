@@ -1,20 +1,8 @@
 import { getDb } from "./index";
-import { products, reservations, adminUsers } from "./schema";
+import { products, reservations, orders } from "./schema";
 import { eq, like, and, or, sql, desc } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import type { Product, NewProduct, Reservation, AdminUser } from "./schema";
-
-// ==================== 管理者ユーザー ====================
-
-export async function getAdminByUsername(username: string): Promise<AdminUser | undefined> {
-  const db = await getDb();
-  return db.select().from(adminUsers).where(eq(adminUsers.username, username)).get();
-}
-
-export async function getAdminById(id: string): Promise<AdminUser | undefined> {
-  const db = await getDb();
-  return db.select().from(adminUsers).where(eq(adminUsers.id, id)).get();
-}
+import type { Product, NewProduct, Reservation, Order } from "./schema";
 
 // ==================== 商品管理 ====================
 
@@ -159,18 +147,86 @@ export async function adminGetReservations(
   return { items, total };
 }
 
+// ==================== 注文管理 ====================
+
+interface AdminGetOrdersOptions {
+  status?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export async function adminGetOrders(
+  options: AdminGetOrdersOptions = {}
+): Promise<{ items: Order[]; total: number }> {
+  const db = await getDb();
+  const conditions = [];
+
+  if (options.status) {
+    conditions.push(eq(orders.status, options.status));
+  }
+
+  const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(orders)
+    .where(whereClause)
+    .get();
+
+  const total = countResult?.count || 0;
+
+  let query = db
+    .select()
+    .from(orders)
+    .where(whereClause)
+    .orderBy(desc(orders.createdAt));
+
+  if (options.limit) {
+    query = query.limit(options.limit) as typeof query;
+  }
+  if (options.offset) {
+    query = query.offset(options.offset) as typeof query;
+  }
+
+  const items = await query.all();
+  return { items, total };
+}
+
 // ==================== ダッシュボード ====================
 
 export interface DashboardStats {
   totalProducts: number;
+  // レガシー予約 (reservations)
   totalReservations: number;
-  totalRevenue: number;
   pendingReservations: number;
   confirmedReservations: number;
   completedReservations: number;
   recentReservations: Reservation[];
+  // 新規注文 (orders)
+  totalOrders: number;
+  pendingOrders: number;
+  paidOrders: number;
+  shippedOrders: number;
+  completedOrders: number;
+  recentOrders: Order[];
+  // 統合集計
+  totalRevenue: number;
   salesByCategory: { category: string; total: number; count: number }[];
   salesByMonth: { month: string; total: number; count: number }[];
+}
+
+async function countWhere(
+  db: Awaited<ReturnType<typeof getDb>>,
+  table: typeof reservations | typeof orders,
+  statusField: typeof reservations.status | typeof orders.status,
+  statusValue: string,
+): Promise<number> {
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(table)
+    .where(eq(statusField, statusValue))
+    .get();
+  return result?.count || 0;
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
@@ -179,44 +235,12 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const totalProducts =
     (await db.select({ count: sql<number>`count(*)` }).from(products).get())?.count || 0;
 
+  // --- レガシー予約 (reservations) ---
   const totalReservations =
     (await db.select({ count: sql<number>`count(*)` }).from(reservations).get())?.count || 0;
-
-  const totalRevenue =
-    (
-      await db
-        .select({ total: sql<number>`COALESCE(SUM(total_amount), 0)` })
-        .from(reservations)
-        .where(or(eq(reservations.status, "confirmed"), eq(reservations.status, "completed")))
-        .get()
-    )?.total || 0;
-
-  const pendingReservations =
-    (
-      await db
-        .select({ count: sql<number>`count(*)` })
-        .from(reservations)
-        .where(eq(reservations.status, "pending"))
-        .get()
-    )?.count || 0;
-
-  const confirmedReservations =
-    (
-      await db
-        .select({ count: sql<number>`count(*)` })
-        .from(reservations)
-        .where(eq(reservations.status, "confirmed"))
-        .get()
-    )?.count || 0;
-
-  const completedReservations =
-    (
-      await db
-        .select({ count: sql<number>`count(*)` })
-        .from(reservations)
-        .where(eq(reservations.status, "completed"))
-        .get()
-    )?.count || 0;
+  const pendingReservations = await countWhere(db, reservations, reservations.status, "pending");
+  const confirmedReservations = await countWhere(db, reservations, reservations.status, "confirmed");
+  const completedReservations = await countWhere(db, reservations, reservations.status, "completed");
 
   const recentReservations = await db
     .select()
@@ -225,28 +249,108 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .limit(5)
     .all();
 
-  const allReservations = await db
+  // --- 新規注文 (orders) ---
+  const totalOrders =
+    (await db.select({ count: sql<number>`count(*)` }).from(orders).get())?.count || 0;
+  const pendingOrders = await countWhere(db, orders, orders.status, "pending_payment");
+  const paidOrders = await countWhere(db, orders, orders.status, "paid");
+  const shippedOrders = await countWhere(db, orders, orders.status, "shipped");
+  const completedOrders = await countWhere(db, orders, orders.status, "completed");
+
+  const recentOrders = await db
+    .select()
+    .from(orders)
+    .orderBy(desc(orders.createdAt))
+    .limit(5)
+    .all();
+
+  // --- 売上集計（reservations + orders 統合） ---
+  const reservationRevenue =
+    (
+      await db
+        .select({ total: sql<number>`COALESCE(SUM(total_amount), 0)` })
+        .from(reservations)
+        .where(or(eq(reservations.status, "confirmed"), eq(reservations.status, "completed")))
+        .get()
+    )?.total || 0;
+
+  const orderRevenue =
+    (
+      await db
+        .select({ total: sql<number>`COALESCE(SUM(total_amount), 0)` })
+        .from(orders)
+        .where(or(
+          eq(orders.status, "paid"),
+          eq(orders.status, "shipped"),
+          eq(orders.status, "completed"),
+        ))
+        .get()
+    )?.total || 0;
+
+  const totalRevenue = reservationRevenue + orderRevenue;
+
+  // カテゴリ別・月別集計（reservations + orders）
+  const categoryMap = new Map<string, { total: number; count: number }>();
+  const monthMap = new Map<string, { total: number; count: number }>();
+
+  // 商品カテゴリを一括取得して Map に格納（N+1 クエリ回避）
+  const allProducts = await db
+    .select({ id: products.id, category: products.category })
+    .from(products)
+    .all();
+  const productCategoryMap = new Map(allProducts.map((p) => [p.id, p.category]));
+
+  // reservations の集計
+  const paidReservations = await db
     .select()
     .from(reservations)
     .where(or(eq(reservations.status, "confirmed"), eq(reservations.status, "completed")))
     .all();
 
-  const categoryMap = new Map<string, { total: number; count: number }>();
-  for (const r of allReservations) {
+  for (const r of paidReservations) {
+    // 月別
+    const month = r.createdAt.substring(0, 7);
+    const mExisting = monthMap.get(month) || { total: 0, count: 0 };
+    monthMap.set(month, { total: mExisting.total + r.totalAmount, count: mExisting.count + 1 });
+
+    // カテゴリ別
     try {
-      const items = JSON.parse(r.items) as {
-        productId: string;
-        quantity: number;
-        price: number;
-        category?: string;
-      }[];
+      const items = JSON.parse(r.items) as { productId: string; quantity: number; price: number }[];
       for (const item of items) {
-        const product = await db
-          .select({ category: products.category })
-          .from(products)
-          .where(eq(products.id, item.productId))
-          .get();
-        const cat = product?.category || "unknown";
+        const cat = productCategoryMap.get(item.productId) || "unknown";
+        const existing = categoryMap.get(cat) || { total: 0, count: 0 };
+        categoryMap.set(cat, {
+          total: existing.total + item.price * item.quantity,
+          count: existing.count + item.quantity,
+        });
+      }
+    } catch {
+      // JSON パースエラーは無視
+    }
+  }
+
+  // orders の集計
+  const paidOrdersList = await db
+    .select()
+    .from(orders)
+    .where(or(
+      eq(orders.status, "paid"),
+      eq(orders.status, "shipped"),
+      eq(orders.status, "completed"),
+    ))
+    .all();
+
+  for (const o of paidOrdersList) {
+    // 月別
+    const month = o.createdAt.substring(0, 7);
+    const mExisting = monthMap.get(month) || { total: 0, count: 0 };
+    monthMap.set(month, { total: mExisting.total + o.totalAmount, count: mExisting.count + 1 });
+
+    // カテゴリ別
+    try {
+      const items = JSON.parse(o.items) as { product_id: string; quantity: number; price: number }[];
+      for (const item of items) {
+        const cat = productCategoryMap.get(item.product_id) || "unknown";
         const existing = categoryMap.get(cat) || { total: 0, count: 0 };
         categoryMap.set(cat, {
           total: existing.total + item.price * item.quantity,
@@ -264,13 +368,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     count: data.count,
   }));
 
-  const monthMap = new Map<string, { total: number; count: number }>();
-  for (const r of allReservations) {
-    const month = r.createdAt.substring(0, 7);
-    const existing = monthMap.get(month) || { total: 0, count: 0 };
-    monthMap.set(month, { total: existing.total + r.totalAmount, count: existing.count + 1 });
-  }
-
   const salesByMonth = Array.from(monthMap.entries())
     .map(([month, data]) => ({ month, total: data.total, count: data.count }))
     .sort((a, b) => a.month.localeCompare(b.month));
@@ -278,11 +375,17 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   return {
     totalProducts,
     totalReservations,
-    totalRevenue,
     pendingReservations,
     confirmedReservations,
     completedReservations,
     recentReservations,
+    totalOrders,
+    pendingOrders,
+    paidOrders,
+    shippedOrders,
+    completedOrders,
+    recentOrders,
+    totalRevenue,
     salesByCategory,
     salesByMonth,
   };

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getReservationById } from "@/lib/db/reservation-queries";
-import { getAdminFromRequest } from "@/lib/auth";
-
-export const runtime = "edge";
+import { getAdminSession } from "@/lib/admin-auth";
 
 export async function GET(
   request: NextRequest,
@@ -18,7 +16,8 @@ export async function GET(
       return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
     }
 
-    const isAdmin = getAdminFromRequest(request) !== null;
+    const admin = await getAdminSession();
+    const isAdmin = admin !== null;
     const hasValidToken = token && reservation.accessToken && token === reservation.accessToken;
 
     if (!isAdmin && !hasValidToken) {

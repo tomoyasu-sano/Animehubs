@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { TrendingUp, BarChart3 } from "lucide-react";
 import type { DashboardStats } from "@/lib/db/admin-queries";
 
@@ -10,17 +9,13 @@ function formatSEK(amount: number): string {
 }
 
 export default function AdminSalesPage() {
-  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("/api/admin/dashboard")
       .then((res) => {
-        if (res.status === 401) {
-          router.push("/admin/login");
-          return null;
-        }
+        if (!res.ok) return null;
         return res.json() as Promise<DashboardStats>;
       })
       .then((data) => {
@@ -28,7 +23,7 @@ export default function AdminSalesPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [router]);
+  }, []);
 
   if (loading) {
     return (
@@ -42,6 +37,10 @@ export default function AdminSalesPage() {
     return <div className="text-red-500">Failed to load sales data.</div>;
   }
 
+  const totalPaidCount =
+    stats.paidOrders + stats.shippedOrders + stats.completedOrders +
+    stats.confirmedReservations + stats.completedReservations;
+
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-gray-900">Sales Analytics</h1>
@@ -54,26 +53,26 @@ export default function AdminSalesPage() {
             {formatSEK(stats.totalRevenue)}
           </p>
           <p className="mt-1 text-xs text-gray-400">
-            From confirmed and completed reservations
+            From paid orders and confirmed reservations
           </p>
         </div>
         <div className="rounded-xl bg-white p-6 shadow-sm">
-          <p className="text-sm text-gray-500">Total Reservations</p>
+          <p className="text-sm text-gray-500">Total Orders</p>
           <p className="mt-1 text-3xl font-bold text-gray-900">
-            {stats.totalReservations}
+            {stats.totalOrders + stats.totalReservations}
           </p>
-          <p className="mt-1 text-xs text-gray-400">All time</p>
+          <p className="mt-1 text-xs text-gray-400">
+            {stats.totalOrders} orders + {stats.totalReservations} reservations
+          </p>
         </div>
         <div className="rounded-xl bg-white p-6 shadow-sm">
           <p className="text-sm text-gray-500">Avg. Order Value</p>
           <p className="mt-1 text-3xl font-bold text-gray-900">
-            {stats.totalReservations > 0
-              ? formatSEK(
-                  Math.round(stats.totalRevenue / (stats.confirmedReservations + stats.completedReservations || 1))
-                )
+            {totalPaidCount > 0
+              ? formatSEK(Math.round(stats.totalRevenue / totalPaidCount))
               : "0 SEK"}
           </p>
-          <p className="mt-1 text-xs text-gray-400">Per confirmed order</p>
+          <p className="mt-1 text-xs text-gray-400">Per paid order</p>
         </div>
       </div>
 
@@ -157,22 +156,21 @@ export default function AdminSalesPage() {
         )}
       </div>
 
-      {/* 予約ステータス分布 */}
+      {/* 注文ステータス分布 */}
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold text-gray-900">
-          Reservation Status Distribution
+          Order Status Distribution
         </h2>
         <div className="flex gap-4">
           {[
-            { label: "Pending", count: stats.pendingReservations, color: "bg-yellow-400" },
-            { label: "Confirmed", count: stats.confirmedReservations, color: "bg-blue-400" },
-            { label: "Completed", count: stats.completedReservations, color: "bg-green-400" },
+            { label: "Pending", count: stats.pendingOrders, color: "bg-yellow-400" },
+            { label: "Paid", count: stats.paidOrders, color: "bg-blue-400" },
+            { label: "Shipped", count: stats.shippedOrders, color: "bg-indigo-400" },
+            { label: "Completed", count: stats.completedOrders, color: "bg-green-400" },
           ].map((item) => {
             const total =
-              stats.pendingReservations +
-              stats.confirmedReservations +
-              stats.completedReservations;
-            const widthPercent = total > 0 ? (item.count / total) * 100 : 33;
+              stats.pendingOrders + stats.paidOrders + stats.shippedOrders + stats.completedOrders;
+            const widthPercent = total > 0 ? (item.count / total) * 100 : 25;
             return (
               <div key={item.label} className="flex-1">
                 <div className="mb-2 flex items-center justify-between">

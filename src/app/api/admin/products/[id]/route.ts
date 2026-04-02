@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminFromRequest } from "@/lib/auth";
+import { getAdminSession } from "@/lib/admin-auth";
 import { updateProduct, deleteProduct } from "@/lib/db/admin-queries";
 import { getProductById } from "@/lib/db/queries";
-
-export const runtime = "edge";
+import { validateUpdateProduct } from "@/lib/admin-validation";
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = getAdminFromRequest(request);
+    const admin = await getAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -33,13 +32,18 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = getAdminFromRequest(request);
+    const admin = await getAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id } = await params;
     const body = await request.json() as Record<string, unknown>;
+
+    const errors = validateUpdateProduct(body);
+    if (errors.length > 0) {
+      return NextResponse.json({ error: "Validation failed", details: errors }, { status: 400 });
+    }
 
     const updateData: Record<string, unknown> = {};
     if (body.nameEn !== undefined) updateData.nameEn = body.nameEn;
@@ -66,11 +70,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = getAdminFromRequest(request);
+    const admin = await getAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

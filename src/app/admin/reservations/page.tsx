@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import type { Reservation } from "@/lib/db/schema";
 
@@ -34,13 +33,13 @@ const NEXT_STATUS: Record<string, string[]> = {
 };
 
 export default function AdminReservationsPage() {
-  const router = useRouter();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
   const fetchReservations = useCallback(async () => {
     setLoading(true);
@@ -48,20 +47,21 @@ export default function AdminReservationsPage() {
     if (statusFilter) params.set("status", statusFilter);
 
     try {
+      setError("");
       const res = await fetch(`/api/admin/reservations?${params}`);
-      if (res.status === 401) {
-        router.push("/admin/login");
+      if (!res.ok) {
+        setError("Failed to load reservations.");
         return;
       }
       const data = await res.json() as { items: Reservation[]; total: number };
       setReservations(data.items || []);
       setTotal(data.total || 0);
-    } catch (error) {
-      console.error("Failed to fetch reservations:", error);
+    } catch {
+      setError("Failed to load reservations.");
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, router]);
+  }, [statusFilter]);
 
   useEffect(() => {
     fetchReservations();
@@ -123,6 +123,11 @@ export default function AdminReservationsPage() {
           </button>
         ))}
       </div>
+
+      {/* エラー表示 */}
+      {error && (
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+      )}
 
       {/* テーブル */}
       {loading ? (

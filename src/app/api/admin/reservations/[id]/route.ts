@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminFromRequest } from "@/lib/auth";
+import { getAdminSession } from "@/lib/admin-auth";
 import { getReservationById, updateReservationStatus } from "@/lib/db/reservation-queries";
-
-export const runtime = "edge";
 
 const VALID_STATUSES = ["pending", "confirmed", "completed", "cancelled"] as const;
 type ReservationStatus = (typeof VALID_STATUSES)[number];
@@ -19,7 +17,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const admin = getAdminFromRequest(request);
+    const admin = await getAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

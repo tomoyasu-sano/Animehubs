@@ -1,12 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getAdminFromRequest } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import { getAdminSession } from "@/lib/admin-auth";
 import { getDashboardStats } from "@/lib/db/admin-queries";
 
-export const runtime = "edge";
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const admin = getAdminFromRequest(request);
+    const admin = await getAdminSession();
     if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

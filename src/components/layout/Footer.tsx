@@ -35,6 +35,13 @@ export default function Footer() {
                 {t("footer.instagram")}
               </a>
             </div>
+          </div>
+
+          {/* プライバシーポリシー */}
+          <div>
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
+              {t("footer.privacyPolicy")}
+            </h4>
             <div className="mt-4">
               <Link
                 href="/privacy"
@@ -43,24 +50,6 @@ export default function Footer() {
                 {t("footer.privacyPolicy")}
               </Link>
             </div>
-          </div>
-
-          {/* お問い合わせ */}
-          <div>
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
-              {t("footer.contact")}
-            </h4>
-            <p className="mt-4 text-sm text-muted">
-              Uppsala, Sweden
-            </p>
-            <a
-              href={instagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 text-sm text-muted transition-colors hover:text-white"
-            >
-              DM via Instagram
-            </a>
           </div>
         </div>
 

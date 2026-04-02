@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// lucide-react アイコンは不要（シンプルなテキストベースUIに変更）
 import type { DashboardStats } from "@/lib/db/admin-queries";
 
 function StatCard({
@@ -26,16 +25,20 @@ function formatSEK(amount: number): string {
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-700",
+    pending_payment: "bg-yellow-100 text-yellow-700",
     confirmed: "bg-blue-100 text-blue-700",
+    paid: "bg-blue-100 text-blue-700",
+    shipped: "bg-indigo-100 text-indigo-700",
     completed: "bg-green-100 text-green-700",
     cancelled: "bg-red-100 text-red-700",
+    payment_failed: "bg-red-100 text-red-700",
   };
 
   return (
     <span
       className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status] || "bg-gray-100 text-gray-700"}`}
     >
-      {status}
+      {status.replace(/_/g, " ")}
     </span>
   );
 }
@@ -46,8 +49,13 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetch("/api/admin/dashboard")
-      .then((res) => res.json() as Promise<DashboardStats>)
-      .then(setStats)
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json() as Promise<DashboardStats>;
+      })
+      .then((data) => {
+        if (data) setStats(data);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -73,23 +81,24 @@ export default function AdminDashboardPage() {
       {/* 統計カード */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Products" value={stats.totalProducts} />
+        <StatCard title="Orders" value={stats.totalOrders} />
         <StatCard title="Reservations" value={stats.totalReservations} />
         <StatCard title="Revenue" value={formatSEK(stats.totalRevenue)} />
-        <StatCard title="Pending" value={stats.pendingReservations} />
       </div>
 
-      {/* 予約ステータスサマリー */}
+      {/* 注文ステータスサマリー */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* ステータス別内訳 */}
+        {/* 注文ステータス */}
         <div className="rounded-xl bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
-            Reservation Status
+            Order Status
           </h2>
           <div className="space-y-3">
             {[
-              { label: "Pending", value: stats.pendingReservations, dot: "bg-yellow-400" },
-              { label: "Confirmed", value: stats.confirmedReservations, dot: "bg-blue-400" },
-              { label: "Completed", value: stats.completedReservations, dot: "bg-green-400" },
+              { label: "Pending Payment", value: stats.pendingOrders, dot: "bg-yellow-400" },
+              { label: "Paid", value: stats.paidOrders, dot: "bg-blue-400" },
+              { label: "Shipped", value: stats.shippedOrders, dot: "bg-indigo-400" },
+              { label: "Completed", value: stats.completedOrders, dot: "bg-green-400" },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -102,33 +111,33 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* 最近の予約 */}
+        {/* 最近の注文 */}
         <div className="rounded-xl bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-gray-900">
-            Recent Reservations
+            Recent Orders
           </h2>
-          {stats.recentReservations.length === 0 ? (
-            <p className="text-sm text-gray-500">No reservations yet.</p>
+          {stats.recentOrders.length === 0 ? (
+            <p className="text-sm text-gray-500">No orders yet.</p>
           ) : (
             <div className="space-y-3">
-              {stats.recentReservations.map((r) => (
+              {stats.recentOrders.map((o) => (
                 <div
-                  key={r.id}
+                  key={o.id}
                   className="flex items-center justify-between rounded-lg border border-gray-100 p-3"
                 >
                   <div>
                     <p className="text-sm font-medium text-gray-900">
-                      {r.customerName}
+                      {o.orderNumber}
                     </p>
                     <p className="text-xs text-gray-500">
-                      {new Date(r.createdAt).toLocaleDateString()}
+                      {o.customerName} &middot; {new Date(o.createdAt).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-medium text-gray-700">
-                      {formatSEK(r.totalAmount)}
+                      {formatSEK(o.totalAmount)}
                     </span>
-                    <StatusBadge status={r.status} />
+                    <StatusBadge status={o.status} />
                   </div>
                 </div>
               ))}
@@ -136,6 +145,65 @@ export default function AdminDashboardPage() {
           )}
         </div>
       </div>
+
+      {/* レガシー予約（データがある場合のみ表示） */}
+      {stats.totalReservations > 0 && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900">
+              Legacy Reservations
+            </h2>
+            <div className="space-y-3">
+              {[
+                { label: "Pending", value: stats.pendingReservations, dot: "bg-yellow-400" },
+                { label: "Confirmed", value: stats.confirmedReservations, dot: "bg-blue-400" },
+                { label: "Completed", value: stats.completedReservations, dot: "bg-green-400" },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className={`h-2 w-2 rounded-full ${item.dot}`} />
+                    <span className="text-sm text-gray-600">{item.label}</span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-900">{item.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-white p-6 shadow-sm">
+            <h2 className="mb-4 text-lg font-semibold text-gray-900">
+              Recent Reservations
+            </h2>
+            {stats.recentReservations.length === 0 ? (
+              <p className="text-sm text-gray-500">No reservations.</p>
+            ) : (
+              <div className="space-y-3">
+                {stats.recentReservations.map((r) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between rounded-lg border border-gray-100 p-3"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {r.customerName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {new Date(r.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-gray-700">
+                        {formatSEK(r.totalAmount)}
+                      </span>
+                      <StatusBadge status={r.status} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* 月別売上 */}
       {stats.salesByMonth.length > 0 && (

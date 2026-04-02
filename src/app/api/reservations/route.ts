@@ -4,8 +4,6 @@ import { validateReservation, type ReservationInput } from "@/lib/validation";
 import { sendConfirmationEmail } from "@/lib/email/send-confirmation";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-export const runtime = "edge";
-
 const RESERVATION_RATE_LIMIT = 5;
 const RESERVATION_WINDOW_MS = 60_000;
 

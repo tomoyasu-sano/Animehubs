@@ -54,9 +54,29 @@ const intlMiddleware = createMiddleware(routing);
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 管理者パスのチェック（i18nミドルウェアの前に処理）
+  // 管理者画面パスのチェック（i18nミドルウェアの前に処理）
+  // 注: /api/admin/* はミドルウェアでは処理しない（OpenNextバンドラー互換性のため）
+  //     各APIルートで getAdminSession() により個別に認証チェック済み
   if (isAdminPath(pathname)) {
-    // 既存の管理者認証をそのまま通す（Phase 1-2 完了後にNextAuth v5に切り替え）
+    // /admin/login はログインページなのでそのまま通す
+    if (pathname === "/admin/login" || pathname.startsWith("/admin/login/")) {
+      return NextResponse.next();
+    }
+
+    // NextAuth セッション確認 + role=admin チェック
+    try {
+      const { auth } = await import("./lib/auth-v2");
+      const session = await auth();
+      if (!session?.user) {
+        return NextResponse.redirect(new URL("/admin/login", request.url));
+      }
+      const role = (session.user as { role?: string }).role;
+      if (role !== "admin") {
+        return NextResponse.redirect(new URL("/admin/login", request.url));
+      }
+    } catch {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
     return NextResponse.next();
   }
 
@@ -89,6 +109,7 @@ export const config = {
   matcher: [
     "/",
     "/(en|sv)/:path*",
+    "/admin/:path*",
     "/((?!api|_next|_vercel|admin|.*\\..*).*)",
   ],
 };

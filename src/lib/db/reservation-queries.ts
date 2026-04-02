@@ -58,75 +58,70 @@ export async function createReservation(input: CreateReservationInput): Promise<
   const id = uuidv4();
 
   try {
-    const result = await db.transaction(async (tx) => {
-      const outOfStock: StockCheckResult["outOfStock"] = [];
+    // 在庫チェック（batch前に実施）
+    const outOfStock: StockCheckResult["outOfStock"] = [];
 
-      for (const item of input.items) {
-        const product = await tx
-          .select()
-          .from(products)
-          .where(eq(products.id, item.productId))
-          .get();
+    for (const item of input.items) {
+      const product = await db
+        .select()
+        .from(products)
+        .where(eq(products.id, item.productId))
+        .get();
 
-        if (!product) {
-          outOfStock.push({
-            productId: item.productId,
-            nameEn: item.nameEn,
-            requested: item.quantity,
-            available: 0,
-          });
-          continue;
-        }
-        if (product.stock < item.quantity) {
-          outOfStock.push({
-            productId: item.productId,
-            nameEn: product.nameEn,
-            requested: item.quantity,
-            available: product.stock,
-          });
-        }
+      if (!product) {
+        outOfStock.push({
+          productId: item.productId,
+          nameEn: item.nameEn,
+          requested: item.quantity,
+          available: 0,
+        });
+        continue;
       }
-
-      if (outOfStock.length > 0) {
-        return { ok: false as const, outOfStock };
+      if (product.stock < item.quantity) {
+        outOfStock.push({
+          productId: item.productId,
+          nameEn: product.nameEn,
+          requested: item.quantity,
+          available: product.stock,
+        });
       }
+    }
 
-      for (const item of input.items) {
-        await tx.update(products)
-          .set({
-            stock: sql`${products.stock} - ${item.quantity}`,
-            updatedAt: now,
-          })
-          .where(eq(products.id, item.productId))
-          .run();
-      }
+    if (outOfStock.length > 0) {
+      return { ok: false, outOfStock };
+    }
 
-      const bytes = new Uint8Array(16);
-      globalThis.crypto.getRandomValues(bytes);
-      const accessToken = Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
-      await tx.insert(reservations)
-        .values({
-          id,
-          customerName: input.customerName,
-          customerEmail: input.customerEmail,
-          location: input.location,
-          timeSlot: input.timeSlot,
-          status: "pending",
-          totalAmount: input.totalAmount,
-          items: JSON.stringify(input.items),
-          accessToken,
-          notes: input.notes || null,
-          createdAt: now,
+    // D1はSQLトランザクション(BEGIN)非対応のためdb.batch()で一括実行
+    const bytes = new Uint8Array(16);
+    globalThis.crypto.getRandomValues(bytes);
+    const accessToken = Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+
+    const stockUpdates = input.items.map((item) =>
+      db.update(products)
+        .set({
+          stock: sql`${products.stock} - ${item.quantity}`,
           updatedAt: now,
         })
-        .run();
+        .where(eq(products.id, item.productId))
+    );
 
-      return { ok: true as const };
-    });
+    const insertReservation = db.insert(reservations)
+      .values({
+        id,
+        customerName: input.customerName,
+        customerEmail: input.customerEmail,
+        location: input.location,
+        timeSlot: input.timeSlot,
+        status: "pending",
+        totalAmount: input.totalAmount,
+        items: JSON.stringify(input.items),
+        accessToken,
+        notes: input.notes || null,
+        createdAt: now,
+        updatedAt: now,
+      });
 
-    if (!result.ok) {
-      return { ok: false, outOfStock: result.outOfStock };
-    }
+    await db.batch([...stockUpdates, insertReservation] as [typeof insertReservation]);
 
     const reservation = await db
       .select()

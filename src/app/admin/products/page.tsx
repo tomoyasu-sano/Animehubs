@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import type { Product } from "@/lib/db/schema";
 import { CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
@@ -12,7 +11,6 @@ function formatSEK(amount: number): string {
 }
 
 export default function AdminProductsPage() {
-  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -20,6 +18,7 @@ export default function AdminProductsPage() {
   const [category, setCategory] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -28,20 +27,21 @@ export default function AdminProductsPage() {
     if (category) params.set("category", category);
 
     try {
+      setError("");
       const res = await fetch(`/api/admin/products?${params}`);
-      if (res.status === 401) {
-        router.push("/admin/login");
+      if (!res.ok) {
+        setError("Failed to load products.");
         return;
       }
       const data = await res.json() as { items: Product[]; total: number };
       setProducts(data.items || []);
       setTotal(data.total || 0);
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
+    } catch {
+      setError("Failed to load products.");
     } finally {
       setLoading(false);
     }
-  }, [search, category, router]);
+  }, [search, category]);
 
   useEffect(() => {
     fetchProducts();
@@ -107,6 +107,11 @@ export default function AdminProductsPage() {
         </select>
       </div>
 
+      {/* エラー表示 */}
+      {error && (
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+      )}
+
       {/* テーブル */}
       {loading ? (
         <div className="flex h-32 items-center justify-center text-gray-500">
@@ -146,7 +151,8 @@ export default function AdminProductsPage() {
             </thead>
             <tbody>
               {products.map((product) => {
-                const images = JSON.parse(product.images || "[]");
+                let images: string[] = [];
+                try { images = JSON.parse(product.images || "[]"); } catch { /* invalid JSON */ }
                 return (
                   <tr
                     key={product.id}

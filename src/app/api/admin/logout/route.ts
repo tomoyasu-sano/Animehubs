@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
-import { getAdminCookieName } from "@/lib/auth";
 
-export const runtime = "edge";
-
+/**
+ * レガシー管理者ログアウトAPI — NextAuth v5 signOutに移行済み。
+ * 旧クライアントがアクセスした場合は 410 Gone を返す。
+ */
 export async function POST() {
-  const response = NextResponse.json({ message: "Logged out successfully" });
-
-  response.cookies.set(getAdminCookieName(), "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 0,
-    path: "/",
-  });
-
-  return response;
+  return NextResponse.json(
+    { error: "Admin logout has been migrated to NextAuth signOut. Use /admin layout logout button." },
+    { status: 410 }
+  );
 }
