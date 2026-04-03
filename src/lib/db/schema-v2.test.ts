@@ -145,10 +145,10 @@ describe("v2 schema - orders テーブル", () => {
 describe("v2 schema - 型定義", () => {
   it("OrderStatus が正しいリテラル型である", () => {
     const validStatuses: OrderStatus[] = [
+      "reserved",
       "pending_payment",
       "paid",
       "cancellation_requested",
-      "pending_inspection",
       "shipped",
       "completed",
       "payment_failed",

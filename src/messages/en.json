@@ -16,7 +16,8 @@
     "backToHome": "Back to Home",
     "login": "Log in",
     "logout": "Log out",
-    "myPage": "My Page"
+    "myPage": "My Page",
+    "orders": "Orders"
   },
   "home": {
     "heroTitle": "Curated Anime Figures",
@@ -94,6 +95,15 @@
     "postalCodePlaceholder": "e.g. 753 09",
     "payWithStripe": "Pay with Stripe",
     "useDefaultAddress": "Use default address",
+    "inspectionTitle": "In-Person Inspection Checkout",
+    "inspectionNotice1": "No payment is required now. Your items will be reserved for 7 days.",
+    "inspectionNotice2": "If not inspected within 7 days, the reservation will be automatically cancelled.",
+    "inspectionNotice3": "For safety, the meeting location will be a public place (e.g. train station, shopping center).",
+    "inspectionMeetingPlace": "Meeting Point: Uppsala Central Station area",
+    "inspectionAgree": "I understand and agree to the inspection terms above",
+    "inspectionSubtotal": "Subtotal",
+    "inspectionNoCharge": "No charge now — pay after inspection",
+    "reserveForInspection": "Reserve for Inspection",
     "errors": {
       "nameRequired": "Name must be at least 2 characters",
       "emailInvalid": "Please enter a valid email address",
@@ -103,7 +113,8 @@
       "cityRequired": "City is required",
       "postalCodeInvalid": "Enter a valid Swedish postal code (e.g. 753 09)",
       "serverError": "Something went wrong. Please try again.",
-      "outOfStock": "Some items are out of stock. Please update your cart."
+      "outOfStock": "Some items are out of stock. Please update your cart.",
+      "tooManyReservations": "You have too many active reservations (max 3). Please complete or cancel existing ones first."
     }
   },
   "confirm": {
@@ -136,10 +147,50 @@
     "inspectionDeadline": "Deadline: {date}",
     "inspectionMessage": "Hi! I'd like to arrange an inspection for order {orderNumber}.",
     "contactInstagram": "Contact via Instagram DM",
+    "dmTemplate": "Copy this message for Instagram DM:",
+    "copyMessage": "Copy message",
+    "copied": "Copied!",
     "continueShopping": "Continue Shopping",
     "viewOrders": "View Orders",
     "notFound": "Order not found",
     "backToHome": "Back to Home"
+  },
+  "orders": {
+    "title": "My Orders",
+    "empty": "No orders yet",
+    "browseProducts": "Browse Products"
+  },
+  "orderDetail": {
+    "title": "Order Details",
+    "loading": "Loading order...",
+    "notFound": "Order not found",
+    "backToHome": "Back to Home",
+    "orderNumber": "Order Number",
+    "orderDetails": "Order Details",
+    "total": "Total",
+    "continueShopping": "Continue Shopping",
+    "payNowTitle": "Ready to Pay?",
+    "payNowDescription": "After inspecting the items, tap the button below to complete your purchase via Stripe.",
+    "payNow": "Pay Now",
+    "payError": "Payment failed. Please try again.",
+    "processing": "Processing...",
+    "deadline": "Reservation expires: {date}",
+    "expired": "This reservation has expired and will be cancelled automatically.",
+    "paymentProcessing": "Processing your payment... This may take a moment.",
+    "arrangeInspection": "Arrange Inspection",
+    "arrangeInspectionNote": "Contact us via Instagram DM to arrange a time and place to inspect the items.",
+    "copyDmLabel": "Copy this message for Instagram DM:",
+    "dmTemplate": "Hi! I'd like to arrange an inspection for order {orderNumber}.",
+    "copyMessage": "Copy message",
+    "copied": "Copied!",
+    "contactInstagram": "Contact via Instagram DM",
+    "statusReserved": "Reserved",
+    "statusPendingPayment": "Pending Payment",
+    "statusPaid": "Paid",
+    "statusShipped": "Shipped",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled",
+    "statusPaymentFailed": "Payment Failed"
   },
   "favorites": {
     "add": "Add to favorites",

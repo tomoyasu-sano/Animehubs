@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, Loader2, AlertCircle, Copy, Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
 import type { OrderItem, SwedishAddress } from "@/lib/db/schema";
@@ -38,6 +38,7 @@ export default function CheckoutCompletePage() {
   const [state, setState] = useState<PageState>("loading");
   const [order, setOrder] = useState<OrderData | null>(null);
   const [cartCleared, setCartCleared] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const fetchOrder = useCallback(async (): Promise<OrderData | null> => {
     if (!sessionId) return null;
@@ -158,31 +159,64 @@ export default function CheckoutCompletePage() {
       </div>
 
       {/* 実物確認の場合: Instagram DM セクション */}
-      {order.type === "inspection" && (
-        <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
-          <h3 className="font-semibold text-amber-900 dark:text-amber-200">
-            {t("inspectionTitle")}
-          </h3>
-          <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
-            {t("inspectionNote")}
-          </p>
-          {order.expiresAt && (
-            <p className="mt-1 text-sm font-medium text-amber-900 dark:text-amber-200">
-              {t("inspectionDeadline", {
-                date: new Date(order.expiresAt).toLocaleDateString("en-SE"),
-              })}
+      {order.type === "inspection" && (() => {
+        const deadlineDate = order.expiresAt
+          ? new Date(order.expiresAt).toLocaleDateString("en-SE")
+          : "7 days";
+        const dmText = t("inspectionMessage", {
+          orderNumber: order.orderNumber,
+        }) + `\nDeadline: ${deadlineDate}\nMeeting: Uppsala Central Station area`;
+
+        return (
+          <div className="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
+            <h3 className="font-semibold text-amber-900 dark:text-amber-200">
+              {t("inspectionTitle")}
+            </h3>
+            <p className="mt-1 text-sm text-amber-800 dark:text-amber-300">
+              {t("inspectionNote")}
             </p>
-          )}
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-block rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background transition-colors hover:bg-accent"
-          >
-            {t("contactInstagram")}
-          </a>
-        </div>
-      )}
+            {order.expiresAt && (
+              <p className="mt-1 text-sm font-medium text-amber-900 dark:text-amber-200">
+                {t("inspectionDeadline", { date: deadlineDate })}
+              </p>
+            )}
+
+            {/* DM 定型文 */}
+            <div className="relative mt-3 rounded-md border border-amber-200 bg-white p-3 dark:border-amber-600 dark:bg-amber-900/50">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(dmText);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                }}
+                className="absolute right-2 top-2 inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-800"
+              >
+                {copied ? (
+                  <><Check className="h-3 w-3" />{t("copied")}</>
+                ) : (
+                  <><Copy className="h-3 w-3" />{t("copyMessage")}</>
+                )}
+              </button>
+              <p className="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1 pr-20">
+                {t("dmTemplate")}
+              </p>
+              <p className="text-sm text-amber-900 dark:text-amber-200 whitespace-pre-line">
+                {dmText}
+              </p>
+            </div>
+
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-block rounded-lg bg-foreground px-4 py-2 text-sm font-semibold text-background transition-colors hover:bg-accent"
+            >
+              {t("contactInstagram")}
+            </a>
+          </div>
+        );
+      })()}
 
       {/* 注文詳細 */}
       <div className="mb-6 rounded-lg border border-border bg-card p-4">

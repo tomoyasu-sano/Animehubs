@@ -86,6 +86,10 @@ export const CURRENCY_SYMBOL = "kr";
 export const FREE_SHIPPING_THRESHOLD_ORE = 79900; // 799 SEK
 export const SHIPPING_FEE_ORE = 7900; // 79 SEK
 
+// 実物確認の予約制限
+export const MAX_ACTIVE_RESERVATIONS = 3;
+export const RESERVATION_EXPIRY_DAYS = 7;
+
 // 管理者メールアドレス（Googleログイン時に自動で role='admin' 付与）
 export const ADMIN_EMAILS = [
   "anytimes.sano@gmail.com",

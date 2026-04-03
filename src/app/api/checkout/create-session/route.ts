@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth-v2";
 import { stripe } from "@/lib/stripe";
-import { createOrder, checkAvailableStock } from "@/lib/db/order-queries";
+import { createOrder, checkAvailableStock, getOrderById, updateOrderStatus } from "@/lib/db/order-queries";
 import { getDb } from "@/lib/db";
 import { products } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -18,10 +18,11 @@ interface CartItem {
 }
 
 interface CreateSessionRequest {
-  items: CartItem[];
-  type: OrderType;
+  items?: CartItem[];
+  type?: OrderType;
   email?: string;
   shippingAddress?: SwedishAddress;
+  orderId?: string;
 }
 
 const UUID_RE =
@@ -34,6 +35,15 @@ function validateRequest(body: unknown): {
 } {
   const req = body as CreateSessionRequest;
 
+  // orderId パターン: 既存の reserved 注文から Pay Now
+  if (req.orderId) {
+    if (!UUID_RE.test(req.orderId)) {
+      return { ok: false, error: "Invalid orderId" };
+    }
+    return { ok: true, data: req };
+  }
+
+  // 通常パターン: カートから新規注文
   if (!req.items || !Array.isArray(req.items) || req.items.length === 0) {
     return { ok: false, error: "items is required and must be a non-empty array" };
   }
@@ -106,15 +116,109 @@ export async function POST(request: Request) {
       );
     }
 
-    const { items, type, email: requestEmail, shippingAddress } = validation.data!;
-    // クライアントから送られたメールを優先、なければセッションのメール
+    const { orderId, items, type, email: requestEmail, shippingAddress } = validation.data!;
+
+    // リクエストの Origin/Referer からベースURL・ロケールを取得
+    const origin = request.headers.get("origin");
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ||
+      origin ||
+      "http://localhost:8787";
+    const referer = request.headers.get("referer") || "";
+    const localeMatch = referer.match(/\/(en|sv)\//);
+    const locale = localeMatch ? localeMatch[1] : "en";
+
+    // ─── orderId パターン: 既存 reserved 注文から Pay Now ───
+    if (orderId) {
+      const existingOrder = await getOrderById(orderId);
+      if (!existingOrder) {
+        return NextResponse.json(
+          { error: "Order not found" },
+          { status: 404 },
+        );
+      }
+      if (existingOrder.userId !== session.user.id) {
+        return NextResponse.json(
+          { error: "Order not found" },
+          { status: 404 },
+        );
+      }
+      if (existingOrder.status !== "reserved") {
+        return NextResponse.json(
+          { error: "Order is not in reserved status" },
+          { status: 400 },
+        );
+      }
+      // 期限切れチェック
+      if (existingOrder.expiresAt && new Date(existingOrder.expiresAt) < new Date()) {
+        return NextResponse.json(
+          { error: "Reservation has expired" },
+          { status: 410 },
+        );
+      }
+
+      // 既存の Stripe Session があれば expire してから新規作成
+      if (existingOrder.stripeCheckoutSessionId) {
+        await stripe.checkout.sessions
+          .expire(existingOrder.stripeCheckoutSessionId)
+          .catch(() => {});
+      }
+
+      const orderItems: OrderItem[] = JSON.parse(existingOrder.items);
+      const lineItems = orderItems.map((item) => ({
+        price_data: {
+          currency: CURRENCY.toLowerCase(),
+          product_data: {
+            name: item.name_en,
+            images: item.image ? [item.image] : undefined,
+          },
+          unit_amount: item.price,
+        },
+        quantity: item.quantity,
+      }));
+
+      const expiresAt = Math.floor(Date.now() / 1000) + 30 * 60;
+      const checkoutSession = await stripe.checkout.sessions.create({
+        mode: "payment",
+        currency: CURRENCY.toLowerCase(),
+        line_items: lineItems,
+        customer_email: existingOrder.customerEmail || undefined,
+        expires_at: expiresAt,
+        success_url: `${baseUrl}/${locale}/orders/${existingOrder.id}?payment=success`,
+        cancel_url: `${baseUrl}/${locale}/orders/${existingOrder.id}`,
+        metadata: {
+          order_type: "inspection",
+          user_id: session.user.id,
+          order_id: existingOrder.id,
+        },
+      });
+
+      // 注文に Stripe Session ID を紐付け
+      const db = await getDb();
+      const { orders } = await import("@/lib/db/schema");
+      await db
+        .update(orders)
+        .set({
+          stripeCheckoutSessionId: checkoutSession.id,
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(orders.id, existingOrder.id))
+        .run();
+
+      return NextResponse.json({
+        sessionId: checkoutSession.id,
+        sessionUrl: checkoutSession.url,
+      });
+    }
+
+    // ─── 通常パターン: カートから新規注文 ───
     const customerEmail = requestEmail?.trim() || session.user.email || "";
 
     // 商品情報をDBから取得
     const db = await getDb();
     const orderItems: OrderItem[] = [];
 
-    for (const cartItem of items) {
+    for (const cartItem of items!) {
       const product = await db
         .select()
         .from(products)
@@ -192,17 +296,6 @@ export async function POST(request: Request) {
       });
     }
 
-    // Stripe Checkout Session 作成
-    // リクエストの Origin からベースURLを取得（ポート違い問題を回避）
-    const origin = request.headers.get("origin");
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      origin ||
-      "http://localhost:8787";
-    // リクエストの Referer からロケールを取得（デフォルト: en）
-    const referer = request.headers.get("referer") || "";
-    const localeMatch = referer.match(/\/(en|sv)\//);
-    const locale = localeMatch ? localeMatch[1] : "en";
     const expiresAt = Math.floor(Date.now() / 1000) + 30 * 60; // 30分後
 
     const checkoutSession = await stripe.checkout.sessions.create({
@@ -214,7 +307,7 @@ export async function POST(request: Request) {
       success_url: `${baseUrl}/${locale}/checkout/complete?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/${locale}/cart`,
       metadata: {
-        order_type: type,
+        order_type: type!,
         user_id: session.user.id,
       },
     });
@@ -224,7 +317,7 @@ export async function POST(request: Request) {
       userId: session.user.id,
       customerName: shippingAddress?.full_name || session.user.name || "",
       customerEmail: customerEmail,
-      type,
+      type: type!,
       items: orderItems,
       totalAmount,
       shippingAddress: type === "delivery" ? shippingAddress : undefined,

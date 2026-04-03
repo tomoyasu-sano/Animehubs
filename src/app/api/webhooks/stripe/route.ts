@@ -55,7 +55,7 @@ async function handleCheckoutSessionCompleted(
   }
 
   // べき等チェック: 既に paid 以上なら処理済み
-  if (order.status !== "pending_payment") {
+  if (order.status !== "pending_payment" && order.status !== "reserved") {
     console.log(
       `Order ${order.orderNumber} already processed (status: ${order.status})`,
     );
@@ -63,11 +63,6 @@ async function handleCheckoutSessionCompleted(
   }
 
   const items: OrderItem[] = JSON.parse(order.items);
-  const newStatus =
-    order.type === "inspection" ? "pending_inspection" : "paid";
-
-  // 在庫確定減算（stock -N, reserved_stock -N）
-  await confirmStockDeduction(items);
 
   const extra: Record<string, string> = {
     stripePaymentIntentId:
@@ -76,23 +71,32 @@ async function handleCheckoutSessionCompleted(
         : session.payment_intent?.id ?? "",
   };
 
-  // inspection の場合 expires_at を7日後に設定
-  if (order.type === "inspection") {
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
-    extra.expiresAt = expiresAt.toISOString();
+  if (order.status === "reserved") {
+    // 予約注文の Pay Now: reserved → paid
+    // reserved_stock は既に確保済み。stock から確定減算のみ行う
+    await confirmStockDeduction(items);
+  } else {
+    // 通常注文: pending_payment → paid
+    await confirmStockDeduction(items);
   }
 
-  await updateOrderStatus(order.id, newStatus, extra);
+  await updateOrderStatus(order.id, "paid", extra);
 
-  // メール送信（ノンブロッキング: 失敗しても Webhook は 200 を返す）
-  const updatedOrder = { ...order, status: newStatus };
-  sendOrderConfirmationEmail(updatedOrder).catch((err) =>
-    console.error("Failed to send order confirmation:", err),
-  );
-  sendAdminNewOrderEmail(updatedOrder, ADMIN_EMAILS).catch((err) =>
-    console.error("Failed to send admin notification:", err),
-  );
+  // メール送信
+  const updatedOrder = { ...order, status: "paid" };
+  try {
+    const emailResult = await sendOrderConfirmationEmail(updatedOrder);
+    if (!emailResult.ok) {
+      console.error("Order confirmation email failed:", emailResult.error);
+    }
+  } catch (err) {
+    console.error("Failed to send order confirmation:", err);
+  }
+  try {
+    await sendAdminNewOrderEmail(updatedOrder, ADMIN_EMAILS);
+  } catch (err) {
+    console.error("Failed to send admin notification:", err);
+  }
 }
 
 async function handlePaymentFailed(
@@ -100,6 +104,9 @@ async function handlePaymentFailed(
 ): Promise<void> {
   const order = await getOrderByCheckoutSessionId(session.id);
   if (!order) return;
+
+  // reserved 注文の Stripe Session 期限切れは無視（予約自体は有効のまま）
+  if (order.status === "reserved") return;
 
   if (order.status !== "pending_payment") return;
 

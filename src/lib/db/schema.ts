@@ -12,10 +12,10 @@ import { sql } from "drizzle-orm";
 // ============================================================
 
 export type OrderStatus =
+  | "reserved"
   | "pending_payment"
   | "paid"
   | "cancellation_requested"
-  | "pending_inspection"
   | "shipped"
   | "completed"
   | "payment_failed"

@@ -1,4 +1,4 @@
-CREATE TABLE `accounts` (
+CREATE TABLE IF NOT EXISTS `accounts` (
 	`user_id` text NOT NULL,
 	`type` text NOT NULL,
 	`provider` text NOT NULL,
@@ -14,15 +14,15 @@ CREATE TABLE `accounts` (
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `admin_users` (
+CREATE TABLE IF NOT EXISTS `admin_users` (
 	`id` text PRIMARY KEY NOT NULL,
 	`username` text NOT NULL,
 	`password_hash` text NOT NULL,
 	`created_at` text NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `admin_users_username_unique` ON `admin_users` (`username`);--> statement-breakpoint
-CREATE TABLE `favorites` (
+CREATE UNIQUE INDEX IF NOT EXISTS `admin_users_username_unique` ON `admin_users` (`username`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `favorites` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
 	`product_id` text NOT NULL,
@@ -31,7 +31,7 @@ CREATE TABLE `favorites` (
 	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `orders` (
+CREATE TABLE IF NOT EXISTS `orders` (
 	`id` text PRIMARY KEY NOT NULL,
 	`order_number` text NOT NULL,
 	`order_date` text NOT NULL,
@@ -54,8 +54,8 @@ CREATE TABLE `orders` (
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `orders_order_number_unique` ON `orders` (`order_number`);--> statement-breakpoint
-CREATE TABLE `products` (
+CREATE UNIQUE INDEX IF NOT EXISTS `orders_order_number_unique` ON `orders` (`order_number`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `products` (
 	`id` text PRIMARY KEY NOT NULL,
 	`name_en` text NOT NULL,
 	`name_sv` text NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE `products` (
 	`updated_at` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `reservations` (
+CREATE TABLE IF NOT EXISTS `reservations` (
 	`id` text PRIMARY KEY NOT NULL,
 	`customer_name` text NOT NULL,
 	`customer_email` text NOT NULL,
@@ -88,14 +88,14 @@ CREATE TABLE `reservations` (
 	`updated_at` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `sessions` (
+CREATE TABLE IF NOT EXISTS `sessions` (
 	`session_token` text PRIMARY KEY NOT NULL,
 	`user_id` text NOT NULL,
 	`expires` text NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
 	`id` text PRIMARY KEY NOT NULL,
 	`email` text NOT NULL,
 	`name` text,
@@ -107,8 +107,8 @@ CREATE TABLE `users` (
 	`updated_at` text NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
-CREATE TABLE `verification_tokens` (
+CREATE UNIQUE INDEX IF NOT EXISTS `users_email_unique` ON `users` (`email`);--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS `verification_tokens` (
 	`identifier` text NOT NULL,
 	`token` text NOT NULL,
 	`expires` text NOT NULL,

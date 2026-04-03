@@ -2,8 +2,8 @@
 
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { Heart, ShoppingCart, Menu, X, Globe, LogIn, LogOut } from "lucide-react";
-import { useState } from "react";
+import { Heart, ShoppingCart, Menu, X, Globe, LogIn, LogOut, Package } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/hooks/useCart";
@@ -19,6 +19,31 @@ export default function Header() {
   const { totalItems } = useCart();
   const { status } = useSession();
   const isAuthenticated = status === "authenticated";
+  const [hasNewReservation, setHasNewReservation] = useState(false);
+
+  // localStorage の予約フラグを監視
+  useEffect(() => {
+    const check = () => {
+      setHasNewReservation(localStorage.getItem("hasNewReservation") === "true");
+    };
+    check();
+    // 同一タブ内で InspectionForm がフラグを立てた場合を検知
+    window.addEventListener("storage", check);
+    // カスタムイベントで同一タブ内の変更も検知
+    window.addEventListener("newReservation", check);
+    return () => {
+      window.removeEventListener("storage", check);
+      window.removeEventListener("newReservation", check);
+    };
+  }, []);
+
+  // /orders ページに遷移したらフラグをクリア
+  useEffect(() => {
+    if (pathname === "/orders") {
+      localStorage.removeItem("hasNewReservation");
+      setHasNewReservation(false);
+    }
+  }, [pathname]);
 
   const handleLocaleSwitch = () => {
     const newLocale = locale === "en" ? "sv" : "en";
@@ -75,6 +100,22 @@ export default function Header() {
             >
               <Heart className="h-5 w-5" />
             </Link>
+
+            {/* 注文履歴 */}
+            {isAuthenticated && (
+              <Link
+                href="/orders"
+                className="relative rounded-md p-2 text-muted transition-colors hover:text-white"
+                aria-label={t("common.orders")}
+              >
+                <Package className="h-5 w-5" />
+                {hasNewReservation && (
+                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">
+                    !
+                  </span>
+                )}
+              </Link>
+            )}
 
             {/* カート */}
             <button
@@ -138,6 +179,15 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
+              {isAuthenticated && (
+                <Link
+                  href="/orders"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-white"
+                >
+                  {t("common.orders")}
+                </Link>
+              )}
               <Link
                 href="/cart"
                 onClick={() => setMobileMenuOpen(false)}

@@ -7,7 +7,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Package,
-  CalendarCheck,
+  ShoppingBag,
   BarChart3,
   LogOut,
   Menu,
@@ -17,7 +17,7 @@ import {
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
-  { href: "/admin/reservations", label: "Reservations", icon: CalendarCheck },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/sales", label: "Sales", icon: BarChart3 },
 ];
 

@@ -16,7 +16,8 @@
     "backToHome": "Tillbaka till startsidan",
     "login": "Logga in",
     "logout": "Logga ut",
-    "myPage": "Min sida"
+    "myPage": "Min sida",
+    "orders": "Bestallningar"
   },
   "home": {
     "heroTitle": "Utvalda animefigurer",
@@ -94,6 +95,15 @@
     "postalCodePlaceholder": "t.ex. 753 09",
     "payWithStripe": "Betala med Stripe",
     "useDefaultAddress": "Anvand standardadress",
+    "inspectionTitle": "Personlig inspektionskassa",
+    "inspectionNotice1": "Ingen betalning kravs nu. Dina varor reserveras i 7 dagar.",
+    "inspectionNotice2": "Om inspektion inte sker inom 7 dagar avbryts reservationen automatiskt.",
+    "inspectionNotice3": "For sakerhetens skull sker overlamnandet pa en offentlig plats (t.ex. tagstation, kopcentrum).",
+    "inspectionMeetingPlace": "Motesplats: Uppsala Centralstation-omradet",
+    "inspectionAgree": "Jag forstar och godkanner villkoren for inspektion ovan",
+    "inspectionSubtotal": "Delsumma",
+    "inspectionNoCharge": "Ingen kostnad nu — betala efter inspektion",
+    "reserveForInspection": "Reservera for inspektion",
     "errors": {
       "nameRequired": "Namnet maste vara minst 2 tecken",
       "emailInvalid": "Ange en giltig e-postadress",
@@ -103,7 +113,8 @@
       "cityRequired": "Stad kravs",
       "postalCodeInvalid": "Ange ett giltigt svenskt postnummer (t.ex. 753 09)",
       "serverError": "Nagot gick fel. Forsok igen.",
-      "outOfStock": "Vissa artiklar ar slutsalda. Uppdatera din varukorg."
+      "outOfStock": "Vissa artiklar ar slutsalda. Uppdatera din varukorg.",
+      "tooManyReservations": "Du har for manga aktiva reservationer (max 3). Slutfor eller avbryt befintliga forst."
     }
   },
   "confirm": {
@@ -136,10 +147,50 @@
     "inspectionDeadline": "Deadline: {date}",
     "inspectionMessage": "Hej! Jag vill boka en inspektion for order {orderNumber}.",
     "contactInstagram": "Kontakta via Instagram DM",
+    "dmTemplate": "Kopiera detta meddelande for Instagram DM:",
+    "copyMessage": "Kopiera meddelande",
+    "copied": "Kopierat!",
     "continueShopping": "Fortsatt handla",
     "viewOrders": "Visa bestallningar",
     "notFound": "Bestallningen hittades inte",
     "backToHome": "Tillbaka till startsidan"
+  },
+  "orders": {
+    "title": "Mina bestallningar",
+    "empty": "Inga bestallningar annu",
+    "browseProducts": "Utforska produkter"
+  },
+  "orderDetail": {
+    "title": "Orderdetaljer",
+    "loading": "Laddar order...",
+    "notFound": "Ordern hittades inte",
+    "backToHome": "Tillbaka till startsidan",
+    "orderNumber": "Ordernummer",
+    "orderDetails": "Orderdetaljer",
+    "total": "Totalt",
+    "continueShopping": "Fortsatt handla",
+    "payNowTitle": "Redo att betala?",
+    "payNowDescription": "Efter att ha inspekterat varorna, tryck pa knappen nedan for att slutfora kopet via Stripe.",
+    "payNow": "Betala nu",
+    "payError": "Betalningen misslyckades. Forsok igen.",
+    "processing": "Bearbetar...",
+    "deadline": "Reservationen gar ut: {date}",
+    "expired": "Denna reservation har gatt ut och kommer att avbrytas automatiskt.",
+    "paymentProcessing": "Bearbetar din betalning... Det kan ta en stund.",
+    "arrangeInspection": "Boka inspektion",
+    "arrangeInspectionNote": "Kontakta oss via Instagram DM for att boka tid och plats for inspektion.",
+    "copyDmLabel": "Kopiera detta meddelande for Instagram DM:",
+    "dmTemplate": "Hej! Jag vill boka en inspektion for order {orderNumber}.",
+    "copyMessage": "Kopiera meddelande",
+    "copied": "Kopierat!",
+    "contactInstagram": "Kontakta via Instagram DM",
+    "statusReserved": "Reserverad",
+    "statusPendingPayment": "Vantar pa betalning",
+    "statusPaid": "Betald",
+    "statusShipped": "Skickad",
+    "statusCompleted": "Slutford",
+    "statusCancelled": "Avbruten",
+    "statusPaymentFailed": "Betalning misslyckades"
   },
   "favorites": {
     "add": "Lagg till i favoriter",
