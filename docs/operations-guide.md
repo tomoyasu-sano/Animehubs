@@ -89,11 +89,23 @@ stateDiagram-v2
 
 ---
 
-## 5. 自動処理（Cron）
+## 5. 予約キャンセル（手動）
 
-- **毎時実行**: 予約から 7 日超過した reserved 注文を自動キャンセル
-- **影響**: reserved_stock 解放、顧客にキャンセルメール送信
-- **Stripe 返金なし**: 予約時点では決済していないため不要
+- **現在は手動運用**: 管理画面（/admin/orders）から「Cancel Reservation」で個別キャンセル
+- 7日以内に対面できなかった予約は、管理者が手動でキャンセルする
+- キャンセルすると: reserved_stock 解放、顧客にキャンセルメール送信
+- Stripe 返金なし（予約時点では決済していないため不要）
+
+### 将来の自動化（Cron）
+
+自動キャンセルを導入する場合:
+1. Cloudflare環境変数に `CRON_SECRET` を追加（`openssl rand -base64 32` で生成）
+2. [cron-job.org](https://cron-job.org)（無料）でジョブ作成:
+   - URL: `https://ドメイン/api/cron/cancel-expired-inspections`
+   - Method: POST
+   - Schedule: 毎時（`0 * * * *`）
+   - Header: `Authorization: Bearer {CRON_SECRETの値}`
+3. これで予約から7日超過した注文が自動キャンセルされる
 
 ---
 
