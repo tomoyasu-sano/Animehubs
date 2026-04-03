@@ -90,5 +90,6 @@ export const INSTAGRAM_URL = "https://www.instagram.com/animehubs_swe/";
 // 管理者メールアドレス（Googleログイン時に自動で role='admin' 付与）
 export const ADMIN_EMAILS = [
   "anytimes.sano@gmail.com",
+  "anytimes.snao.swe@gmail.com",
   "asa5ng13@gmail.com",
 ] as const;
