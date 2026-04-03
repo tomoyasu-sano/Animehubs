@@ -1,6 +1,11 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
+import NextAuth from "next-auth";
+import { authConfig } from "./lib/auth-v2";
+
+// ミドルウェア用の軽量auth（DB接続不要、JWTデコードのみ）
+const { auth: authMiddleware } = NextAuth(authConfig);
 
 // 保護対象パス（ログイン必須）
 export const PROTECTED_PATHS = [
@@ -74,37 +79,37 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
-    // NextAuth セッション確認 + role=admin チェック
+    // NextAuth セッション確認 + role=admin チェック（DB不要の軽量版）
     try {
-      const { auth } = await import("./lib/auth-v2");
-      const session = await auth();
+      const session = await authMiddleware();
       if (!session?.user) {
+        console.log("[middleware] admin: no session, redirecting to login");
         return NextResponse.redirect(new URL("/admin/login", request.url));
       }
       const role = (session.user as { role?: string }).role;
       if (role !== "admin") {
+        console.log("[middleware] admin: role is not admin:", role);
         return NextResponse.redirect(new URL("/admin/login", request.url));
       }
-    } catch {
+    } catch (error) {
+      console.error("[middleware] admin auth error:", error);
       return NextResponse.redirect(new URL("/admin/login", request.url));
     }
     return NextResponse.next();
   }
 
-  // 保護対象パスのチェック
+  // 保護対象パスのチェック（DB不要の軽量版）
   if (isProtectedPath(pathname)) {
-    // NextAuth セッション確認（動的import で循環参照を回避）
     try {
-      const { auth } = await import("./lib/auth-v2");
-      const session = await auth();
+      const session = await authMiddleware();
       if (!session?.user) {
         const locale = extractLocale(pathname);
         const loginUrl = new URL(`/${locale}/auth/login`, request.url);
         loginUrl.searchParams.set("callbackUrl", pathname);
         return NextResponse.redirect(loginUrl);
       }
-    } catch {
-      // auth 失敗時も保護対象パスへのアクセスは拒否（ログインへリダイレクト）
+    } catch (error) {
+      console.error("[middleware] protected path auth error:", error);
       const locale = extractLocale(pathname);
       const loginUrl = new URL(`/${locale}/auth/login`, request.url);
       loginUrl.searchParams.set("callbackUrl", pathname);
