@@ -13,9 +13,8 @@ export const metadata: Metadata = {
     "Hand-picked anime collectibles from Japan, available for local pickup in Uppsala, Sweden.",
   keywords: [
     "anime figures",
-    "nendoroid",
-    "scale figures",
-    "figma",
+    "anime keychains",
+    "anime pins",
     "Uppsala",
     "Sweden",
     "anime collectibles",

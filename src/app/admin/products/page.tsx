@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import type { Product } from "@/lib/db/schema";
-import { CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
+import { CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants";
 
 function formatSEK(amount: number): string {
   return `${(amount / 100).toLocaleString("sv-SE")} SEK`;
@@ -177,7 +177,7 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <span className="inline-flex rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium capitalize text-gray-700">
-                        {product.category.replace(/-/g, " ")}
+                        {CATEGORY_LABELS[product.category as Category]?.en || product.category}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-gray-900">

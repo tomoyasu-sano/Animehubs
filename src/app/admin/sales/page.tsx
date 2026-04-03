@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { TrendingUp, BarChart3 } from "lucide-react";
 import type { DashboardStats } from "@/lib/db/admin-queries";
+import { CATEGORY_LABELS, type Category } from "@/lib/constants";
 
 function formatSEK(amount: number): string {
   return `${(amount / 100).toLocaleString("sv-SE")} SEK`;
@@ -141,8 +142,8 @@ export default function AdminSalesPage() {
                   key={c.category}
                   className="rounded-lg border border-gray-100 p-4"
                 >
-                  <p className="text-sm font-medium capitalize text-gray-500">
-                    {c.category.replace(/-/g, " ")}
+                  <p className="text-sm font-medium text-gray-500">
+                    {CATEGORY_LABELS[c.category as Category]?.en || c.category}
                   </p>
                   <p className="mt-1 text-xl font-bold text-gray-900">
                     {formatSEK(c.total)}

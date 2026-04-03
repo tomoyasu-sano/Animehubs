@@ -15,6 +15,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { INSTAGRAM_URL } from "@/lib/constants";
 import type { OrderItem } from "@/lib/db/schema";
 
 interface OrderData {
@@ -31,10 +32,6 @@ interface OrderData {
   createdAt: string;
   stripeCheckoutSessionId: string | null;
 }
-
-const INSTAGRAM_URL =
-  process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
-  "https://www.instagram.com/animehubs_swe/";
 
 function StatusBadge({ status }: { status: string }) {
   const t = useTranslations("orderDetail");

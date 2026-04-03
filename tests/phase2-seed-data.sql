@@ -21,7 +21,7 @@ DELETE FROM products;
 INSERT INTO products (id, name_en, name_sv, description_en, description_sv, price, stock, reserved_stock, category, condition, images, featured, likes_count, created_at, updated_at) VALUES
 -- 1) 通常在庫（stock=10）
 (
-  'test-prod-001',
+  'b0000001-0000-4000-8000-000000000001',
   'Rem - Re:Zero 1/7 Scale Figure',
   'Rem - Re:Zero 1/7 Skalfigur',
   'Beautiful 1/7 scale figure of Rem from Re:Zero.',
@@ -29,7 +29,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
   189900,
   10,
   0,
-  'scale-figures',
+  'figures',
   'like_new',
   '["/placeholder/figure-1.svg"]',
   1,
@@ -39,7 +39,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
 ),
 -- 2) 通常在庫（stock=5）
 (
-  'test-prod-002',
+  'b0000001-0000-4000-8000-000000000002',
   'Nendoroid Miku Hatsune',
   'Nendoroid Miku Hatsune',
   'Classic Nendoroid of Hatsune Miku with accessories.',
@@ -47,7 +47,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
   89900,
   5,
   0,
-  'nendoroids',
+  'figures',
   'good',
   '["/placeholder/figure-2.svg"]',
   1,
@@ -57,7 +57,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
 ),
 -- 3) 残りわずか（stock=3, reserved=1 → 実質2個）
 (
-  'test-prod-003',
+  'b0000001-0000-4000-8000-000000000003',
   'Nezuko Kamado - Demon Slayer',
   'Nezuko Kamado - Demon Slayer',
   'Nezuko figure in bamboo muzzle pose.',
@@ -65,7 +65,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
   149900,
   3,
   1,
-  'scale-figures',
+  'figures',
   'like_new',
   '["/placeholder/figure-1.svg"]',
   0,
@@ -75,7 +75,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
 ),
 -- 4) 残りわずか（stock=2, reserved=0 → 実質2個）
 (
-  'test-prod-004',
+  'b0000001-0000-4000-8000-000000000004',
   'Gojo Satoru - Jujutsu Kaisen',
   'Gojo Satoru - Jujutsu Kaisen',
   'Gojo figure with Infinite Void pose.',
@@ -83,7 +83,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
   219900,
   2,
   0,
-  'scale-figures',
+  'keychains',
   'good',
   '["/placeholder/figure-2.svg"]',
   0,
@@ -93,7 +93,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
 ),
 -- 5) 在庫切れ（stock=0）
 (
-  'test-prod-005',
+  'b0000001-0000-4000-8000-000000000005',
   'Zero Two - Darling in the Franxx',
   'Zero Two - Darling in the Franxx',
   'Zero Two in pilot suit, SOLD OUT.',
@@ -101,7 +101,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
   299900,
   0,
   0,
-  'scale-figures',
+  'pins',
   'like_new',
   '["/placeholder/figure-1.svg"]',
   0,
@@ -111,7 +111,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
 ),
 -- 6) 在庫切れ（stock=1, reserved=1 → 実質0個）
 (
-  'test-prod-006',
+  'b0000001-0000-4000-8000-000000000006',
   'Levi Ackerman - Attack on Titan',
   'Levi Ackerman - Attack on Titan',
   'Levi figure, last one reserved.',
@@ -119,7 +119,7 @@ INSERT INTO products (id, name_en, name_sv, description_en, description_sv, pric
   179900,
   1,
   1,
-  'scale-figures',
+  'figures',
   'good',
   '["/placeholder/figure-2.svg"]',
   0,

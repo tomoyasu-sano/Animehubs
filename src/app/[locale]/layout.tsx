@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
 import Providers from "@/components/Providers";
+import { auth } from "@/lib/auth-v2";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CookieBanner from "@/components/layout/CookieBanner";
@@ -30,11 +31,12 @@ export default async function LocaleLayout({
   }
 
   const messages = await getMessages();
+  const session = await auth();
   const webSiteJsonLd = generateWebSiteJsonLd();
   const localBusinessJsonLd = generateLocalBusinessJsonLd();
 
   return (
-    <html lang={locale} className={`dark ${inter.variable}`}>
+    <html lang={locale} className={`dark ${inter.variable}`} suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -49,8 +51,8 @@ export default async function LocaleLayout({
           }}
         />
       </head>
-      <body className="min-h-screen bg-background font-sans antialiased">
-        <Providers>
+      <body className="min-h-screen bg-background font-sans antialiased" suppressHydrationWarning>
+        <Providers session={session}>
           <NextIntlClientProvider messages={messages}>
             <div className="flex min-h-screen flex-col">
               <Header />

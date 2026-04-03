@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { CheckCircle, Loader2, AlertCircle, Copy, Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { INSTAGRAM_URL } from "@/lib/constants";
 import { useCart } from "@/hooks/useCart";
 import type { OrderItem, SwedishAddress } from "@/lib/db/schema";
 
@@ -24,10 +25,6 @@ interface OrderData {
 }
 
 type PageState = "loading" | "processing" | "complete" | "not_found";
-
-const INSTAGRAM_URL =
-  process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
-  "https://www.instagram.com/animehubs_swe/";
 
 export default function CheckoutCompletePage() {
   const t = useTranslations("orderComplete");

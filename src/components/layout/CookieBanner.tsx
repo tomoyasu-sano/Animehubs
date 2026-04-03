@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 const COOKIE_CONSENT_KEY = "animehubs-cookie-consent";
 
-function getInitialVisibility(): boolean {
-  if (typeof window === "undefined") return false;
-  return !localStorage.getItem(COOKIE_CONSENT_KEY);
-}
-
 export default function CookieBanner() {
   const t = useTranslations("cookie");
-  const [visible, setVisible] = useState(getInitialVisibility);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem(COOKIE_CONSENT_KEY)) {
+      setVisible(true);
+    }
+  }, []);
 
   const handleAccept = () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");

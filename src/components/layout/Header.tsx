@@ -16,9 +16,14 @@ export default function Header() {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { totalItems } = useCart();
   const { status } = useSession();
-  const isAuthenticated = status === "authenticated";
+  const isAuthenticated = mounted && status === "authenticated";
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [hasNewReservation, setHasNewReservation] = useState(false);
 
   // localStorage の予約フラグを監視
@@ -109,7 +114,7 @@ export default function Header() {
                 aria-label={t("common.orders")}
               >
                 <Package className="h-5 w-5" />
-                {hasNewReservation && (
+                {mounted && hasNewReservation && (
                   <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">
                     !
                   </span>
@@ -124,7 +129,7 @@ export default function Header() {
               aria-label={t("common.cart")}
             >
               <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
+              {mounted && totalItems > 0 && (
                 <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-black">
                   {totalItems > 99 ? "99+" : totalItems}
                 </span>
@@ -193,7 +198,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors hover:text-white"
               >
-                {t("common.cart")} {totalItems > 0 && `(${totalItems})`}
+                {t("common.cart")} {mounted && totalItems > 0 && `(${totalItems})`}
               </Link>
             </nav>
           </div>
