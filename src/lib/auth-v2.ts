@@ -34,9 +34,15 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        // user.email が存在する場合は token に明示的にセット
+        if (user.email) {
+          token.email = user.email;
+        }
       }
-      // 毎回 token.email から role を再計算（セッション途中の ADMIN_EMAILS 変更にも対応）
+      console.log("[jwt callback] token.email:", token.email, "user?.email:", user?.email, "ADMIN_EMAILS:", ADMIN_EMAILS);
+      // 毎回 token.email から role を再計算
       token.role = isAdminEmail(token.email) ? "admin" : "user";
+      console.log("[jwt callback] role:", token.role);
       return token;
     },
     async session({ session, token }) {
