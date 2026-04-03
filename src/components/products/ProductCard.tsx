@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { formatPrice, getLocalizedField } from "@/lib/utils";
+import { formatPrice, getLocalizedField, parseImages } from "@/lib/utils";
 import { CONDITION_LABELS, type Condition } from "@/lib/constants";
 import FavoriteButton from "@/components/favorites/FavoriteButton";
 import type { Product } from "@/lib/db/schema";
@@ -19,15 +19,7 @@ export default function ProductCard({ product, isFavorite, onToggleFavorite, lik
   const locale = useLocale();
   const t = useTranslations("products");
   const name = getLocalizedField(product, "name", locale);
-  let images: string[] = [];
-  try {
-    const parsed: unknown = JSON.parse(product.images);
-    if (Array.isArray(parsed)) {
-      images = parsed.filter((v): v is string => typeof v === "string");
-    }
-  } catch {
-    // 不正なJSON — フォールバック
-  }
+  const images = parseImages(product.images);
   const firstImage = images[0] || "/placeholder/no-image.svg";
   const conditionLabel =
     CONDITION_LABELS[product.condition as Condition]?.[locale as "en" | "sv"] || product.condition;

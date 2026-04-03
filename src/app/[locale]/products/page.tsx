@@ -5,6 +5,7 @@ import ProductSearch from "@/components/products/ProductSearch";
 import CategoryFilter from "@/components/products/CategoryFilter";
 import { generatePageMetadata } from "@/lib/seo";
 import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/Skeleton";
 import type { Metadata } from "next";
 
 interface ProductsPageProps {
@@ -50,10 +51,16 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
 
       {/* 検索・フィルター */}
       <div className="mb-8 space-y-4">
-        <Suspense fallback={null}>
+        <Suspense fallback={<Skeleton className="h-10 w-full rounded-lg" />}>
           <ProductSearch />
         </Suspense>
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          <div className="flex gap-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Skeleton key={i} className="h-8 w-24 rounded-full" />
+            ))}
+          </div>
+        }>
           <CategoryFilter />
         </Suspense>
       </div>

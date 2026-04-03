@@ -34,6 +34,22 @@ export function generateSlug(text: string): string {
 }
 
 /**
+ * JSON文字列から画像URL配列をパースする
+ * 不正なJSONの場合は空配列を返す
+ */
+export function parseImages(json: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(json);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((v): v is string => typeof v === "string");
+    }
+  } catch {
+    // 不正なJSON — フォールバック
+  }
+  return [];
+}
+
+/**
  * 商品名をロケールに応じて取得
  */
 export function getLocalizedField<T extends Record<string, unknown>>(

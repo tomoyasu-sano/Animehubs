@@ -393,6 +393,37 @@ export async function createReservationOrder(input: {
 }
 
 /**
+ * ユーザーの注文一覧を取得（ページネーション付き）
+ */
+export async function getOrdersByUserId(
+  userId: string,
+  options: { page?: number; limit?: number } = {},
+): Promise<{ orders: Order[]; total: number; page: number; limit: number }> {
+  const db = await getDb();
+  const page = Math.max(1, options.page ?? 1);
+  const limit = Math.min(50, Math.max(1, options.limit ?? 10));
+  const offset = (page - 1) * limit;
+
+  const [items, totalResult] = await Promise.all([
+    db
+      .select()
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .orderBy(sql`${orders.createdAt} DESC`)
+      .limit(limit)
+      .offset(offset)
+      .all(),
+    db
+      .select({ cnt: count() })
+      .from(orders)
+      .where(eq(orders.userId, userId))
+      .get(),
+  ]);
+
+  return { orders: items, total: totalResult?.cnt ?? 0, page, limit };
+}
+
+/**
  * 注文IDで検索
  */
 export async function getOrderById(id: string): Promise<Order | undefined> {
