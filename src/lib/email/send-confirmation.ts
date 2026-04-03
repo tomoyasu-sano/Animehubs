@@ -1,14 +1,12 @@
 import { Resend } from "resend";
 import type { Reservation } from "@/lib/db/schema";
 import type { ReservationItemInput } from "@/lib/validation";
-import { PICKUP_LOCATIONS, TIME_SLOTS } from "@/lib/constants";
+import { PICKUP_LOCATIONS, TIME_SLOTS, INSTAGRAM_URL } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "AnimeHubs <onboarding@resend.dev>";
-const INSTAGRAM_URL =
-  process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/animehubs_placeholder";
 
 interface SendConfirmationOptions {
   reservation: Reservation;

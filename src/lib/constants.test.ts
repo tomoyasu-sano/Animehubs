@@ -42,8 +42,8 @@ describe("TIME_SLOTS", () => {
 });
 
 describe("CATEGORIES", () => {
-  it("7つのカテゴリを持つ", () => {
-    expect(CATEGORIES).toHaveLength(7);
+  it("4つのカテゴリを持つ", () => {
+    expect(CATEGORIES).toHaveLength(4);
   });
 
   it("全カテゴリに表示ラベルがある", () => {

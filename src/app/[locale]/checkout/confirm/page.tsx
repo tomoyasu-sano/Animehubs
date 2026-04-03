@@ -6,7 +6,7 @@ import { CheckCircle, ExternalLink, ArrowLeft } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/utils";
-import { PICKUP_LOCATIONS, TIME_SLOTS } from "@/lib/constants";
+import { PICKUP_LOCATIONS, TIME_SLOTS, INSTAGRAM_URL } from "@/lib/constants";
 
 interface ReservationItem {
   productId: string;
@@ -38,8 +38,7 @@ export default function ConfirmPage() {
   const [loading, setLoading] = useState(!!reservationId);
   const [error, setError] = useState(!reservationId);
 
-  const instagramUrl =
-    process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/animehubs_placeholder";
+  const instagramUrl = INSTAGRAM_URL;
 
   useEffect(() => {
     if (!reservationId) return;

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { DashboardStats } from "@/lib/db/admin-queries";
+import { CATEGORY_LABELS, type Category } from "@/lib/constants";
 
 function StatCard({
   title,
@@ -248,8 +249,8 @@ export default function AdminDashboardPage() {
                 key={c.category}
                 className="rounded-lg border border-gray-100 p-4"
               >
-                <p className="text-sm font-medium capitalize text-gray-900">
-                  {c.category.replace(/-/g, " ")}
+                <p className="text-sm font-medium text-gray-900">
+                  {CATEGORY_LABELS[c.category as Category]?.en || c.category}
                 </p>
                 <p className="mt-1 text-lg font-bold text-gray-900">
                   {formatSEK(c.total)}

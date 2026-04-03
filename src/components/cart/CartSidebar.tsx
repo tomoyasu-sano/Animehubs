@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/utils";
 import CartItemComponent from "./CartItem";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -15,7 +15,19 @@ interface CartSidebarProps {
 
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const t = useTranslations("cart");
-  const { items, updateQuantity, removeItem, totalAmount, totalItems, isEmpty } = useCart();
+  const [mounted, setMounted] = useState(false);
+  const cart = useCart();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // hydration中はサーバーと同じ空状態を返す（DOM一致を保証）
+  const items = mounted ? cart.items : [];
+  const totalItems = mounted ? cart.totalItems : 0;
+  const totalAmount = mounted ? cart.totalAmount : 0;
+  const isEmpty = mounted ? cart.isEmpty : true;
+  const { updateQuantity, removeItem } = cart;
 
   // スクロールロック（モバイルでフルスクリーン時のスクロール防止）
   useEffect(() => {

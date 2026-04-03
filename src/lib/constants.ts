@@ -39,11 +39,8 @@ export const TIME_SLOTS = [
 // 商品カテゴリ
 export const CATEGORIES = [
   "figures",
-  "scale-figures",
-  "nendoroid",
-  "figma",
-  "prize-figures",
-  "garage-kits",
+  "keychains",
+  "pins",
   "other",
 ] as const;
 
@@ -52,12 +49,9 @@ export type Category = (typeof CATEGORIES)[number];
 // カテゴリ表示名
 export const CATEGORY_LABELS: Record<Category, { en: string; sv: string }> = {
   figures: { en: "Figures", sv: "Figurer" },
-  "scale-figures": { en: "Scale Figures", sv: "Skalfigurer" },
-  nendoroid: { en: "Nendoroid", sv: "Nendoroid" },
-  figma: { en: "Figma", sv: "Figma" },
-  "prize-figures": { en: "Prize Figures", sv: "Prisfigurer" },
-  "garage-kits": { en: "Garage Kits", sv: "Garage Kits" },
-  other: { en: "Other", sv: "Ovrigt" },
+  keychains: { en: "Keychains", sv: "Nyckelringar" },
+  pins: { en: "Pins & Badges", sv: "Pins & Märken" },
+  other: { en: "Other", sv: "Övrigt" },
 };
 
 // コンディション
@@ -89,6 +83,9 @@ export const SHIPPING_FEE_ORE = 7900; // 79 SEK
 // 実物確認の予約制限
 export const MAX_ACTIVE_RESERVATIONS = 3;
 export const RESERVATION_EXPIRY_DAYS = 7;
+
+// Instagram URL
+export const INSTAGRAM_URL = "https://www.instagram.com/animehubs_swe/";
 
 // 管理者メールアドレス（Googleログイン時に自動で role='admin' 付与）
 export const ADMIN_EMAILS = [

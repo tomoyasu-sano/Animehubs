@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { formatPrice } from "@/lib/utils";
+import { INSTAGRAM_URL } from "@/lib/constants";
 import type { Order, OrderItem } from "@/lib/db/schema";
 
 function escapeHtml(s: string): string {
@@ -14,9 +15,6 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL =
   process.env.RESEND_FROM_EMAIL || "AnimeHubs <onboarding@resend.dev>";
-const INSTAGRAM_URL =
-  process.env.NEXT_PUBLIC_INSTAGRAM_URL ||
-  "https://www.instagram.com/animehubs_swe/";
 
 function buildOrderEmailHtml(order: Order, items: OrderItem[]): string {
   const isDelivery = order.type === "delivery";

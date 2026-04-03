@@ -3,10 +3,11 @@
 import { useTranslations } from "next-intl";
 import { ExternalLink } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { INSTAGRAM_URL } from "@/lib/constants";
 
 export default function Footer() {
   const t = useTranslations();
-  const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/animehubs_placeholder";
+  const instagramUrl = INSTAGRAM_URL;
 
   return (
     <footer className="border-t border-neutral-800 bg-[var(--color-footer)]">

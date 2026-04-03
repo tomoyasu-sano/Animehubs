@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import type { Product } from "@/lib/db/schema";
 
@@ -20,46 +20,37 @@ const CART_KEY = "animehubs_cart";
 const CART_UPDATED_EVENT = "cart-updated";
 
 const EMPTY_ARRAY: CartItem[] = [];
-let cachedSnapshot: CartItem[] = EMPTY_ARRAY;
-let cachedRaw: string | null = null;
 
-function getSnapshot(): CartItem[] {
+/** localStorageからカートを読み込む */
+function readCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(CART_KEY);
-    if (raw !== cachedRaw) {
-      cachedRaw = raw;
-      cachedSnapshot = raw ? JSON.parse(raw) : EMPTY_ARRAY;
-    }
-    return cachedSnapshot;
+    return raw ? JSON.parse(raw) : EMPTY_ARRAY;
   } catch {
     return EMPTY_ARRAY;
   }
 }
 
-function getServerSnapshot(): CartItem[] {
-  return EMPTY_ARRAY;
-}
-
-function subscribe(callback: () => void): () => void {
-  window.addEventListener("storage", callback);
-  window.addEventListener(CART_UPDATED_EVENT, callback);
-  return () => {
-    window.removeEventListener("storage", callback);
-    window.removeEventListener(CART_UPDATED_EVENT, callback);
-  };
-}
-
-/** localStorageに保存し、全useCartインスタンスに通知 */
-function saveItems(newItems: CartItem[]) {
+/** localStorageにカートを保存し、他のインスタンスに通知 */
+function persistCart(newItems: CartItem[]) {
   try {
-    const json = JSON.stringify(newItems);
-    localStorage.setItem(CART_KEY, json);
-    cachedRaw = json;
-    cachedSnapshot = newItems;
+    localStorage.setItem(CART_KEY, JSON.stringify(newItems));
   } catch {
     // 保存失敗時は無視
   }
   window.dispatchEvent(new Event(CART_UPDATED_EVENT));
+}
+
+function parseImages(imagesJson: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(imagesJson);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((v): v is string => typeof v === "string");
+    }
+  } catch {
+    // 不正なJSON
+  }
+  return [];
 }
 
 const noOp = () => {};
@@ -67,14 +58,33 @@ const noOp = () => {};
 export function useCart() {
   const { status } = useSession();
   const isAuthenticated = status === "authenticated";
-  const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  // 初期値は空配列 → サーバーレンダリングと一致（hydration mismatch を回避）
+  const [items, setItems] = useState<CartItem[]>(EMPTY_ARRAY);
+  // useCallback 内から最新の items を参照するための ref
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+
+  // マウント後に localStorage から読み込み + イベントリスナー登録
+  useEffect(() => {
+    setItems(readCart());
+
+    const handleChange = () => {
+      setItems(readCart());
+    };
+
+    window.addEventListener("storage", handleChange);
+    window.addEventListener(CART_UPDATED_EVENT, handleChange);
+    return () => {
+      window.removeEventListener("storage", handleChange);
+      window.removeEventListener(CART_UPDATED_EVENT, handleChange);
+    };
+  }, []);
 
   const addItem = useCallback(
     (product: Product) => {
-      // getSnapshot() で最新のカート状態を取得
-      const current = getSnapshot();
+      const current = itemsRef.current;
       const existing = current.find((item) => item.productId === product.id);
-      const images: string[] = JSON.parse(product.images);
+      const images = parseImages(product.images);
       const availableStock = product.stock - product.reservedStock;
 
       if (existing) {
@@ -84,7 +94,7 @@ export function useCart() {
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
-        saveItems(updated);
+        persistCart(updated);
       } else {
         if (availableStock <= 0) return;
         const newItem: CartItem = {
@@ -97,7 +107,7 @@ export function useCart() {
           stock: product.stock,
           reservedStock: product.reservedStock,
         };
-        saveItems([...current, newItem]);
+        persistCart([...current, newItem]);
       }
     },
     []
@@ -105,17 +115,17 @@ export function useCart() {
 
   const removeItem = useCallback(
     (productId: string) => {
-      const current = getSnapshot();
-      saveItems(current.filter((item) => item.productId !== productId));
+      const current = itemsRef.current;
+      persistCart(current.filter((item) => item.productId !== productId));
     },
     []
   );
 
   const updateQuantity = useCallback(
     (productId: string, quantity: number) => {
-      const current = getSnapshot();
+      const current = itemsRef.current;
       if (quantity <= 0) {
-        saveItems(current.filter((item) => item.productId !== productId));
+        persistCart(current.filter((item) => item.productId !== productId));
         return;
       }
       const updated = current.map((item) =>
@@ -123,13 +133,13 @@ export function useCart() {
           ? { ...item, quantity: Math.min(quantity, item.stock - item.reservedStock) }
           : item
       );
-      saveItems(updated);
+      persistCart(updated);
     },
     []
   );
 
   const clearCart = useCallback(() => {
-    saveItems([]);
+    persistCart([]);
   }, []);
 
   // 未認証時は操作を無効化（localStorageは保持）
