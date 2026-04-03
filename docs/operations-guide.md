@@ -131,3 +131,109 @@ stateDiagram-v2
 | 予約有効期限 | 7 日 | 超過で自動キャンセル |
 | Inspection paid 後の返金 | なし | 対面販売 = スウェーデン距離販売法の対象外 |
 | Stripe Checkout Session | 30 分で期限切れ | 期限切れ後も再度 Pay Now 可能 |
+
+---
+
+## 8. デプロイ手順
+
+### 通常のコード修正リリース
+
+1. ローカルで修正・動作確認（`npm run dev:cf`）
+2. `git add` → `git commit` → `git push origin main`
+3. Cloudflare が自動でビルド・デプロイ（数分で完了）
+
+※ 設定変更（wrangler.toml 等）を含む場合は `npm run build:cf` でローカルビルド確認してからpush
+
+### 環境変数の追加・変更
+
+Cloudflare Dashboard の環境変数は Workers に届かないことがある。**必ず `wrangler secret` で設定する**：
+
+```bash
+npx wrangler secret put 変数名
+# プロンプトで値を入力
+```
+
+設定済みの確認:
+```bash
+npx wrangler secret list
+```
+
+### 現在の本番環境変数一覧
+
+| 変数名 | 用途 | 備考 |
+|--------|------|------|
+| AUTH_SECRET | NextAuth署名キー | |
+| AUTH_TRUST_HOST | NextAuth ホスト信頼 | `true` |
+| AUTH_URL | NextAuth ベースURL | `https://anime-hubs.com` |
+| AUTH_GOOGLE_ID | Google OAuth ID | |
+| AUTH_GOOGLE_SECRET | Google OAuth Secret | |
+| STRIPE_SECRET_KEY | Stripe本番キー | `sk_live_...` |
+| STRIPE_PUBLISHABLE_KEY | Stripe公開キー | `pk_live_...` |
+| STRIPE_WEBHOOK_SECRET | Stripe Webhook署名 | `whsec_...` |
+| RESEND_API_KEY | メール送信 | |
+| RESEND_FROM_EMAIL | 送信元メール | `AnimeHubs <noreply@anime-hubs.com>` |
+| JWT_SECRET | 管理者JWT | |
+| ADMIN_PASSWORD_HASH | 管理者パスワード | |
+| INSTAGRAM_URL | Instagram リンク | |
+| NEXT_PUBLIC_SITE_URL | サイトURL | |
+
+---
+
+## 9. 本番DB操作
+
+wrangler 経由で本番D1に直接SQLを実行できる。
+
+### よく使うコマンド
+
+```bash
+# テーブル一覧
+npx wrangler d1 execute animehubs-db --remote --command "SELECT name FROM sqlite_master WHERE type='table'"
+
+# 商品一覧
+npx wrangler d1 execute animehubs-db --remote --command "SELECT id, name_en, stock, reserved_stock FROM products"
+
+# 注文一覧
+npx wrangler d1 execute animehubs-db --remote --command "SELECT id, order_number, status, type FROM orders"
+
+# ユーザー一覧
+npx wrangler d1 execute animehubs-db --remote --command "SELECT id, email, role FROM users"
+```
+
+### テストデータのクリーンアップ
+
+本番でテスト後、データを削除する場合（注文 → 商品の順で削除）：
+
+```bash
+# 注文を全削除
+npx wrangler d1 execute animehubs-db --remote --command "DELETE FROM orders"
+
+# 商品を全削除
+npx wrangler d1 execute animehubs-db --remote --command "DELETE FROM products"
+
+# reserved_stock リセット（商品を残す場合）
+npx wrangler d1 execute animehubs-db --remote --command "UPDATE products SET reserved_stock = 0"
+```
+
+### DBマイグレーション
+
+スキーマ変更があった場合：
+
+```bash
+npx wrangler d1 migrations apply animehubs-db --remote
+```
+
+### リアルタイムログ
+
+本番のエラー調査：
+
+```bash
+npx wrangler tail animehubs
+```
+
+---
+
+## 10. Stripe 本番の注意
+
+- **本番Stripeでのテスト決済は実際に課金される**
+- テスト時は少額商品（1 SEK等）で確認するか、Inspection（予約のみ）で確認
+- Stripe Dashboard の本番モードで Webhook ログ・決済履歴を確認可能
