@@ -12,3 +12,7 @@ binding = "DB"
 database_name = "animehubs-db"
 database_id = "6193c47d-7779-46b8-a5a0-14adb909ed99"
 migrations_dir = "src/lib/db/migrations"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "animehubs-images"

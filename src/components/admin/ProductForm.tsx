@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, X, Save } from "lucide-react";
+import { Plus, X, Save, Upload, Loader2 } from "lucide-react";
 import { CATEGORIES, CATEGORY_LABELS, CONDITIONS, CONDITION_LABELS } from "@/lib/constants";
 import type { Product } from "@/lib/db/schema";
 
@@ -27,6 +27,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
     product ? JSON.parse(product.images || "[]") : []
   );
   const [imageUrl, setImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -46,6 +47,49 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
     setImages((prev) => [...prev, url]);
     setImageUrl("");
     setError("");
+  };
+
+  const uploadFile = async (file: File) => {
+    if (images.length >= 5) {
+      setError("Maximum 5 images allowed.");
+      return;
+    }
+    setUploading(true);
+    setError("");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json() as { url?: string; error?: string };
+      if (!res.ok) {
+        setError(data.error || "Upload failed.");
+        return;
+      }
+      if (data.url) {
+        setImages((prev) => [...prev, data.url!]);
+      }
+    } catch {
+      setError("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    for (let i = 0; i < files.length; i++) {
+      uploadFile(files[i]);
+    }
+    e.target.value = "";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    for (let i = 0; i < files.length; i++) {
+      uploadFile(files[i]);
+    }
   };
 
   const removeImage = (index: number) => {
@@ -248,7 +292,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
         </div>
       </div>
 
-      {/* 画像URL入力 */}
+      {/* 画像アップロード */}
       <div>
         <label className="block text-sm font-medium text-gray-700">
           Images (max 5)
@@ -275,24 +319,54 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
             </div>
           ))}
         </div>
+
         {images.length < 5 && (
-          <div className="mt-2 flex gap-2">
-            <input
-              type="text"
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImageUrl(); } }}
-              placeholder="https://example.com/image.jpg"
-              className="block flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
-            />
-            <button
-              type="button"
-              onClick={addImageUrl}
-              className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+          <div className="mt-3 space-y-3">
+            {/* ファイルアップロード（ドラッグ&ドロップ対応） */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 transition-colors hover:border-gray-400 hover:bg-gray-100"
+              onClick={() => document.getElementById("file-upload")?.click()}
             >
-              <Plus className="h-4 w-4" />
-              Add
-            </button>
+              {uploading ? (
+                <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              ) : (
+                <Upload className="h-8 w-8 text-gray-400" />
+              )}
+              <p className="mt-2 text-sm text-gray-500">
+                {uploading ? "Uploading..." : "Drop images here or click to upload"}
+              </p>
+              <p className="mt-1 text-xs text-gray-400">JPEG, PNG, WebP, AVIF (max 5MB)</p>
+              <input
+                id="file-upload"
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                multiple
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+
+            {/* URL直接入力（代替手段） */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addImageUrl(); } }}
+                placeholder="Or paste image URL..."
+                className="block flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+              />
+              <button
+                type="button"
+                onClick={addImageUrl}
+                className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+              >
+                <Plus className="h-4 w-4" />
+                Add
+              </button>
+            </div>
           </div>
         )}
       </div>
