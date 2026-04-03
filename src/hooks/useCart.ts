@@ -3,6 +3,7 @@
 import { useCallback, useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import type { Product } from "@/lib/db/schema";
+import { parseImages } from "@/lib/utils";
 
 // カートアイテムの型定義
 export interface CartItem {
@@ -39,18 +40,6 @@ function persistCart(newItems: CartItem[]) {
     // 保存失敗時は無視
   }
   window.dispatchEvent(new Event(CART_UPDATED_EVENT));
-}
-
-function parseImages(imagesJson: string): string[] {
-  try {
-    const parsed: unknown = JSON.parse(imagesJson);
-    if (Array.isArray(parsed)) {
-      return parsed.filter((v): v is string => typeof v === "string");
-    }
-  } catch {
-    // 不正なJSON
-  }
-  return [];
 }
 
 const noOp = () => {};

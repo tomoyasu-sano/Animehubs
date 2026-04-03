@@ -42,22 +42,31 @@ describe("generateSlug", () => {
 });
 
 describe("getLocalizedField", () => {
-  const item = {
-    name_en: "English Name",
-    name_sv: "Swedish Name",
-    description_en: "English Description",
-  };
-
-  it("指定ロケールのフィールドを返す", () => {
+  it("snake_case キーで指定ロケールのフィールドを返す", () => {
+    const item = { name_en: "English Name", name_sv: "Swedish Name" };
     expect(getLocalizedField(item, "name", "en")).toBe("English Name");
     expect(getLocalizedField(item, "name", "sv")).toBe("Swedish Name");
   });
 
+  it("camelCase キーで指定ロケールのフィールドを返す", () => {
+    const item = { nameEn: "English Name", nameSv: "Swedish Name", descriptionEn: "Desc" };
+    expect(getLocalizedField(item, "name", "en")).toBe("English Name");
+    expect(getLocalizedField(item, "name", "sv")).toBe("Swedish Name");
+    expect(getLocalizedField(item, "description", "en")).toBe("Desc");
+  });
+
   it("指定ロケールがない場合は英語にフォールバックする", () => {
+    const item = { description_en: "English Description" };
+    expect(getLocalizedField(item, "description", "sv")).toBe("English Description");
+  });
+
+  it("camelCaseで英語にフォールバックする", () => {
+    const item = { descriptionEn: "English Description" };
     expect(getLocalizedField(item, "description", "sv")).toBe("English Description");
   });
 
   it("どちらもない場合は空文字を返す", () => {
+    const item = { name_en: "test" };
     expect(getLocalizedField(item, "nonexistent", "en")).toBe("");
   });
 });

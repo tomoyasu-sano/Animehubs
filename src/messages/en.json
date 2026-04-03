@@ -17,7 +17,8 @@
     "login": "Log in",
     "logout": "Log out",
     "myPage": "My Page",
-    "orders": "Orders"
+    "orders": "Orders",
+    "tryAgain": "Try again"
   },
   "home": {
     "heroTitle": "Curated Anime Figures",

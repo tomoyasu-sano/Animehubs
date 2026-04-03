@@ -34,6 +34,22 @@ export function generateSlug(text: string): string {
 }
 
 /**
+ * JSON文字列から画像URL配列をパースする
+ * 不正なJSONの場合は空配列を返す
+ */
+export function parseImages(json: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(json);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((v): v is string => typeof v === "string");
+    }
+  } catch {
+    // 不正なJSON — フォールバック
+  }
+  return [];
+}
+
+/**
  * 商品名をロケールに応じて取得
  */
 export function getLocalizedField<T extends Record<string, unknown>>(
@@ -41,7 +57,12 @@ export function getLocalizedField<T extends Record<string, unknown>>(
   field: string,
   locale: string
 ): string {
-  const key = `${field}_${locale}` as keyof T;
-  const fallbackKey = `${field}_en` as keyof T;
-  return (item[key] as string) || (item[fallbackKey] as string) || "";
+  // snake_case (name_en) と camelCase (nameEn) の両方に対応
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const snakeKey = `${field}_${locale}` as keyof T;
+  const camelKey = `${field}${capitalize(locale)}` as keyof T;
+  const snakeFallback = `${field}_en` as keyof T;
+  const camelFallback = `${field}En` as keyof T;
+  return (item[snakeKey] as string) || (item[camelKey] as string) ||
+         (item[snakeFallback] as string) || (item[camelFallback] as string) || "";
 }

@@ -11,6 +11,7 @@ import {
   SHIPPING_FEE_ORE,
 } from "@/lib/constants";
 import type { OrderItem, OrderType, SwedishAddress } from "@/lib/db/schema";
+import { parseImages } from "@/lib/utils";
 
 interface CartItem {
   productId: string;
@@ -238,7 +239,7 @@ export async function POST(request: Request) {
         name_sv: product.nameSv,
         price: product.price,
         quantity: cartItem.quantity,
-        image: JSON.parse(product.images)[0] ?? "",
+        image: parseImages(product.images)[0] ?? "",
       });
     }
 

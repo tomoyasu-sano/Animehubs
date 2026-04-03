@@ -8,6 +8,7 @@ import {
   createReservationOrder,
 } from "@/lib/db/order-queries";
 import { sendReservationConfirmationEmail, sendAdminNewOrderEmail } from "@/lib/email/send-order-email";
+import { parseImages } from "@/lib/utils";
 import { MAX_ACTIVE_RESERVATIONS, ADMIN_EMAILS } from "@/lib/constants";
 import type { OrderItem } from "@/lib/db/schema";
 
@@ -115,7 +116,7 @@ export async function POST(request: Request) {
         name_sv: product.nameSv,
         price: product.price,
         quantity: cartItem.quantity,
-        image: JSON.parse(product.images)[0] ?? "",
+        image: parseImages(product.images)[0] ?? "",
       });
     }
 

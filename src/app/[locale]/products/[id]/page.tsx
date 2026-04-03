@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getProductById } from "@/lib/db/queries";
-import { formatPrice, getLocalizedField } from "@/lib/utils";
+import { formatPrice, getLocalizedField, parseImages } from "@/lib/utils";
 import { CATEGORY_LABELS, CONDITION_LABELS, type Category, type Condition } from "@/lib/constants";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductDetailActions from "./ProductDetailActions";
@@ -28,7 +28,7 @@ export async function generateMetadata({
 
   const name = getLocalizedField(product, "name", locale);
   const description = getLocalizedField(product, "description", locale);
-  const images: string[] = JSON.parse(product.images);
+  const images = parseImages(product.images);
   const siteUrl = getSiteUrl();
 
   return generatePageMetadata({
@@ -61,7 +61,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
   const name = getLocalizedField(product, "name", locale);
   const description = getLocalizedField(product, "description", locale);
-  const images: string[] = JSON.parse(product.images);
+  const images = parseImages(product.images);
   const categoryLabel =
     CATEGORY_LABELS[product.category as Category]?.[locale as "en" | "sv"] || product.category;
   const conditionLabel =
