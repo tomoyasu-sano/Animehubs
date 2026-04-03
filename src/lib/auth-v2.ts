@@ -32,11 +32,11 @@ export const authConfig: NextAuthConfig = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      // 初回ログイン時にユーザー情報をトークンに埋め込む
       if (user) {
         token.id = user.id;
-        token.role = isAdminEmail(user.email) ? "admin" : "user";
       }
+      // 毎回 token.email から role を再計算（セッション途中の ADMIN_EMAILS 変更にも対応）
+      token.role = isAdminEmail(token.email) ? "admin" : "user";
       return token;
     },
     async session({ session, token }) {
