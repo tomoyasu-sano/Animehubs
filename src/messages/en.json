@@ -256,6 +256,17 @@
     "successMessage": "Subscribed! You'll be notified when new items arrive.",
     "errorMessage": "Something went wrong. Please try again."
   },
+  "unsubscribe": {
+    "title": "Unsubscribe",
+    "loading": "Processing...",
+    "successTitle": "Unsubscribed",
+    "successMessage": "You have been successfully unsubscribed from our newsletter.",
+    "expiredTitle": "Link Expired",
+    "expiredMessage": "This unsubscribe link has expired. Please log in and re-subscribe, then use the link in the next email to unsubscribe.",
+    "invalidTitle": "Invalid Link",
+    "invalidMessage": "This unsubscribe link is invalid.",
+    "backToHome": "Back to Home"
+  },
   "cookie": {
     "message": "We use essential cookies to make this site work. No tracking cookies are used.",
     "accept": "Accept",

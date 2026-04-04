@@ -28,14 +28,21 @@ vi.mock("@/lib/db/newsletter-sends-queries", () => ({
 }));
 
 // メールテンプレートモック
+const mockBuildNewsletterEmailHtml = vi.fn().mockReturnValue("<html>newsletter</html>");
 vi.mock("./newsletter-template", () => ({
-  buildNewsletterEmailHtml: vi.fn().mockReturnValue("<html>newsletter</html>"),
+  buildNewsletterEmailHtml: (...args: unknown[]) => mockBuildNewsletterEmailHtml(...args),
 }));
 
 // 商品取得モック
 const mockGetRecentProducts = vi.fn();
 vi.mock("@/lib/db/admin-queries", () => ({
   getRecentProducts: (...args: unknown[]) => mockGetRecentProducts(...args),
+}));
+
+// トークン生成モック
+const mockGenerateUnsubscribeToken = vi.fn();
+vi.mock("@/lib/newsletter-token", () => ({
+  generateUnsubscribeToken: (...args: unknown[]) => mockGenerateUnsubscribeToken(...args),
 }));
 
 import { sendNewsletter, type SendNewsletterInput } from "./send-newsletter";
@@ -54,16 +61,18 @@ describe("sendNewsletter", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.stubEnv("NEWSLETTER_HMAC_SECRET", "test-secret");
     mockGetRecentNonFailedSend.mockResolvedValue(false);
     mockCreateNewsletterSend.mockResolvedValue({ id: "send-1" });
     mockUpdateNewsletterSendResult.mockResolvedValue(undefined);
+    mockGenerateUnsubscribeToken.mockReturnValue("generated-token-abc");
   });
 
   it("正常系: locale別にグループ化してバッチ送信する", async () => {
     mockGetSubscribersWithEmail.mockResolvedValue([
-      { email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
-      { email: "user2@example.com", locale: "sv", createdAt: "2026-04-02" },
-      { email: "user3@example.com", locale: "en", createdAt: "2026-04-03" },
+      { userId: "u1", email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
+      { userId: "u2", email: "user2@example.com", locale: "sv", createdAt: "2026-04-02" },
+      { userId: "u3", email: "user3@example.com", locale: "en", createdAt: "2026-04-03" },
     ]);
 
     mockBatchSend.mockResolvedValue({
@@ -134,7 +143,7 @@ describe("sendNewsletter", () => {
 
   it("Resend APIがバッチ全体エラーを返した場合", async () => {
     mockGetSubscribersWithEmail.mockResolvedValue([
-      { email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
+      { userId: "u1", email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
     ]);
 
     mockBatchSend.mockResolvedValue({
@@ -156,9 +165,9 @@ describe("sendNewsletter", () => {
 
   it("部分失敗: sent_count と failed_count を正しく集計", async () => {
     mockGetSubscribersWithEmail.mockResolvedValue([
-      { email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
-      { email: "bad@example.com", locale: "en", createdAt: "2026-04-02" },
-      { email: "user3@example.com", locale: "en", createdAt: "2026-04-03" },
+      { userId: "u1", email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
+      { userId: "u2", email: "bad@example.com", locale: "en", createdAt: "2026-04-02" },
+      { userId: "u3", email: "user3@example.com", locale: "en", createdAt: "2026-04-03" },
     ]);
 
     mockBatchSend.mockResolvedValue({
@@ -177,9 +186,44 @@ describe("sendNewsletter", () => {
     });
   });
 
+  it("各購読者に固有の配信停止トークンを生成する", async () => {
+    mockGetSubscribersWithEmail.mockResolvedValue([
+      { userId: "u1", email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
+      { userId: "u2", email: "user2@example.com", locale: "sv", createdAt: "2026-04-02" },
+    ]);
+
+    mockGenerateUnsubscribeToken
+      .mockReturnValueOnce("token-for-u1")
+      .mockReturnValueOnce("token-for-u2");
+
+    mockBatchSend.mockResolvedValue({
+      data: { data: [{ id: "msg-1" }, { id: "msg-2" }] },
+      error: null,
+    });
+
+    await sendNewsletter(baseInput);
+
+    // 各購読者のuserIdでトークン生成が呼ばれる
+    expect(mockGenerateUnsubscribeToken).toHaveBeenCalledWith("u1", "test-secret");
+    expect(mockGenerateUnsubscribeToken).toHaveBeenCalledWith("u2", "test-secret");
+
+    // テンプレートに正しいURLが渡される
+    const enCall = mockBuildNewsletterEmailHtml.mock.calls.find(
+      (call: unknown[]) => (call[0] as { unsubscribeUrl: string }).unsubscribeUrl.includes("token-for-u1"),
+    );
+    expect(enCall).toBeTruthy();
+    expect((enCall![0] as { unsubscribeUrl: string }).unsubscribeUrl).toContain("/en/unsubscribe?token=token-for-u1");
+
+    const svCall = mockBuildNewsletterEmailHtml.mock.calls.find(
+      (call: unknown[]) => (call[0] as { unsubscribeUrl: string }).unsubscribeUrl.includes("token-for-u2"),
+    );
+    expect(svCall).toBeTruthy();
+    expect((svCall![0] as { unsubscribeUrl: string }).unsubscribeUrl).toContain("/sv/unsubscribe?token=token-for-u2");
+  });
+
   it("商品自動挿入: includeRecentProducts=true の場合", async () => {
     mockGetSubscribersWithEmail.mockResolvedValue([
-      { email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
+      { userId: "u1", email: "user1@example.com", locale: "en", createdAt: "2026-04-01" },
     ]);
     mockGetRecentProducts.mockResolvedValue([
       { id: "p1", nameEn: "Naruto Figure", price: 29900, images: '["https://example.com/img.jpg"]' },

@@ -6,6 +6,7 @@ import {
   getRecentNonFailedSend,
 } from "@/lib/db/newsletter-sends-queries";
 import { getRecentProducts } from "@/lib/db/admin-queries";
+import { generateUnsubscribeToken } from "@/lib/newsletter-token";
 import {
   buildNewsletterEmailHtml,
   type NewsletterProduct,
@@ -104,35 +105,29 @@ export async function sendNewsletter(
     sentBy: input.adminEmail,
   });
 
-  // locale別にグループ化
-  const enSubscribers = subscribers.filter((s) => s.locale === "en");
-  const svSubscribers = subscribers.filter((s) => s.locale !== "en");
+  // HMAC秘密鍵
+  const hmacSecret = process.env.NEWSLETTER_HMAC_SECRET;
+  if (!hmacSecret) {
+    console.error("NEWSLETTER_HMAC_SECRET is not set");
+    return { success: false, sent: 0, failed: 0, error: "Server configuration error." };
+  }
 
-  // メール生成
-  const emails = [
-    ...enSubscribers.map((s) => ({
+  // メール生成（各購読者に固有の配信停止トークンを埋め込む）
+  const emails = subscribers.map((s) => {
+    const locale = s.locale === "en" ? "en" : "sv";
+    const token = generateUnsubscribeToken(s.userId, hmacSecret);
+    return {
       from: FROM_EMAIL,
       to: [s.email],
-      subject: input.subjectEn,
+      subject: locale === "en" ? input.subjectEn : input.subjectSv,
       html: buildNewsletterEmailHtml({
-        body: input.bodyEn,
-        unsubscribeUrl: `${SITE_URL}/en/unsubscribe?token=placeholder`,
-        shopUrl: `${SITE_URL}/en`,
+        body: locale === "en" ? input.bodyEn : input.bodySv,
+        unsubscribeUrl: `${SITE_URL}/${locale}/unsubscribe?token=${token}`,
+        shopUrl: `${SITE_URL}/${locale}`,
         products,
       }),
-    })),
-    ...svSubscribers.map((s) => ({
-      from: FROM_EMAIL,
-      to: [s.email],
-      subject: input.subjectSv,
-      html: buildNewsletterEmailHtml({
-        body: input.bodySv,
-        unsubscribeUrl: `${SITE_URL}/sv/unsubscribe?token=placeholder`,
-        shopUrl: `${SITE_URL}/sv`,
-        products,
-      }),
-    })),
-  ];
+    };
+  });
 
   // バッチ送信
   let totalSent = 0;

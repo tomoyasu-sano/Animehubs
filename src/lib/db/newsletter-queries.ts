@@ -86,11 +86,12 @@ export async function getSubscriberCount(): Promise<number> {
  * 購読者のメール・locale 付きリストを返す（users JOIN）。
  */
 export async function getSubscribersWithEmail(): Promise<
-  Array<{ email: string; locale: string; createdAt: string }>
+  Array<{ userId: string; email: string; locale: string; createdAt: string }>
 > {
   const db = await getDb();
   const rows = await db
     .select({
+      userId: newsletterSubscribers.userId,
       email: users.email,
       locale: newsletterSubscribers.locale,
       createdAt: newsletterSubscribers.createdAt,

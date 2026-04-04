@@ -256,6 +256,17 @@
     "successMessage": "Prenumererar! Du far ett meddelande nar nya varor anländer.",
     "errorMessage": "Nagot gick fel. Forsok igen."
   },
+  "unsubscribe": {
+    "title": "Avprenumerera",
+    "loading": "Bearbetar...",
+    "successTitle": "Avprenumererad",
+    "successMessage": "Du har avprenumererats fran vart nyhetsbrev.",
+    "expiredTitle": "Länken har gatt ut",
+    "expiredMessage": "Denna avprenumerationslänk har gatt ut. Logga in och prenumerera igen, använd sedan länken i nästa e-post for att avprenumerera.",
+    "invalidTitle": "Ogiltig länk",
+    "invalidMessage": "Denna avprenumerationslänk är ogiltig.",
+    "backToHome": "Tillbaka till startsidan"
+  },
   "cookie": {
     "message": "Vi anvander nodvandiga cookies for att webbplatsen ska fungera. Inga sparningscookies anvands.",
     "accept": "Acceptera",
