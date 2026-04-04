@@ -77,8 +77,8 @@ export const CURRENCY = "SEK" as const;
 export const CURRENCY_SYMBOL = "kr";
 
 // 送料設定（öre単位: 1 SEK = 100 öre）
-export const FREE_SHIPPING_THRESHOLD_ORE = 79900; // 799 SEK
-export const SHIPPING_FEE_ORE = 7900; // 79 SEK
+export const FREE_SHIPPING_THRESHOLD_ORE = 59900; // 599 SEK
+export const SHIPPING_FEE_ORE = 4500; // 45 SEK
 
 // 実物確認の予約制限
 export const MAX_ACTIVE_RESERVATIONS = 3;

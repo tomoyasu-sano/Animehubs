@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
@@ -9,6 +10,22 @@ import DeliveryForm from "@/components/checkout/DeliveryForm";
 export default function DeliveryCheckoutPage() {
   const t = useTranslations("checkout");
   const { isEmpty } = useCart();
+  const cancelledRef = useRef(false);
+
+  // ブラウザ戻るで Stripe から戻った場合、pending session をキャンセル
+  useEffect(() => {
+    if (cancelledRef.current) return;
+    const pendingSession = sessionStorage.getItem("pending_checkout_session");
+    if (!pendingSession) return;
+    cancelledRef.current = true;
+    sessionStorage.removeItem("pending_checkout_session");
+
+    fetch("/api/checkout/cancel-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: pendingSession }),
+    }).catch(() => {});
+  }, []);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">

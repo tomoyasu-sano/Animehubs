@@ -87,6 +87,7 @@ export default function DeliveryForm() {
 
       const data = (await res.json()) as {
         error?: string;
+        sessionId?: string;
         sessionUrl?: string;
       };
 
@@ -101,6 +102,10 @@ export default function DeliveryForm() {
 
       // Stripe Checkout にリダイレクト
       if (data.sessionUrl) {
+        // ブラウザ戻る時にキャンセル処理できるよう sessionId を保存
+        if (data.sessionId) {
+          sessionStorage.setItem("pending_checkout_session", data.sessionId);
+        }
         window.location.href = data.sessionUrl;
       }
     } catch {

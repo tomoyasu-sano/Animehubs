@@ -75,7 +75,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
     condition: product.condition,
     images,
     url: `${siteUrl}/${locale}/products/${id}`,
-    inStock: product.stock > 0,
+    inStock: product.stock - product.reservedStock > 0,
   });
 
   return (
@@ -120,7 +120,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted">{t("products.inStock")}</span>
-              <span className="text-sm text-foreground">{product.stock}</span>
+              <span className="text-sm text-foreground">{product.stock - product.reservedStock}</span>
             </div>
           </div>
 
