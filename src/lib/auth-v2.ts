@@ -39,12 +39,15 @@ export const authConfig: NextAuthConfig = {
     maxAge: 30 * 24 * 60 * 60, // 30日
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, profile }) {
       if (user) {
         token.id = user.id;
-        if (user.email) {
-          token.email = user.email;
-        }
+      }
+      // Google プロフィールのメールを優先（DB上のメールではなく実際にログインしたアカウントのメール）
+      if (profile?.email) {
+        token.email = profile.email;
+      } else if (user?.email) {
+        token.email = user.email;
       }
       token.role = isAdminEmail(token.email) ? "admin" : "user";
       return token;
