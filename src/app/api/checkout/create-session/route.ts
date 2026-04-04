@@ -13,6 +13,15 @@ import {
 import type { OrderItem, OrderType, SwedishAddress } from "@/lib/db/schema";
 import { parseImages } from "@/lib/utils";
 
+function isValidHttpUrl(str: string): boolean {
+  try {
+    const url = new URL(str);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 interface CartItem {
   productId: string;
   quantity: number;
@@ -124,7 +133,7 @@ export async function POST(request: Request) {
     const baseUrl =
       process.env.NEXT_PUBLIC_BASE_URL ||
       origin ||
-      "http://localhost:8787";
+      "https://anime-hubs.com";
     const referer = request.headers.get("referer") || "";
     const localeMatch = referer.match(/\/(en|sv)\//);
     const locale = localeMatch ? localeMatch[1] : "en";
@@ -171,7 +180,7 @@ export async function POST(request: Request) {
           currency: CURRENCY.toLowerCase(),
           product_data: {
             name: item.name_en,
-            images: item.image && item.image.startsWith("http") ? [item.image] : undefined,
+            images: item.image && isValidHttpUrl(item.image) ? [item.image] : undefined,
           },
           unit_amount: item.price,
         },
@@ -276,7 +285,7 @@ export async function POST(request: Request) {
         currency: CURRENCY.toLowerCase(),
         product_data: {
           name: item.name_en,
-          images: item.image && item.image.startsWith("http") ? [item.image] : undefined,
+          images: item.image && isValidHttpUrl(item.image) ? [item.image] : undefined,
         },
         unit_amount: item.price,
       },

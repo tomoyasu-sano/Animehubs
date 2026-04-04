@@ -149,7 +149,7 @@ export async function POST(request: Request) {
       const locale = localeMatch ? localeMatch[1] : "en";
       const origin = request.headers.get("origin");
       const baseUrl =
-        process.env.NEXT_PUBLIC_BASE_URL || origin || "http://localhost:8787";
+        process.env.NEXT_PUBLIC_BASE_URL || origin || "https://anime-hubs.com";
       const orderPageUrl = `${baseUrl}/${locale}/orders/${result.order.id}`;
 
       // 購入者に予約確認メール
