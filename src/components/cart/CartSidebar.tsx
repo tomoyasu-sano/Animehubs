@@ -54,7 +54,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
       {/* サイドパネル - モバイルではフルスクリーン */}
       <div
-        className={`fixed right-0 top-0 z-50 flex h-full w-full flex-col bg-background shadow-xl transition-transform duration-300 ease-in-out sm:max-w-md ${
+        className={`fixed inset-y-0 right-0 z-50 flex w-full flex-col bg-background shadow-xl transition-transform duration-300 ease-in-out sm:max-w-md ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"

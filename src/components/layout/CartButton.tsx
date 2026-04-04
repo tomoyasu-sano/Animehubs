@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
@@ -30,7 +31,11 @@ export default function CartButton() {
           </span>
         )}
       </button>
-      <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      {mounted &&
+        createPortal(
+          <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />,
+          document.body
+        )}
     </>
   );
 }
