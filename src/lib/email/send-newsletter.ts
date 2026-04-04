@@ -75,12 +75,6 @@ export async function sendNewsletter(
     return sendTestEmail(input);
   }
 
-  // 重複送信防止
-  const hasRecent = await getRecentNonFailedSend();
-  if (hasRecent) {
-    return { success: false, sent: 0, failed: 0, error: "Newsletter was recently sent. Please wait before sending again." };
-  }
-
   // 購読者取得
   const subscribers = await getSubscribersWithEmail();
   console.log(`Newsletter: ${subscribers.length} subscribers found`);
