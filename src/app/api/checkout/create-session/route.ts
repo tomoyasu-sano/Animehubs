@@ -306,7 +306,7 @@ export async function POST(request: Request) {
       customer_email: customerEmail || undefined,
       expires_at: expiresAt,
       success_url: `${baseUrl}/${locale}/checkout/complete?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/${locale}/cart`,
+      cancel_url: `${baseUrl}/${locale}/cart?cancelled_session={CHECKOUT_SESSION_ID}`,
       metadata: {
         order_type: type!,
         user_id: session.user.id,

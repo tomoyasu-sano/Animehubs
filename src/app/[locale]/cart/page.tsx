@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, ShoppingCart } from "lucide-react";
@@ -10,6 +12,28 @@ import CartSummary from "@/components/cart/CartSummary";
 export default function CartPage() {
   const t = useTranslations("cart");
   const { items, updateQuantity, removeItem, totalAmount, totalItems, isEmpty } = useCart();
+  const searchParams = useSearchParams();
+  const cancelledRef = useRef(false);
+
+  // Stripe 決済キャンセル時に在庫仮押さえを即解放
+  useEffect(() => {
+    const cancelledSession = searchParams.get("cancelled_session");
+    if (!cancelledSession || cancelledRef.current) return;
+    cancelledRef.current = true;
+
+    fetch("/api/checkout/cancel-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId: cancelledSession }),
+    }).catch(() => {
+      // webhook で最終的に処理されるため、エラーは無視
+    });
+
+    // URL からクエリパラメータを除去
+    const url = new URL(window.location.href);
+    url.searchParams.delete("cancelled_session");
+    window.history.replaceState({}, "", url.pathname);
+  }, [searchParams]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
