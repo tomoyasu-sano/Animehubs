@@ -24,7 +24,15 @@ export function isAdminEmail(
 
 export const authConfig: NextAuthConfig = {
   trustHost: true,
-  providers: [Google],
+  providers: [
+    Google({
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
+    }),
+  ],
   // D1 + DrizzleAdapter の database session に互換性問題があるため JWT 戦略を使用
   session: {
     strategy: "jwt",
