@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, X, Save, Upload, Loader2 } from "lucide-react";
+import { Plus, X, Save, Upload, Loader2, Languages } from "lucide-react";
 import { CATEGORIES, CATEGORY_LABELS, CONDITIONS, CONDITION_LABELS } from "@/lib/constants";
 import type { Product } from "@/lib/db/schema";
 
@@ -29,7 +29,39 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const [error, setError] = useState("");
+
+  const translateToSwedish = async () => {
+    if (!nameEn && !descriptionEn) {
+      setError("Enter English name or description first.");
+      return;
+    }
+    setTranslating(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nameEn, description: descriptionEn }),
+      });
+      const data = (await res.json()) as {
+        nameSv?: string;
+        descriptionSv?: string;
+        error?: string;
+      };
+      if (!res.ok) {
+        setError(data.error || "Translation failed.");
+        return;
+      }
+      if (data.nameSv) setNameSv(data.nameSv);
+      if (data.descriptionSv) setDescriptionSv(data.descriptionSv);
+    } catch {
+      setError("Translation failed. Please try again.");
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   const addImageUrl = () => {
     const url = imageUrl.trim();
@@ -212,8 +244,25 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
         </div>
       </div>
 
-      {/* 価格・在庫 */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {/* 翻訳ボタン */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          disabled={translating || (!nameEn && !descriptionEn)}
+          onClick={translateToSwedish}
+          className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-50"
+        >
+          {translating ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Languages className="h-4 w-4" />
+          )}
+          {translating ? "Translating..." : "Auto-translate EN → SV"}
+        </button>
+      </div>
+
+      {/* 価格・Featured */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-sm font-medium text-gray-700">
             Price (SEK) *
@@ -225,19 +274,6 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
             step="0.01"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Stock *
-          </label>
-          <input
-            type="number"
-            required
-            min="0"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
             className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
           />
         </div>
@@ -253,6 +289,8 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
           </label>
         </div>
       </div>
+      {/* stock は一点物デフォルト(1)で非表示 */}
+      <input type="hidden" value={stock} />
 
       {/* カテゴリ・コンディション */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
