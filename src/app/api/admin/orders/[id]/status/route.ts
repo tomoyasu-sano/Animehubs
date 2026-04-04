@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth-v2";
+import { getAdminSession } from "@/lib/admin-auth";
 import { updateOrderStatus, releaseReservedStock } from "@/lib/db/order-queries";
 import { getDb } from "@/lib/db";
 import { orders } from "@/lib/db/schema";
@@ -22,9 +22,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await auth();
-    const role = (session?.user as { role?: string })?.role;
-    if (!session?.user?.id || role !== "admin") {
+    const admin = await getAdminSession();
+    if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

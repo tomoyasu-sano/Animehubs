@@ -34,7 +34,7 @@ export default function AdminLayoutInner({
   const { data: session, status } = useSession();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const isAdmin = (session?.user as { role?: string })?.role === "admin";
+  const isAdmin = session?.user?.role === "admin";
 
   useEffect(() => {
     if (isLoginPage || status === "loading") return;

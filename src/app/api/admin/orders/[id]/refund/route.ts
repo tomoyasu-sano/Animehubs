@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth-v2";
+import { getAdminSession } from "@/lib/admin-auth";
 import { stripe } from "@/lib/stripe";
 import { updateOrderStatus, restoreStock } from "@/lib/db/order-queries";
 import { sendOrderCancellationEmail } from "@/lib/email/send-order-email";
@@ -13,9 +13,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const session = await auth();
-    const role = (session?.user as { role?: string })?.role;
-    if (!session?.user?.id || role !== "admin") {
+    const admin = await getAdminSession();
+    if (!admin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

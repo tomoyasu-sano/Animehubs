@@ -86,10 +86,11 @@ export default async function middleware(request: NextRequest) {
         console.log("[middleware] admin: no session, redirecting to login");
         return NextResponse.redirect(new URL("/admin/login", request.url));
       }
-      const role = (session.user as { role?: string }).role;
-      if (role !== "admin") {
-        console.log("[middleware] admin: role is not admin:", role);
-        return NextResponse.redirect(new URL("/admin/login", request.url));
+      if (session.user.role !== "admin") {
+        console.log("[middleware] admin: role is not admin:", session.user.role);
+        const loginUrl = new URL("/admin/login", request.url);
+        loginUrl.searchParams.set("error", "not_admin");
+        return NextResponse.redirect(loginUrl);
       }
     } catch (error) {
       console.error("[middleware] admin auth error:", error);

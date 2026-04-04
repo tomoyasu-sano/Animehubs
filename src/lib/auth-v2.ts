@@ -10,6 +10,7 @@ import {
   sessions,
   verificationTokens,
 } from "./db/schema";
+import "@/types/next-auth";
 
 /**
  * 管理者メールアドレスかどうかを判定（大文字小文字を無視）
@@ -42,19 +43,17 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        // user.email が存在する場合は token に明示的にセット
         if (user.email) {
           token.email = user.email;
         }
       }
-      // 毎回 token.email から role を再計算
       token.role = isAdminEmail(token.email) ? "admin" : "user";
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        (session.user as any).role = token.role;
+        session.user.role = token.role ?? "user";
       }
       return session;
     },
@@ -63,18 +62,30 @@ export const authConfig: NextAuthConfig = {
 
 /**
  * NextAuth ハンドラーを遅延初期化（getDb() が非同期のため）
+ * Promise をキャッシュしてリクエストごとの再生成を防止
  */
-async function getAuthHandler() {
-  const db = await getDb();
-  return NextAuth({
-    ...authConfig,
-    adapter: DrizzleAdapter(db, {
-      usersTable: users as any,
-      accountsTable: accounts as any,
-      sessionsTable: sessions as any,
-      verificationTokensTable: verificationTokens as any,
+let cachedHandler: ReturnType<typeof initAuthHandler> | null = null;
+
+function initAuthHandler() {
+  return getDb().then((db) =>
+    NextAuth({
+      ...authConfig,
+      adapter: DrizzleAdapter(db, {
+        usersTable: users,
+        accountsTable: accounts,
+        sessionsTable: sessions,
+        verificationTokensTable: verificationTokens,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any),
     }),
-  });
+  );
+}
+
+function getAuthHandler() {
+  if (!cachedHandler) {
+    cachedHandler = initAuthHandler();
+  }
+  return cachedHandler;
 }
 
 export const handlers = {
