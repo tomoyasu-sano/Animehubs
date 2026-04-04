@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { LogIn } from "lucide-react";
 
 export default function AdminLoginPage() {
@@ -15,6 +15,7 @@ export default function AdminLoginPage() {
 
 function AdminLoginContent() {
   const searchParams = useSearchParams();
+  const { data: session } = useSession();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -24,6 +25,18 @@ function AdminLoginContent() {
     setLoading(true);
     setError("");
     try {
+      await signIn("google", { callbackUrl: "/admin" });
+    } catch {
+      setError("ログインに失敗しました。もう一度お試しください。");
+      setLoading(false);
+    }
+  };
+
+  const handleSwitchAccount = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      await signOut({ redirect: false });
       await signIn("google", { callbackUrl: "/admin" });
     } catch {
       setError("ログインに失敗しました。もう一度お試しください。");
@@ -42,9 +55,25 @@ function AdminLoginContent() {
         </div>
 
         {notAdmin && (
-          <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-700">
-            このアカウントには管理者権限がありません。管理者用の Google
-            アカウントでログインしてください。
+          <div className="space-y-3">
+            <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-700">
+              {session?.user?.email ? (
+                <>
+                  <strong>{session.user.email}</strong> には管理者権限がありません。
+                </>
+              ) : (
+                <>このアカウントには管理者権限がありません。</>
+              )}
+              管理者用の Google アカウントでログインしてください。
+            </div>
+            <button
+              onClick={handleSwitchAccount}
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-amber-500 disabled:opacity-50"
+            >
+              <LogIn className="h-4 w-4" />
+              {loading ? "リダイレクト中..." : "別の Google アカウントでログイン"}
+            </button>
           </div>
         )}
 
