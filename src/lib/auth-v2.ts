@@ -10,7 +10,6 @@ import {
   sessions,
   verificationTokens,
 } from "./db/schema";
-import "@/types/next-auth";
 
 /**
  * 管理者メールアドレスかどうかを判定（大文字小文字を無視）
