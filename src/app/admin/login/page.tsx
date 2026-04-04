@@ -1,11 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { LogIn } from "lucide-react";
 
 export default function AdminLoginPage() {
+  return (
+    <Suspense>
+      <AdminLoginContent />
+    </Suspense>
+  );
+}
+
+function AdminLoginContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
