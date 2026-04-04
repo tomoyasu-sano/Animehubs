@@ -36,7 +36,7 @@ export const authConfig: NextAuthConfig = {
   // D1 + DrizzleAdapter の database session に互換性問題があるため JWT 戦略を使用
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30日
+    maxAge: 180 * 24 * 60 * 60, // 180日（約6ヶ月）
   },
   callbacks: {
     async jwt({ token, user, profile }) {
