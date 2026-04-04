@@ -106,7 +106,7 @@ export default function InspectionForm() {
           type="checkbox"
           checked={agreed}
           onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-1 h-4 w-4 rounded border-border text-foreground focus:ring-foreground/20"
+          className="mt-1 h-4 w-4 rounded border-border accent-foreground focus:ring-foreground/20"
         />
         <span className="text-sm text-foreground">
           {t("inspectionAgree")}

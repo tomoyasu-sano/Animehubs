@@ -94,7 +94,7 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
   return (
     <>
       {/* バナー */}
-      <div className="bg-gradient-to-r from-amber-600 to-orange-500 px-4 py-3">
+      <div className="bg-gradient-to-r from-violet-700 to-purple-500 px-4 py-3">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
           <p className="text-sm font-medium text-white">{message}</p>
           {subscribed ? (
@@ -106,7 +106,7 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
             <button
               onClick={handleButtonClick}
               disabled={subscribing}
-              className="cursor-pointer inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-orange-700 transition-all hover:scale-105 hover:bg-orange-50 disabled:opacity-50"
+              className="cursor-pointer inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-violet-700 transition-all hover:scale-105 hover:bg-violet-50 disabled:opacity-50"
             >
               <Bell className="h-4 w-4" />
               {status === "authenticated"
@@ -149,7 +149,7 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
               <button
                 onClick={handleSubscribe}
                 disabled={subscribing}
-                className="cursor-pointer flex-1 rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:bg-orange-700 disabled:opacity-50"
+                className="cursor-pointer flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:bg-violet-700 disabled:opacity-50"
               >
                 {t("confirmYes")}
               </button>
