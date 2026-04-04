@@ -15,7 +15,8 @@ import {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL || "AnimeHubs <onboarding@resend.dev>";
+  process.env.RESEND_FROM_EMAIL || "AnimeHubs <newsletter@anime-hubs.com>";
+const REPLY_TO_EMAIL = process.env.RESEND_REPLY_TO_EMAIL || "";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://animehubs.se";
 
@@ -113,6 +114,7 @@ export async function sendNewsletter(
     return {
       from: FROM_EMAIL,
       to: [s.email],
+      ...(REPLY_TO_EMAIL ? { replyTo: REPLY_TO_EMAIL } : {}),
       subject: locale === "en" ? input.subjectEn : input.subjectSv,
       html: buildNewsletterEmailHtml({
         body: locale === "en" ? input.bodyEn : input.bodySv,
@@ -187,6 +189,7 @@ async function sendTestEmail(
     {
       from: FROM_EMAIL,
       to: [input.adminEmail],
+      ...(REPLY_TO_EMAIL ? { replyTo: REPLY_TO_EMAIL } : {}),
       subject: `[TEST] ${input.subjectEn}`,
       html: buildNewsletterEmailHtml({
         body: input.bodyEn,

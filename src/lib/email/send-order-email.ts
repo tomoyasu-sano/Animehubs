@@ -14,7 +14,7 @@ function escapeHtml(s: string): string {
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL =
-  process.env.RESEND_FROM_EMAIL || "AnimeHubs <onboarding@resend.dev>";
+  process.env.RESEND_FROM_EMAIL || "AnimeHubs <newsletter@anime-hubs.com>";
 
 function buildOrderEmailHtml(order: Order, items: OrderItem[]): string {
   const isDelivery = order.type === "delivery";

@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/utils";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "AnimeHubs <onboarding@resend.dev>";
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "AnimeHubs <newsletter@anime-hubs.com>";
 
 interface SendConfirmationOptions {
   reservation: Reservation;
