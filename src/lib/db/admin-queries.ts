@@ -1,6 +1,6 @@
 import { getDb } from "./index";
 import { products, reservations, orders } from "./schema";
-import { eq, like, and, or, sql, desc } from "drizzle-orm";
+import { eq, like, and, or, sql, desc, gte } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import type { Product, NewProduct, Reservation, Order } from "./schema";
 
@@ -194,6 +194,17 @@ export async function adminGetOrders(
 
 // ==================== ダッシュボード ====================
 
+export interface PopularProduct {
+  id: string;
+  nameEn: string;
+  nameSv: string;
+  category: string;
+  price: number;
+  stock: number;
+  likesCount: number;
+  images: string;
+}
+
 export interface DashboardStats {
   totalProducts: number;
   // レガシー予約 (reservations)
@@ -213,6 +224,8 @@ export interface DashboardStats {
   totalRevenue: number;
   salesByCategory: { category: string; total: number; count: number }[];
   salesByMonth: { month: string; total: number; count: number }[];
+  // いいねランキング
+  popularProducts: PopularProduct[];
 }
 
 async function countWhere(
@@ -372,6 +385,23 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     .map(([month, data]) => ({ month, total: data.total, count: data.count }))
     .sort((a, b) => a.month.localeCompare(b.month));
 
+  // いいねランキング TOP10
+  const popularProducts: PopularProduct[] = await db
+    .select({
+      id: products.id,
+      nameEn: products.nameEn,
+      nameSv: products.nameSv,
+      category: products.category,
+      price: products.price,
+      stock: products.stock,
+      likesCount: products.likesCount,
+      images: products.images,
+    })
+    .from(products)
+    .orderBy(desc(products.likesCount))
+    .limit(10)
+    .all();
+
   return {
     totalProducts,
     totalReservations,
@@ -388,5 +418,37 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     totalRevenue,
     salesByCategory,
     salesByMonth,
+    popularProducts,
   };
+}
+
+// ==================== ニュースレター用商品取得 ====================
+
+/**
+ * 直近N日以内に作成された商品を取得する（UTC基準）。
+ */
+export async function getRecentProducts(
+  days: number,
+): Promise<
+  Array<{
+    id: string;
+    nameEn: string;
+    price: number;
+    images: string;
+  }>
+> {
+  const db = await getDb();
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+  return db
+    .select({
+      id: products.id,
+      nameEn: products.nameEn,
+      price: products.price,
+      images: products.images,
+    })
+    .from(products)
+    .where(gte(products.createdAt, since))
+    .orderBy(desc(products.createdAt))
+    .all();
 }

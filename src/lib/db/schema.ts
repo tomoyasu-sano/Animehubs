@@ -193,6 +193,57 @@ export const orders = sqliteTable("orders", {
 });
 
 // ============================================================
+// ニュースレター購読者テーブル
+// ============================================================
+
+export const newsletterSubscribers = sqliteTable("newsletter_subscribers", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  locale: text("locale").notNull().default("en"),
+  createdAt: text("created_at").notNull(),
+});
+
+// ============================================================
+// サイト告知バナーテーブル
+// ============================================================
+
+export const siteAnnouncements = sqliteTable("site_announcements", {
+  id: text("id").primaryKey(),
+  messageEn: text("message_en").notNull(),
+  messageSv: text("message_sv").notNull(),
+  active: integer("active").notNull().default(0),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+// ============================================================
+// ニュースレター送信履歴テーブル
+// ============================================================
+
+export type NewsletterSendStatus =
+  | "sending"
+  | "completed"
+  | "partial_failure"
+  | "failed";
+
+export const newsletterSends = sqliteTable("newsletter_sends", {
+  id: text("id").primaryKey(),
+  subjectEn: text("subject_en").notNull(),
+  subjectSv: text("subject_sv").notNull(),
+  bodyEn: text("body_en").notNull(),
+  bodySv: text("body_sv").notNull(),
+  recipientCount: integer("recipient_count").notNull(),
+  sentCount: integer("sent_count").notNull().default(0),
+  failedCount: integer("failed_count").notNull().default(0),
+  status: text("status").notNull().default("sending"),
+  sentBy: text("sent_by").notNull(),
+  sentAt: text("sent_at").notNull(),
+});
+
+// ============================================================
 // 管理者テーブル（v2で廃止予定、互換性のため残す）
 // ============================================================
 
@@ -218,3 +269,9 @@ export type Favorite = typeof favorites.$inferSelect;
 export type NewFavorite = typeof favorites.$inferInsert;
 export type Order = typeof orders.$inferSelect;
 export type NewOrder = typeof orders.$inferInsert;
+export type NewsletterSubscriber = typeof newsletterSubscribers.$inferSelect;
+export type NewNewsletterSubscriber = typeof newsletterSubscribers.$inferInsert;
+export type SiteAnnouncement = typeof siteAnnouncements.$inferSelect;
+export type NewSiteAnnouncement = typeof siteAnnouncements.$inferInsert;
+export type NewsletterSend = typeof newsletterSends.$inferSelect;
+export type NewNewsletterSend = typeof newsletterSends.$inferInsert;

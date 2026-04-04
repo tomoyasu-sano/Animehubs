@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",
+    "@google/generative-ai": "^0.24.1",
     "@opennextjs/cloudflare": "^1.18.0",
     "@react-email/components": "^1.0.10",
     "@stripe/stripe-js": "^9.0.1",

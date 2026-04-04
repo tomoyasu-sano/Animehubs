@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { DashboardStats } from "@/lib/db/admin-queries";
 import { CATEGORY_LABELS, type Category } from "@/lib/constants";
+import AnnouncementManager from "@/components/admin/AnnouncementManager";
 
 function StatCard({
   title,
@@ -78,6 +79,9 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+
+      {/* 告知バナー管理 */}
+      <AnnouncementManager />
 
       {/* 統計カード */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -202,6 +206,82 @@ export default function AdminDashboardPage() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* いいねランキング */}
+      {stats.popularProducts && stats.popularProducts.length > 0 && (
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900">
+            Popular Products (Likes)
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-400">
+                  <th className="pb-3 pr-4">#</th>
+                  <th className="pb-3 pr-4">Product</th>
+                  <th className="pb-3 pr-4">Category</th>
+                  <th className="pb-3 pr-4 text-right">Price</th>
+                  <th className="pb-3 pr-4 text-right">Stock</th>
+                  <th className="pb-3 text-right">Likes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.popularProducts.map((p: {
+                  id: string;
+                  nameEn: string;
+                  category: string;
+                  price: number;
+                  stock: number;
+                  likesCount: number;
+                  images: string;
+                }, i: number) => {
+                  let firstImage: string | null = null;
+                  try {
+                    const imgs = JSON.parse(p.images) as string[];
+                    if (imgs.length > 0) firstImage = imgs[0];
+                  } catch { /* ignore */ }
+                  return (
+                    <tr key={p.id} className="border-b border-gray-50">
+                      <td className="py-3 pr-4 text-gray-400">{i + 1}</td>
+                      <td className="py-3 pr-4">
+                        <div className="flex items-center gap-3">
+                          {firstImage ? (
+                            <img
+                              src={firstImage}
+                              alt={p.nameEn}
+                              className="h-10 w-10 rounded-md object-cover"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 rounded-md bg-gray-100" />
+                          )}
+                          <span className="font-medium text-gray-900">{p.nameEn}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 pr-4 text-gray-500">
+                        {CATEGORY_LABELS[p.category as Category]?.en || p.category}
+                      </td>
+                      <td className="py-3 pr-4 text-right text-gray-700">{formatSEK(p.price)}</td>
+                      <td className="py-3 pr-4 text-right">
+                        <span className={p.stock === 0 ? "font-medium text-red-600" : "text-gray-700"}>
+                          {p.stock === 0 ? "Sold out" : p.stock}
+                        </span>
+                      </td>
+                      <td className="py-3 text-right">
+                        <span className="inline-flex items-center gap-1 font-semibold text-pink-600">
+                          <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                          </svg>
+                          {p.likesCount}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

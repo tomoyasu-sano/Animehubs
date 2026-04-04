@@ -9,6 +9,7 @@ import {
   Package,
   ShoppingBag,
   BarChart3,
+  Mail,
   LogOut,
   Menu,
   X,
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/sales", label: "Sales", icon: BarChart3 },
 ];
 

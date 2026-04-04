@@ -245,6 +245,17 @@
     "section7Title": "7. Changes to This Policy",
     "section7Content": "We may update this policy from time to time. Any changes will be posted on this page."
   },
+  "newsletter": {
+    "bannerButton": "Get notified",
+    "subscribeButton": "Notify me of new arrivals",
+    "subscribedButton": "Subscribed",
+    "confirmTitle": "Receive notifications?",
+    "confirmMessage": "Would you like to receive email notifications when new anime goods arrive?",
+    "confirmYes": "Yes, notify me",
+    "confirmNo": "No thanks",
+    "successMessage": "Subscribed! You'll be notified when new items arrive.",
+    "errorMessage": "Something went wrong. Please try again."
+  },
   "cookie": {
     "message": "We use essential cookies to make this site work. No tracking cookies are used.",
     "accept": "Accept",

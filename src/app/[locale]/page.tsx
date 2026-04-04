@@ -3,6 +3,8 @@ import { Link } from "@/i18n/navigation";
 import { ArrowRight } from "lucide-react";
 import { getProducts } from "@/lib/db/queries";
 import ProductGrid from "@/components/products/ProductGrid";
+import AnnouncementBanner from "@/components/newsletter/AnnouncementBanner";
+import { getActiveAnnouncement } from "@/lib/db/announcement-queries";
 import { generatePageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 
@@ -26,10 +28,16 @@ export async function generateMetadata({
 export default async function HomePage() {
   const t = await getTranslations();
 
-  const { items: featuredProducts } = await getProducts({ featured: true, limit: 6 });
+  const [{ items: featuredProducts }, announcement] = await Promise.all([
+    getProducts({ featured: true, limit: 6 }),
+    getActiveAnnouncement(),
+  ]);
 
   return (
     <div>
+      {/* 告知バナー */}
+      <AnnouncementBanner announcement={announcement} />
+
       {/* ヒーローセクション */}
       <section className="relative flex min-h-[60vh] items-center justify-center overflow-hidden bg-gradient-to-b from-neutral-900 via-neutral-800 to-background">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />

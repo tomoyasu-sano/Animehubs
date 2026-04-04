@@ -245,6 +245,17 @@
     "section7Title": "7. Andringar av denna policy",
     "section7Content": "Vi kan uppdatera denna policy fran tid till annan. Eventuella andringar publiceras pa denna sida."
   },
+  "newsletter": {
+    "bannerButton": "Fa notis",
+    "subscribeButton": "Meddela mig om nya varor",
+    "subscribedButton": "Prenumererar",
+    "confirmTitle": "Fa notiser?",
+    "confirmMessage": "Vill du fa e-postnotiser nar nya anime-varor anländer?",
+    "confirmYes": "Ja, meddela mig",
+    "confirmNo": "Nej tack",
+    "successMessage": "Prenumererar! Du far ett meddelande nar nya varor anländer.",
+    "errorMessage": "Nagot gick fel. Forsok igen."
+  },
   "cookie": {
     "message": "Vi anvander nodvandiga cookies for att webbplatsen ska fungera. Inga sparningscookies anvands.",
     "accept": "Acceptera",
