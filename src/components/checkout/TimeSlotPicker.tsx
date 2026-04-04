@@ -30,11 +30,11 @@ export default function TimeSlotPicker({ value, onChange, disabled }: TimeSlotPi
               type="button"
               onClick={() => onChange(slot.id)}
               disabled={disabled}
-              className={`rounded-lg border px-4 py-3 text-left text-sm transition-colors ${
+              className={`rounded-lg border px-4 py-3 text-left text-sm transition-all ${
                 isSelected
                   ? "border-foreground bg-foreground/5 font-medium text-foreground"
                   : "border-border text-muted hover:border-foreground/50 hover:text-foreground"
-              } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
+              } ${disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:scale-[1.02]"}`}
             >
               {name}
             </button>

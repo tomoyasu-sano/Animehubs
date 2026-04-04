@@ -41,7 +41,7 @@ export default function OrderTypeSelector({
             key={type}
             type="button"
             onClick={() => onSelect(type)}
-            className={`flex items-start gap-3 rounded-lg border p-4 text-left transition-colors ${
+            className={`cursor-pointer flex items-start gap-3 rounded-lg border p-4 text-left transition-all hover:scale-[1.02] ${
               selected === type
                 ? "border-foreground bg-foreground/5"
                 : "border-border hover:border-foreground/50"

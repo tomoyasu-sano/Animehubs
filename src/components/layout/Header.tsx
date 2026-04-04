@@ -54,7 +54,7 @@ export default function Header() {
 
           <Link
             href="/favorites"
-            className="rounded-md p-2 text-muted transition-colors hover:text-white"
+            className="cursor-pointer rounded-md p-2 text-muted transition-all hover:scale-110 hover:text-white"
             aria-label={t("common.favorites")}
           >
             <Heart className="h-5 w-5" />
@@ -67,7 +67,7 @@ export default function Header() {
           {/* モバイルメニュートグル */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="rounded-md p-2 text-muted transition-colors hover:text-white md:hidden"
+            className="cursor-pointer rounded-md p-2 text-muted transition-all hover:scale-110 hover:text-white md:hidden"
             aria-label="Menu"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

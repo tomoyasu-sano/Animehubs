@@ -24,7 +24,7 @@ export default function AuthButton() {
     return (
       <button
         onClick={() => signOut({ callbackUrl: `/${locale}` })}
-        className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-colors hover:text-white"
+        className="cursor-pointer flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-all hover:scale-105 hover:text-white"
         aria-label={t("logout")}
       >
         <LogOut className="h-4 w-4" />
@@ -36,7 +36,7 @@ export default function AuthButton() {
   return (
     <Link
       href="/auth/login"
-      className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-colors hover:text-white"
+      className="cursor-pointer flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-all hover:scale-105 hover:text-white"
     >
       <LogIn className="h-4 w-4" />
       <span className="hidden sm:inline">{t("login")}</span>

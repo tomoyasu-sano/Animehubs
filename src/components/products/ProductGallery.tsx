@@ -75,14 +75,14 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
           <>
             <button
               onClick={goToPrevious}
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
+              className="cursor-pointer absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-all hover:scale-110 hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
               aria-label="Previous image"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
             <button
               onClick={goToNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-colors hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
+              className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-2 text-white transition-all hover:scale-110 hover:bg-black/70 focus:outline-none focus:ring-2 focus:ring-white"
               aria-label="Next image"
             >
               <ChevronRight className="h-5 w-5" />
@@ -98,7 +98,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
                 key={index}
                 onClick={() => setSelectedIndex(index)}
                 className={cn(
-                  "h-2 w-2 rounded-full transition-all",
+                  "cursor-pointer h-2 w-2 rounded-full transition-all",
                   selectedIndex === index
                     ? "w-4 bg-white"
                     : "bg-white/50"
@@ -118,7 +118,7 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
               key={index}
               onClick={() => setSelectedIndex(index)}
               className={cn(
-                "relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-foreground",
+                "cursor-pointer relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md transition-all focus:outline-none focus:ring-2 focus:ring-foreground",
                 selectedIndex === index
                   ? "ring-2 ring-foreground"
                   : "opacity-60 hover:opacity-100"

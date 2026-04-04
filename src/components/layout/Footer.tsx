@@ -30,7 +30,7 @@ export default function Footer() {
                 href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-white"
+                className="cursor-pointer inline-flex items-center gap-2 text-sm text-muted transition-colors hover:text-white"
               >
                 <ExternalLink className="h-4 w-4" />
                 {t("footer.instagram")}
@@ -46,7 +46,7 @@ export default function Footer() {
             <div className="mt-4">
               <Link
                 href="/privacy"
-                className="text-sm text-muted transition-colors hover:text-white"
+                className="cursor-pointer text-sm text-muted transition-colors hover:text-white"
               >
                 {t("footer.privacyPolicy")}
               </Link>

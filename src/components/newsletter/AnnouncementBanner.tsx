@@ -106,7 +106,7 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
             <button
               onClick={handleButtonClick}
               disabled={subscribing}
-              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-orange-700 transition-colors hover:bg-orange-50 disabled:opacity-50"
+              className="cursor-pointer inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-sm font-semibold text-orange-700 transition-all hover:scale-105 hover:bg-orange-50 disabled:opacity-50"
             >
               <Bell className="h-4 w-4" />
               {status === "authenticated"
@@ -142,14 +142,14 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
             <div className="mt-6 flex gap-3">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-card-hover"
+                className="cursor-pointer flex-1 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-all hover:scale-[1.02] hover:bg-card-hover"
               >
                 {t("confirmNo")}
               </button>
               <button
                 onClick={handleSubscribe}
                 disabled={subscribing}
-                className="flex-1 rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-orange-700 disabled:opacity-50"
+                className="cursor-pointer flex-1 rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:bg-orange-700 disabled:opacity-50"
               >
                 {t("confirmYes")}
               </button>

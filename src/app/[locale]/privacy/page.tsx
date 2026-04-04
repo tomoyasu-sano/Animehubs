@@ -33,6 +33,8 @@ export default async function PrivacyPage() {
     { title: t("section5Title"), content: t("section5Content") },
     { title: t("section6Title"), content: t("section6Content") },
     { title: t("section7Title"), content: t("section7Content") },
+    { title: t("section8Title"), content: t("section8Content") },
+    { title: t("section9Title"), content: t("section9Content") },
   ];
 
   return (
@@ -47,7 +49,7 @@ export default async function PrivacyPage() {
 
       <h1 className="mb-2 text-3xl font-bold text-foreground">{t("title")}</h1>
       <p className="mb-8 text-sm text-muted">
-        {t("lastUpdated", { date: "2026-03-23" })}
+        {t("lastUpdated", { date: "2026-04-04" })}
       </p>
 
       <div className="prose prose-invert max-w-none">

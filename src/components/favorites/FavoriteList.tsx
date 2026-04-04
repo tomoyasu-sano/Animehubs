@@ -119,10 +119,10 @@ export default function FavoriteList({ initialFavorites }: FavoriteListProps) {
                 <button
                   onClick={() => handleAddToCart(fav)}
                   disabled={isOutOfStock || isAtStockLimit || justAdded}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${
+                  className={`cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${
                     justAdded
                       ? "bg-green-600 text-white scale-105"
-                      : "bg-foreground text-background hover:bg-accent"
+                      : "bg-foreground text-background hover:scale-[1.02] hover:bg-accent"
                   }`}
                 >
                   {justAdded ? (
@@ -139,7 +139,7 @@ export default function FavoriteList({ initialFavorites }: FavoriteListProps) {
                 </button>
                 <button
                   onClick={() => handleRemoveFavorite(fav.productId)}
-                  className="rounded-lg p-2.5 text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950"
+                  className="cursor-pointer rounded-lg p-2.5 text-red-500 transition-all hover:scale-110 hover:bg-red-50 dark:hover:bg-red-950"
                   aria-label={t("remove")}
                 >
                   <Heart className="h-5 w-5 fill-current" />

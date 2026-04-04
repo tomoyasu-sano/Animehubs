@@ -29,7 +29,7 @@ export default function ProductCard({ product, isFavorite, onToggleFavorite, lik
   const isLowStock = !isOutOfStock && availableStock <= 3;
 
   return (
-    <Link href={`/products/${product.id}`} className="group block">
+    <Link href={`/products/${product.id}`} className="group block cursor-pointer">
       <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-card transition-colors group-hover:bg-card-hover">
         {/* 商品画像 */}
         <Image

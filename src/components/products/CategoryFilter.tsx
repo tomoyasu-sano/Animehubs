@@ -30,7 +30,7 @@ export default function CategoryFilter() {
       <button
         onClick={() => handleCategoryChange("")}
         className={cn(
-          "rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+          "cursor-pointer rounded-full px-4 py-1.5 text-xs font-medium transition-all hover:scale-105",
           !activeCategory
             ? "bg-foreground text-background"
             : "border border-border text-muted hover:border-foreground hover:text-foreground"
@@ -43,7 +43,7 @@ export default function CategoryFilter() {
           key={category}
           onClick={() => handleCategoryChange(category)}
           className={cn(
-            "rounded-full px-4 py-1.5 text-xs font-medium transition-colors",
+            "cursor-pointer rounded-full px-4 py-1.5 text-xs font-medium transition-all hover:scale-105",
             activeCategory === category
               ? "bg-foreground text-background"
               : "border border-border text-muted hover:border-foreground hover:text-foreground"

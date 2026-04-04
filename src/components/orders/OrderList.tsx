@@ -52,7 +52,7 @@ export default function OrderList({ initialData }: OrderListProps) {
         </p>
         <Link
           href="/products"
-          className="mt-4 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background transition-colors hover:bg-accent"
+          className="cursor-pointer mt-4 rounded-lg bg-foreground px-6 py-3 text-sm font-semibold text-background transition-all hover:scale-[1.02] hover:bg-accent"
         >
           {t("browseProducts")}
         </Link>
@@ -79,7 +79,7 @@ export default function OrderList({ initialData }: OrderListProps) {
               <Link
                 key={order.id}
                 href={`/orders/${order.id}`}
-                className="block rounded-lg border border-border bg-card p-4 transition-colors hover:border-foreground/30"
+                className="cursor-pointer block rounded-lg border border-border bg-card p-4 transition-all hover:scale-[1.01] hover:border-foreground/30"
               >
                 <div className="flex items-center justify-between">
                   <div>
@@ -116,7 +116,7 @@ export default function OrderList({ initialData }: OrderListProps) {
           <button
             onClick={() => fetchPage(Math.max(1, page - 1))}
             disabled={page <= 1 || loading}
-            className="rounded-md p-2 text-muted transition-colors hover:text-foreground disabled:opacity-30"
+            className="cursor-pointer rounded-md p-2 text-muted transition-all hover:scale-110 hover:text-foreground disabled:opacity-30"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -126,7 +126,7 @@ export default function OrderList({ initialData }: OrderListProps) {
           <button
             onClick={() => fetchPage(Math.min(totalPages, page + 1))}
             disabled={page >= totalPages || loading}
-            className="rounded-md p-2 text-muted transition-colors hover:text-foreground disabled:opacity-30"
+            className="cursor-pointer rounded-md p-2 text-muted transition-all hover:scale-110 hover:text-foreground disabled:opacity-30"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

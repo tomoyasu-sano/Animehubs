@@ -29,7 +29,7 @@ export default function FavoriteButton({
         onToggle(productId);
       }}
       className={cn(
-        "flex items-center gap-1 rounded-full p-2 transition-all duration-200",
+        "cursor-pointer flex items-center gap-1 rounded-full p-2 transition-all duration-200 hover:scale-110",
         isFavorite
           ? "bg-white text-red-500 ring-2 ring-white shadow-md hover:bg-neutral-100"
           : "bg-white/80 text-neutral-600 shadow-sm hover:bg-white hover:text-red-400",

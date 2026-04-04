@@ -250,7 +250,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
           type="button"
           disabled={translating || (!nameEn && !descriptionEn)}
           onClick={translateToSwedish}
-          className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:opacity-50"
+          className="cursor-pointer flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-all hover:scale-[1.02] hover:bg-blue-100 disabled:opacity-50"
         >
           {translating ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -350,7 +350,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
               <button
                 type="button"
                 onClick={() => removeImage(index)}
-                className="absolute -right-2 -top-2 rounded-full bg-red-500 p-0.5 text-white hover:bg-red-600"
+                className="cursor-pointer absolute -right-2 -top-2 rounded-full bg-red-500 p-0.5 text-white transition-all hover:scale-110 hover:bg-red-600"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -399,7 +399,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
               <button
                 type="button"
                 onClick={addImageUrl}
-                className="flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+                className="cursor-pointer flex items-center gap-1 rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 transition-all hover:scale-[1.02] hover:bg-gray-200"
               >
                 <Plus className="h-4 w-4" />
                 Add

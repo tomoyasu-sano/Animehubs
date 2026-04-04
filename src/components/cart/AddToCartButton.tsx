@@ -54,10 +54,10 @@ export default function AddToCartButton({ product, onCartOpen }: AddToCartButton
     <button
       onClick={handleAdd}
       disabled={isAtStockLimit || justAdded}
-      className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`cursor-pointer flex flex-1 items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 ${
         justAdded
           ? "bg-green-600 text-white scale-105"
-          : "bg-foreground text-background hover:bg-accent"
+          : "bg-foreground text-background hover:scale-[1.02] hover:bg-accent"
       }`}
     >
       {justAdded ? (

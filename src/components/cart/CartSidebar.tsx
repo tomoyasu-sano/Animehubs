@@ -74,7 +74,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           </div>
           <button
             onClick={onClose}
-            className="rounded-md p-1 text-muted transition-colors hover:text-foreground"
+            className="cursor-pointer rounded-md p-1 text-muted transition-all hover:scale-110 hover:text-foreground"
             aria-label={t("close")}
           >
             <X className="h-5 w-5" />
@@ -89,7 +89,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               <p className="text-sm text-muted">{t("empty")}</p>
               <button
                 onClick={onClose}
-                className="mt-2 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-accent"
+                className="cursor-pointer mt-2 rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-all hover:scale-[1.02] hover:bg-accent"
               >
                 {t("continueShopping")}
               </button>
@@ -120,7 +120,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             <Link
               href="/cart"
               onClick={onClose}
-              className="block w-full rounded-lg bg-foreground py-3 text-center text-sm font-semibold text-background transition-colors hover:bg-accent"
+              className="cursor-pointer block w-full rounded-lg bg-foreground py-3 text-center text-sm font-semibold text-background transition-all hover:scale-[1.02] hover:bg-accent"
             >
               {t("checkout")}
             </Link>

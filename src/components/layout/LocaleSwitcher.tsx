@@ -18,7 +18,7 @@ export default function LocaleSwitcher() {
   return (
     <button
       onClick={handleSwitch}
-      className="flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-colors hover:text-white"
+      className="cursor-pointer flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-muted transition-all hover:scale-105 hover:text-white"
       aria-label={t("language")}
     >
       <Globe className="h-4 w-4" />
