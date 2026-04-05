@@ -36,6 +36,7 @@
     "addedToCart": "Added!",
     "stockLimit": "Max quantity reached",
     "outOfStock": "Out of Stock",
+    "height": "Height",
     "inStock": "In Stock",
     "condition": "Condition",
     "category": "Category",

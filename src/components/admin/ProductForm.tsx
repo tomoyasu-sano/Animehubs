@@ -22,6 +22,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
   const [stock, setStock] = useState(product ? String(product.stock) : "1");
   const [category, setCategory] = useState(product?.category || CATEGORIES[0]);
   const [condition, setCondition] = useState(product?.condition || CONDITIONS[0]);
+  const [heightCm, setHeightCm] = useState(product?.heightCm != null ? String(product.heightCm) : "");
   const [featured, setFeatured] = useState(product?.featured === 1);
   const [images, setImages] = useState<string[]>(
     product ? JSON.parse(product.images || "[]") : []
@@ -149,6 +150,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
       stock: parseInt(stock) || 0,
       category,
       condition,
+      heightCm: heightCm ? parseInt(heightCm) : null,
       featured,
       images: JSON.stringify(images),
     };
@@ -291,6 +293,23 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
       </div>
       {/* stock は一点物デフォルト(1)で非表示 */}
       <input type="hidden" value={stock} />
+
+      {/* 高さ（任意） */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Height (cm)
+        </label>
+        <input
+          type="number"
+          min="1"
+          step="1"
+          value={heightCm}
+          onChange={(e) => setHeightCm(e.target.value)}
+          placeholder="e.g. 25"
+          className="mt-1 block w-40 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+        />
+        <p className="mt-1 text-xs text-gray-400">Optional — shown on product page if set</p>
+      </div>
 
       {/* カテゴリ・コンディション */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

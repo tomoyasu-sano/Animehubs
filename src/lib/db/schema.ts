@@ -55,6 +55,7 @@ export const products = sqliteTable("products", {
   reservedStock: integer("reserved_stock").notNull().default(0),
   category: text("category").notNull(),
   condition: text("condition").notNull(),
+  heightCm: integer("height_cm"),
   images: text("images").notNull().default("[]"),
   featured: integer("featured").notNull().default(0),
   featuredOrder: integer("featured_order").notNull().default(0),

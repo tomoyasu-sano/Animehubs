@@ -12,6 +12,7 @@ export interface CreateProductInput {
   category: string;
   condition: string;
   stock?: number;
+  heightCm?: number | null;
   images?: string;
   featured?: boolean;
 }
@@ -25,6 +26,7 @@ export interface UpdateProductInput {
   category?: string;
   condition?: string;
   stock?: number;
+  heightCm?: number | null;
   images?: string;
   featured?: boolean;
 }
@@ -65,6 +67,14 @@ function validateStock(value: unknown, errors: ValidationError[]): void {
   }
 }
 
+function validateHeightCm(value: unknown, errors: ValidationError[]): void {
+  if (value == null) return;
+  const num = Number(value);
+  if (!Number.isFinite(num) || num < 1 || !Number.isInteger(num) || num > 500) {
+    errors.push({ field: "heightCm", message: "Height must be an integer between 1 and 500" });
+  }
+}
+
 function validateCategory(value: unknown, errors: ValidationError[]): void {
   if (typeof value !== "string" || !(CATEGORIES as readonly string[]).includes(value)) {
     errors.push({ field: "category", message: `Invalid category. Must be one of: ${CATEGORIES.join(", ")}` });
@@ -88,6 +98,7 @@ export function validateCreateProduct(input: Record<string, unknown>): Validatio
   validateCategory(input.category, errors);
   validateCondition(input.condition, errors);
   validateStock(input.stock, errors);
+  validateHeightCm(input.heightCm, errors);
 
   return errors;
 }
@@ -103,6 +114,7 @@ export function validateUpdateProduct(input: Record<string, unknown>): Validatio
   if (input.category !== undefined) validateCategory(input.category, errors);
   if (input.condition !== undefined) validateCondition(input.condition, errors);
   if (input.stock !== undefined) validateStock(input.stock, errors);
+  if (input.heightCm !== undefined) validateHeightCm(input.heightCm, errors);
 
   return errors;
 }

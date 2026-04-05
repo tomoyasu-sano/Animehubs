@@ -118,6 +118,12 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <span className="text-sm text-muted">{t("products.condition")}</span>
               <span className="text-sm text-foreground">{conditionLabel}</span>
             </div>
+            {typeof product.heightCm === "number" && product.heightCm > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted">{t("products.height")}</span>
+                <span className="text-sm text-foreground">{product.heightCm} cm</span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted">{t("products.inStock")}</span>
               <span className="text-sm text-foreground">{product.stock - product.reservedStock}</span>

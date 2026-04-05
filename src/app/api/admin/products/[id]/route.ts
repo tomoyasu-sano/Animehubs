@@ -66,6 +66,7 @@ export async function PUT(
     if (body.stock !== undefined) updateData.stock = Number(body.stock);
     if (body.category !== undefined) updateData.category = body.category;
     if (body.condition !== undefined) updateData.condition = body.condition;
+    if (body.heightCm !== undefined) updateData.heightCm = body.heightCm != null ? Number(body.heightCm) : null;
     if (body.images !== undefined) updateData.images = body.images;
     if (body.featured !== undefined) {
       const newFeatured = body.featured ? 1 : 0;
