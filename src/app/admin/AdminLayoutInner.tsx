@@ -7,6 +7,7 @@ import Link from "next/link";
 import {
   LayoutDashboard,
   Package,
+  GripVertical,
   ShoppingBag,
   BarChart3,
   Mail,
@@ -18,6 +19,7 @@ import {
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/featured-order", label: "Featured Order", icon: GripVertical },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/newsletter", label: "Newsletter", icon: Mail },
   { href: "/admin/sales", label: "Sales", icon: BarChart3 },

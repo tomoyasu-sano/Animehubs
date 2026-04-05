@@ -1,6 +1,6 @@
 import { getDb } from "./index";
 import { products, reservations, orders } from "./schema";
-import { eq, like, and, or, sql, desc, gte } from "drizzle-orm";
+import { eq, like, and, or, sql, desc, asc, gte } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 import type { Product, NewProduct, Reservation, Order } from "./schema";
 
@@ -451,4 +451,52 @@ export async function getRecentProducts(
     .where(gte(products.createdAt, since))
     .orderBy(desc(products.createdAt))
     .all();
+}
+
+// ==================== Featured商品並び替え ====================
+
+export async function getFeaturedProducts(): Promise<Product[]> {
+  const db = await getDb();
+  return db
+    .select()
+    .from(products)
+    .where(eq(products.featured, 1))
+    .orderBy(asc(products.featuredOrder), desc(products.createdAt))
+    .all();
+}
+
+export async function getFeaturedCount(): Promise<number> {
+  const db = await getDb();
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(products)
+    .where(eq(products.featured, 1))
+    .get();
+  return result?.count || 0;
+}
+
+export async function getMaxFeaturedOrder(): Promise<number> {
+  const db = await getDb();
+  const result = await db
+    .select({ max: sql<number>`COALESCE(MAX(featured_order), 0)` })
+    .from(products)
+    .where(eq(products.featured, 1))
+    .get();
+  return result?.max || 0;
+}
+
+export async function updateFeaturedOrder(
+  items: Array<{ id: string; order: number }>
+): Promise<void> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+
+  const statements = items.map(({ id, order }) =>
+    db
+      .update(products)
+      .set({ featuredOrder: order, updatedAt: now })
+      .where(eq(products.id, id))
+  );
+
+  await db.batch(statements as [typeof statements[0], ...typeof statements]);
 }

@@ -210,6 +210,8 @@
     "instagram": "Instagram",
     "rightsReserved": "All rights reserved",
     "localPickup": "Pickup in Uppsala · Delivery across Sweden",
+    "information": "Information",
+    "aboutUs": "About Us",
     "privacyPolicy": "Policies",
     "cookiePolicy": "Cookie Policy"
   },
@@ -224,7 +226,9 @@
     "checkoutTitle": "Checkout - AnimeHubs",
     "checkoutDescription": "Complete your order for anime goods with pickup in Uppsala or delivery in Sweden.",
     "privacyTitle": "Policies - AnimeHubs",
-    "privacyDescription": "Shipping, returns, and privacy policies for AnimeHubs. Learn how we handle orders and your personal data."
+    "privacyDescription": "Shipping, returns, and privacy policies for AnimeHubs. Learn how we handle orders and your personal data.",
+    "aboutTitle": "About Us - AnimeHubs",
+    "aboutDescription": "Meet the person behind AnimeHubs. Hand-picked anime collectibles from Japan, based in Uppsala, Sweden."
   },
   "privacy": {
     "title": "Policies",
@@ -270,6 +274,35 @@
     "invalidTitle": "Invalid Link",
     "invalidMessage": "This unsubscribe link is invalid.",
     "backToHome": "Back to Home"
+  },
+  "about": {
+    "heroLabel": "About Us",
+    "heroTitle": "About AnimeHubs",
+    "heroSubtitle": "Your local anime goods shop in Uppsala, Sweden",
+    "backToHome": "Back to Home",
+    "storyTitle": "Our Story",
+    "storyParagraph1": "AnimeHubs was started by two Japanese people living in Uppsala, Sweden, with a simple wish — to share the world of Japanese anime with more people here.",
+    "storyParagraph2": "Sweden has a wonderful culture of caring about interior design and making living spaces feel personal. We'd love for Japanese anime to become part of that — bringing unique, beautifully crafted goods into your home.",
+    "storyParagraph3": "We hope you'll enjoy the incredible craftsmanship and design that Japanese anime goods have to offer!",
+    "commitmentsTitle": "What We Stand For",
+    "commitmentsSubtitle": "Three things we care about most when bringing anime goods to you.",
+    "commitment1Title": "Straight from Japan",
+    "commitment1Description": "All our items are sourced directly from Japan. We hunt through second-hand shops and specialty stores to find quality pieces at great prices.",
+    "commitment2Title": "Your Wish, Our Mission",
+    "commitment2Description": "We stock popular anime goods, but if there's something specific you're looking for, just send us a message — we'll do our best to find it for you.",
+    "commitment3Title": "See Before You Buy",
+    "commitment3Description": "Every item is one-of-a-kind. You can inspect items in person before purchasing, so you know exactly what you're getting.",
+    "locationTitle": "Where We Are",
+    "locationDescription": "AnimeHubs is based in Uppsala, Sweden. We offer local pickup in the Uppsala area as well as delivery across Sweden. For local pickups, we meet at a public location for your convenience and safety.",
+    "businessInfoTitle": "Business Information",
+    "businessName": "Business Name",
+    "businessLocation": "Location",
+    "businessRepresentative": "Representative",
+    "businessContact": "Contact",
+    "businessEmail": "Email",
+    "ctaTitle": "Questions? Get in Touch",
+    "ctaDescription": "Feel free to reach out via Instagram DM or email — we're happy to help with questions about products, orders, or anything else.",
+    "ctaButton": "Message Us on Instagram"
   },
   "cookie": {
     "message": "We use essential cookies to make this site work. No tracking cookies are used.",

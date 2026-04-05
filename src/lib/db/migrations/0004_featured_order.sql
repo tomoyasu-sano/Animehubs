@@ -1,0 +1,1 @@
+ALTER TABLE products ADD COLUMN featured_order INTEGER NOT NULL DEFAULT 0;

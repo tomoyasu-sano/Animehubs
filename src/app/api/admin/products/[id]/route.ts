@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
-import { updateProduct, deleteProduct } from "@/lib/db/admin-queries";
+import {
+  updateProduct,
+  deleteProduct,
+  getFeaturedCount,
+  getMaxFeaturedOrder,
+} from "@/lib/db/admin-queries";
 import { getProductById } from "@/lib/db/queries";
 import { validateUpdateProduct } from "@/lib/admin-validation";
+
+const MAX_FEATURED = 20;
 
 export async function GET(
   _request: NextRequest,
@@ -45,6 +52,11 @@ export async function PUT(
       return NextResponse.json({ error: "Validation failed", details: errors }, { status: 400 });
     }
 
+    const currentProduct = await getProductById(id);
+    if (!currentProduct) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
     const updateData: Record<string, unknown> = {};
     if (body.nameEn !== undefined) updateData.nameEn = body.nameEn;
     if (body.nameSv !== undefined) updateData.nameSv = body.nameSv;
@@ -55,7 +67,30 @@ export async function PUT(
     if (body.category !== undefined) updateData.category = body.category;
     if (body.condition !== undefined) updateData.condition = body.condition;
     if (body.images !== undefined) updateData.images = body.images;
-    if (body.featured !== undefined) updateData.featured = body.featured ? 1 : 0;
+    if (body.featured !== undefined) {
+      const newFeatured = body.featured ? 1 : 0;
+      updateData.featured = newFeatured;
+
+      // Featured 0→1: 末尾に配置 + 上限チェック
+      if (currentProduct.featured === 0 && newFeatured === 1) {
+        const count = await getFeaturedCount();
+        if (count >= MAX_FEATURED) {
+          return NextResponse.json(
+            {
+              error: "Validation failed",
+              details: [`Maximum ${MAX_FEATURED} featured products allowed`],
+            },
+            { status: 400 }
+          );
+        }
+        updateData.featuredOrder = (await getMaxFeaturedOrder()) + 1;
+      }
+
+      // Featured 1→0: リセット
+      if (currentProduct.featured === 1 && newFeatured === 0) {
+        updateData.featuredOrder = 0;
+      }
+    }
 
     const product = await updateProduct(id, updateData);
     if (!product) {

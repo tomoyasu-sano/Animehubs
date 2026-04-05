@@ -48,11 +48,15 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<{
 
   const total = countResult?.count || 0;
 
+  const orderByClause = options.featured
+    ? sql`featured_order ASC, created_at DESC`
+    : sql`created_at DESC`;
+
   let query = db
     .select()
     .from(products)
     .where(whereClause)
-    .orderBy(sql`created_at DESC`);
+    .orderBy(orderByClause);
 
   if (options.limit) {
     query = query.limit(options.limit) as typeof query;

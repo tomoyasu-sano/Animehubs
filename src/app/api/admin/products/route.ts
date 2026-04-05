@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/admin-auth";
-import { adminGetProducts, createProduct } from "@/lib/db/admin-queries";
+import {
+  adminGetProducts,
+  createProduct,
+  getFeaturedCount,
+  getMaxFeaturedOrder,
+} from "@/lib/db/admin-queries";
 import { validateCreateProduct } from "@/lib/admin-validation";
+
+const MAX_FEATURED = 20;
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,6 +47,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Validation failed", details: errors }, { status: 400 });
     }
 
+    const isFeatured = body.featured ? 1 : 0;
+    let featuredOrder = 0;
+
+    if (isFeatured) {
+      const count = await getFeaturedCount();
+      if (count >= MAX_FEATURED) {
+        return NextResponse.json(
+          {
+            error: "Validation failed",
+            details: [`Maximum ${MAX_FEATURED} featured products allowed`],
+          },
+          { status: 400 }
+        );
+      }
+      featuredOrder = (await getMaxFeaturedOrder()) + 1;
+    }
+
     const product = await createProduct({
       nameEn: body.nameEn as string,
       nameSv: body.nameSv as string,
@@ -50,7 +74,8 @@ export async function POST(request: NextRequest) {
       category: body.category as string,
       condition: body.condition as string,
       images: (body.images as string) || "[]",
-      featured: body.featured ? 1 : 0,
+      featured: isFeatured,
+      featuredOrder,
     });
 
     return NextResponse.json(product, { status: 201 });

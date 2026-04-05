@@ -130,7 +130,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
           {/* 説明文 */}
           <div className="border-t border-border pt-6">
             <h2 className="mb-3 text-lg font-semibold text-foreground">{t("products.description")}</h2>
-            <p className="text-sm leading-relaxed text-muted">{description}</p>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-muted">{description}</p>
           </div>
         </div>
       </div>

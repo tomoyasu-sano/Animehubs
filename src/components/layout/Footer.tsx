@@ -38,15 +38,21 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* プライバシーポリシー */}
+          {/* リンク集 */}
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider text-white">
-              {t("footer.privacyPolicy")}
+              {t("footer.information")}
             </h4>
-            <div className="mt-4">
+            <div className="mt-4 space-y-2">
+              <Link
+                href="/about"
+                className="block cursor-pointer text-sm text-muted transition-colors hover:text-white"
+              >
+                {t("footer.aboutUs")}
+              </Link>
               <Link
                 href="/privacy"
-                className="cursor-pointer text-sm text-muted transition-colors hover:text-white"
+                className="block cursor-pointer text-sm text-muted transition-colors hover:text-white"
               >
                 {t("footer.privacyPolicy")}
               </Link>
