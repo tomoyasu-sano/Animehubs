@@ -93,7 +93,7 @@ describe("SEO ユーティリティ", () => {
         name: "Test Figure",
         description: "A great figure",
         price: 129900,
-        condition: "new",
+        condition: "sealed",
         images: ["/images/test.jpg"],
         url: "https://animehubs.se/en/products/123",
         inStock: true,
@@ -106,7 +106,7 @@ describe("SEO ユーティリティ", () => {
       expect(jsonLd.offers.price).toBe("1299.00");
       expect(jsonLd.offers.priceCurrency).toBe("SEK");
       expect(jsonLd.offers.availability).toBe("https://schema.org/InStock");
-      expect(jsonLd.offers.itemCondition).toBe("https://schema.org/NewCondition");
+      expect(jsonLd.offers.itemCondition).toBe("https://schema.org/UsedCondition");
     });
 
     it("在庫切れの場合にOutOfStockを設定する", () => {
@@ -129,7 +129,7 @@ describe("SEO ユーティリティ", () => {
         name: "Test",
         description: "Test",
         price: 10000,
-        condition: "new",
+        condition: "sealed",
         images: ["/images/test.jpg", "https://cdn.example.com/img.jpg"],
         url: "https://animehubs.se/en/products/789",
         inStock: true,

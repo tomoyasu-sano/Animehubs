@@ -53,7 +53,7 @@ const mockProduct = {
   price: 129900,
   stock: 3,
   category: "figures",
-  condition: "new",
+  condition: "sealed",
   images: '["/images/naruto.jpg"]',
   featured: 0,
   createdAt: "2026-01-01T00:00:00Z",

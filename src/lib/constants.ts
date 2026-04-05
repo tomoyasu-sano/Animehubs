@@ -55,16 +55,16 @@ export const CATEGORY_LABELS: Record<Category, { en: string; sv: string }> = {
 };
 
 // コンディション
-export const CONDITIONS = ["new", "like_new", "good", "fair"] as const;
+export const CONDITIONS = ["sealed", "excellent", "good", "fair"] as const;
 
 export type Condition = (typeof CONDITIONS)[number];
 
 // コンディション表示名
 export const CONDITION_LABELS: Record<Condition, { en: string; sv: string }> = {
-  new: { en: "New", sv: "Ny" },
-  like_new: { en: "Like New", sv: "Som ny" },
-  good: { en: "Good", sv: "Bra" },
-  fair: { en: "Fair", sv: "Hyfsat" },
+  sealed: { en: "Sealed", sv: "Oöppnad" },
+  excellent: { en: "Opened - Excellent", sv: "Öppnad - Utmärkt" },
+  good: { en: "Opened - Good", sv: "Öppnad - Bra" },
+  fair: { en: "Opened - Fair", sv: "Öppnad - Hyfsat" },
 };
 
 // 対応ロケール

@@ -92,8 +92,8 @@ export function generateProductJsonLd({
   inStock: boolean;
 }) {
   const conditionMap: Record<string, string> = {
-    new: "https://schema.org/NewCondition",
-    like_new: "https://schema.org/UsedCondition",
+    sealed: "https://schema.org/UsedCondition",
+    excellent: "https://schema.org/UsedCondition",
     good: "https://schema.org/UsedCondition",
     fair: "https://schema.org/UsedCondition",
   };
