@@ -49,7 +49,7 @@ function buildOrderEmailHtml(order: Order, items: OrderItem[]): string {
 
   const inspectionHtml = !isDelivery
     ? `<div style="background-color: #fef3c7; padding: 16px; border-radius: 8px; margin-bottom: 24px;">
-        <p style="margin: 0 0 8px; font-size: 14px; font-weight: bold; color: #92400e;">In-Person Inspection</p>
+        <p style="margin: 0 0 8px; font-size: 14px; font-weight: bold; color: #92400e;">Meet & Buy</p>
         <p style="margin: 0 0 4px; font-size: 14px; color: #92400e;">Please contact us via Instagram DM to arrange a meeting.</p>
         <p style="margin: 0; font-size: 14px; color: #92400e;">Deadline: ${order.expiresAt ? new Date(order.expiresAt).toLocaleDateString("en-SE") : "7 days"}</p>
       </div>`
