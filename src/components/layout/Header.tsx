@@ -230,7 +230,7 @@ export default function Header() {
             )}
           >
             <Info className="h-5 w-5" />
-            {t("common.aboutUs")}
+            {t("footer.aboutUs")}
           </Link>
 
           {/* 言語切替 */}
