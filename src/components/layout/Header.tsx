@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { Heart, Menu, X, Package, Globe, ShoppingCart, Grid, LogIn, LogOut } from "lucide-react";
+import { Heart, Menu, X, Package, Globe, ShoppingCart, Grid, LogIn, LogOut, Info } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useLocale } from "next-intl";
@@ -219,6 +219,19 @@ export default function Header() {
           )}
 
           <div className="my-3 h-px bg-neutral-800" />
+
+          {/* About Us */}
+          <Link
+            href="/about"
+            onClick={() => setMobileMenuOpen(false)}
+            className={cn(
+              "flex items-center gap-3 rounded-md px-3 py-3 text-base font-medium transition-colors hover:text-white",
+              pathname === "/about" ? "text-white" : "text-white/70"
+            )}
+          >
+            <Info className="h-5 w-5" />
+            {t("common.aboutUs")}
+          </Link>
 
           {/* 言語切替 */}
           <button

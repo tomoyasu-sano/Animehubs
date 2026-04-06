@@ -111,15 +111,6 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
           {/* 商品情報 */}
           <div className="space-y-6">
-            {/* モバイル: 戻るリンク */}
-            <Link
-              href="/products"
-              className="inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground md:hidden"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              {t("common.products")}
-            </Link>
-
             <div>
               <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{name}</h1>
               <p className="mt-2 text-2xl font-bold text-foreground md:mt-3 md:text-3xl">{formatPrice(product.price)}</p>
@@ -155,6 +146,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               <h2 className="mb-3 text-lg font-semibold text-foreground">{t("products.description")}</h2>
               <p className="whitespace-pre-line text-sm leading-relaxed text-muted">{description}</p>
             </div>
+
+            {/* モバイル: 戻るリンク */}
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground md:hidden"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {t("common.products")}
+            </Link>
           </div>
         </div>
       </div>
