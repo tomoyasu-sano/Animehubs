@@ -6,8 +6,9 @@ import { useTranslations } from "next-intl";
 import { ShoppingCart } from "lucide-react";
 import { useCart } from "@/hooks/useCart";
 import CartSidebar from "@/components/cart/CartSidebar";
+import { cn } from "@/lib/utils";
 
-export default function CartButton() {
+export default function CartButton({ darkMode = false }: { darkMode?: boolean }) {
   const t = useTranslations("common");
   const [cartOpen, setCartOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -21,12 +22,18 @@ export default function CartButton() {
     <>
       <button
         onClick={() => setCartOpen(true)}
-        className="cursor-pointer relative rounded-md p-2 text-white/70 transition-all hover:scale-110 hover:text-white"
+        className={cn(
+          "cursor-pointer relative rounded-md p-2 transition-all hover:scale-110",
+          darkMode ? "text-black/70 hover:text-black" : "text-white/70 hover:text-white"
+        )}
         aria-label={t("cart")}
       >
         <ShoppingCart className="h-5 w-5" />
         {mounted && totalItems > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-black">
+          <span className={cn(
+            "absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold",
+            darkMode ? "bg-black text-white" : "bg-white text-black"
+          )}>
             {totalItems > 99 ? "99+" : totalItems}
           </span>
         )}

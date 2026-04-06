@@ -54,6 +54,8 @@ export default function Header() {
   // トップページ or 商品詳細 & 未スクロール → 透過、それ以外 → 背景付き
   const isProductDetail = /^\/products\/[^/]+$/.test(pathname);
   const isTransparent = (isHome || isProductDetail) && !scrolled && !mobileMenuOpen;
+  // 商品詳細の透過時のみダークテキスト（背景が明るい商品画像のため）
+  const useDarkText = isProductDetail && isTransparent;
 
   return (
     <header
@@ -70,14 +72,20 @@ export default function Header() {
         {/* スマホ: ハンバーガー（左端） */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="cursor-pointer rounded-md p-2 text-white/80 transition-all hover:text-white md:hidden"
+          className={cn(
+            "cursor-pointer rounded-md p-2 transition-all md:hidden",
+            useDarkText ? "text-black/80 hover:text-black" : "text-white/80 hover:text-white"
+          )}
           aria-label="Menu"
         >
           {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
 
         {/* ロゴ（中央寄り on スマホ、左寄り on PC） */}
-        <Link href="/" className="text-xl font-bold tracking-tight text-white">
+        <Link href="/" className={cn(
+          "text-xl font-bold tracking-tight transition-colors duration-300",
+          useDarkText ? "text-black" : "text-white"
+        )}>
           {t("common.siteName")}
         </Link>
 
@@ -86,10 +94,11 @@ export default function Header() {
           <Link
             href="/products"
             className={cn(
-              "text-sm font-medium transition-colors hover:text-white",
+              "text-sm font-medium transition-colors",
+              useDarkText ? "hover:text-black" : "hover:text-white",
               pathname === "/products" || pathname.startsWith("/products/")
-                ? "text-white"
-                : "text-white/70"
+                ? useDarkText ? "text-black" : "text-white"
+                : useDarkText ? "text-black/70" : "text-white/70"
             )}
           >
             {t("common.products")}
@@ -101,7 +110,10 @@ export default function Header() {
           {/* 言語切替 */}
           <button
             onClick={handleLocaleSwitch}
-            className="cursor-pointer flex items-center gap-1 rounded-md p-2 text-white/70 transition-all hover:text-white"
+            className={cn(
+              "cursor-pointer flex items-center gap-1 rounded-md p-2 transition-all",
+              useDarkText ? "text-black/70 hover:text-black" : "text-white/70 hover:text-white"
+            )}
             aria-label={t("common.language")}
           >
             <Globe className="h-4 w-4" />
@@ -111,23 +123,29 @@ export default function Header() {
           {/* お気に入り */}
           <Link
             href="/favorites"
-            className="cursor-pointer rounded-md p-2 text-white/70 transition-all hover:text-white"
+            className={cn(
+              "cursor-pointer rounded-md p-2 transition-all",
+              useDarkText ? "text-black/70 hover:text-black" : "text-white/70 hover:text-white"
+            )}
             aria-label={t("common.favorites")}
           >
             <Heart className="h-5 w-5" />
           </Link>
 
           {/* 注文 */}
-          <OrdersLink />
+          <OrdersLink darkMode={useDarkText} />
 
           {/* カート */}
-          <CartButton />
+          <CartButton darkMode={useDarkText} />
 
           {/* 認証 */}
           {mounted && isAuthenticated ? (
             <button
               onClick={() => signOut({ callbackUrl: `/${locale}` })}
-              className="cursor-pointer rounded-md px-3 py-1.5 text-sm text-white/70 transition-all hover:text-white"
+              className={cn(
+                "cursor-pointer rounded-md px-3 py-1.5 text-sm transition-all",
+                useDarkText ? "text-black/70 hover:text-black" : "text-white/70 hover:text-white"
+              )}
               aria-label={t("common.logout")}
             >
               {t("common.logout")}
@@ -135,7 +153,10 @@ export default function Header() {
           ) : mounted ? (
             <Link
               href="/auth/login"
-              className="cursor-pointer rounded-md px-3 py-1.5 text-sm text-white/70 transition-all hover:text-white"
+              className={cn(
+                "cursor-pointer rounded-md px-3 py-1.5 text-sm transition-all",
+                useDarkText ? "text-black/70 hover:text-black" : "text-white/70 hover:text-white"
+              )}
             >
               {t("common.login")}
             </Link>
@@ -144,7 +165,7 @@ export default function Header() {
 
         {/* スマホ: 右側カートアイコン */}
         <div className="md:hidden">
-          <CartButton />
+          <CartButton darkMode={useDarkText} />
         </div>
       </div>
 

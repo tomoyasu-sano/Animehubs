@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Package } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { cn } from "@/lib/utils";
 
-export default function OrdersLink() {
+export default function OrdersLink({ darkMode = false }: { darkMode?: boolean }) {
   const t = useTranslations("common");
   const pathname = usePathname();
   const { status } = useSession();
@@ -44,7 +45,10 @@ export default function OrdersLink() {
   return (
     <Link
       href="/orders"
-      className="cursor-pointer relative rounded-md p-2 text-white/70 transition-all hover:scale-110 hover:text-white"
+      className={cn(
+        "cursor-pointer relative rounded-md p-2 transition-all hover:scale-110",
+        darkMode ? "text-black/70 hover:text-black" : "text-white/70 hover:text-white"
+      )}
       aria-label={t("orders")}
     >
       <Package className="h-5 w-5" />
