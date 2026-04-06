@@ -21,7 +21,7 @@ export default function CartButton() {
     <>
       <button
         onClick={() => setCartOpen(true)}
-        className="cursor-pointer relative rounded-md p-2 text-muted transition-all hover:scale-110 hover:text-white"
+        className="cursor-pointer relative rounded-md p-2 text-white/70 transition-all hover:scale-110 hover:text-white"
         aria-label={t("cart")}
       >
         <ShoppingCart className="h-5 w-5" />

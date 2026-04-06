@@ -142,8 +142,10 @@ export default function Header() {
           ) : null}
         </div>
 
-        {/* スマホ: 右側スペーサー（ハンバーガーとロゴのバランス用） */}
-        <div className="w-9 md:hidden" />
+        {/* スマホ: 右側カートアイコン */}
+        <div className="md:hidden">
+          <CartButton />
+        </div>
       </div>
 
       {/* モバイルメニュー: 背景オーバーレイ */}
