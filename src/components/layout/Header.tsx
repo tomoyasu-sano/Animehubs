@@ -51,8 +51,9 @@ export default function Header() {
     window.location.href = `/${newLocale}${pathname}`;
   };
 
-  // トップページ & 未スクロール → 透過、それ以外 → 背景付き
-  const isTransparent = isHome && !scrolled && !mobileMenuOpen;
+  // トップページ or 商品詳細 & 未スクロール → 透過、それ以外 → 背景付き
+  const isProductDetail = /^\/products\/[^/]+$/.test(pathname);
+  const isTransparent = (isHome || isProductDetail) && !scrolled && !mobileMenuOpen;
 
   return (
     <header

@@ -8,9 +8,11 @@ import { cn } from "@/lib/utils";
 interface ProductGalleryProps {
   images: string[];
   alt: string;
+  /** モバイルでフルブリード表示（ヘッダー裏まで広がる） */
+  fullBleed?: boolean;
 }
 
-export default function ProductGallery({ images, alt }: ProductGalleryProps) {
+export default function ProductGallery({ images, alt, fullBleed }: ProductGalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const displayImages = images.length > 0 ? images : ["/placeholder/no-image.svg"];
   const touchStartX = useRef<number | null>(null);
@@ -24,7 +26,6 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
     setSelectedIndex((prev) => (prev === displayImages.length - 1 ? 0 : prev + 1));
   }, [displayImages.length]);
 
-  // スワイプハンドラー
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.targetTouches[0].clientX;
     touchEndX.current = null;
@@ -56,7 +57,12 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
     <div className="space-y-4">
       {/* メイン画像 */}
       <div
-        className="relative aspect-square overflow-hidden rounded-lg border border-border bg-card"
+        className={cn(
+          "relative overflow-hidden bg-card",
+          fullBleed
+            ? "aspect-[3/4] md:aspect-square md:rounded-lg md:border md:border-border"
+            : "aspect-square rounded-lg border border-border"
+        )}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
@@ -90,8 +96,15 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
           </>
         )}
 
-        {/* ドットインジケーター（モバイル） */}
-        {displayImages.length > 1 && (
+        {/* ページインジケーター（モバイル・fullBleed時は数字スタイル） */}
+        {displayImages.length > 1 && fullBleed && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white sm:hidden">
+            {selectedIndex + 1} / {displayImages.length}
+          </div>
+        )}
+
+        {/* ドットインジケーター（モバイル・通常時） */}
+        {displayImages.length > 1 && !fullBleed && (
           <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 sm:hidden">
             {displayImages.map((_, index) => (
               <button
@@ -108,11 +121,21 @@ export default function ProductGallery({ images, alt }: ProductGalleryProps) {
             ))}
           </div>
         )}
+
+        {/* fullBleed時もデスクトップではドットの代わりに数字インジケーター表示 */}
+        {displayImages.length > 1 && fullBleed && (
+          <div className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs font-medium text-white sm:block md:hidden">
+            {selectedIndex + 1} / {displayImages.length}
+          </div>
+        )}
       </div>
 
       {/* サムネイル（タブレット以上のみ表示） */}
       {displayImages.length > 1 && (
-        <div className="hidden gap-2 overflow-x-auto sm:flex">
+        <div className={cn(
+          "gap-2 overflow-x-auto",
+          fullBleed ? "hidden md:flex" : "hidden sm:flex"
+        )}>
           {displayImages.map((image, index) => (
             <button
               key={index}

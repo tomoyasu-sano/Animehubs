@@ -79,7 +79,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24 lg:px-8">
+    <>
       {/* JSON-LD 構造化データ */}
       <script
         type="application/ld+json"
@@ -88,58 +88,76 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         }}
       />
 
-      {/* 戻るリンク */}
-      <Link
-        href="/products"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {t("common.products")}
-      </Link>
+      {/* モバイル: フルブリード画像（ヘッダー裏まで広がる） */}
+      <div className="-mt-16 md:hidden">
+        <ProductGallery images={images} alt={name} fullBleed />
+      </div>
 
-      <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
-        {/* 画像ギャラリー */}
-        <ProductGallery images={images} alt={name} />
+      <div className="mx-auto max-w-5xl px-6 py-8 md:py-16 lg:px-8 lg:py-24">
+        {/* 戻るリンク（デスクトップのみ上に表示） */}
+        <Link
+          href="/products"
+          className="mb-6 hidden items-center gap-1 text-sm text-muted transition-colors hover:text-foreground md:inline-flex"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("common.products")}
+        </Link>
 
-        {/* 商品情報 */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{name}</h1>
-            <p className="mt-3 text-3xl font-bold text-foreground">{formatPrice(product.price)}</p>
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
+          {/* 画像ギャラリー（デスクトップ: 通常表示） */}
+          <div className="hidden md:block">
+            <ProductGallery images={images} alt={name} />
           </div>
 
-          {/* メタ情報 */}
-          <div className="space-y-3 border-t border-border pt-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted">{t("products.category")}</span>
-              <span className="text-sm text-foreground">{categoryLabel}</span>
+          {/* 商品情報 */}
+          <div className="space-y-6">
+            {/* モバイル: 戻るリンク */}
+            <Link
+              href="/products"
+              className="inline-flex items-center gap-1 text-sm text-muted transition-colors hover:text-foreground md:hidden"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              {t("common.products")}
+            </Link>
+
+            <div>
+              <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{name}</h1>
+              <p className="mt-2 text-2xl font-bold text-foreground md:mt-3 md:text-3xl">{formatPrice(product.price)}</p>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted">{t("products.condition")}</span>
-              <span className="text-sm text-foreground">{conditionLabel}</span>
-            </div>
-            {typeof product.heightCm === "number" && product.heightCm > 0 && (
+
+            {/* アクションボタン（カート追加 + お気に入り） */}
+            <ProductDetailActions product={product} />
+
+            {/* メタ情報 */}
+            <div className="space-y-3 border-t border-border pt-6">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted">{t("products.height")}</span>
-                <span className="text-sm text-foreground">{product.heightCm} cm</span>
+                <span className="text-sm text-muted">{t("products.category")}</span>
+                <span className="text-sm text-foreground">{categoryLabel}</span>
               </div>
-            )}
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted">{t("products.inStock")}</span>
-              <span className="text-sm text-foreground">{product.stock - product.reservedStock}</span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted">{t("products.condition")}</span>
+                <span className="text-sm text-foreground">{conditionLabel}</span>
+              </div>
+              {typeof product.heightCm === "number" && product.heightCm > 0 && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted">{t("products.height")}</span>
+                  <span className="text-sm text-foreground">{product.heightCm} cm</span>
+                </div>
+              )}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted">{t("products.inStock")}</span>
+                <span className="text-sm text-foreground">{product.stock - product.reservedStock}</span>
+              </div>
             </div>
-          </div>
 
-          {/* アクションボタン（カート追加 + お気に入り） */}
-          <ProductDetailActions product={product} />
-
-          {/* 説明文 */}
-          <div className="border-t border-border pt-6">
-            <h2 className="mb-3 text-lg font-semibold text-foreground">{t("products.description")}</h2>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-muted">{description}</p>
+            {/* 説明文 */}
+            <div className="border-t border-border pt-6">
+              <h2 className="mb-3 text-lg font-semibold text-foreground">{t("products.description")}</h2>
+              <p className="whitespace-pre-line text-sm leading-relaxed text-muted">{description}</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
