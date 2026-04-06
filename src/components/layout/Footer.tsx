@@ -11,7 +11,7 @@ export default function Footer() {
 
   return (
     <footer className="border-t border-neutral-800 bg-[var(--color-footer)]">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20 lg:px-8">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">
           {/* ブランド */}
           <div>
@@ -60,7 +60,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-border pt-8">
+        <div className="mt-12 border-t border-border pt-10">
           <p className="text-center text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} {t("common.siteName")}. {t("footer.rightsReserved")}.
           </p>

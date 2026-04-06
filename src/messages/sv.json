@@ -21,9 +21,12 @@
     "tryAgain": "Försök igen"
   },
   "home": {
-    "heroTitle": "Din animebutik i Uppsala",
-    "heroSubtitle": "Handplockade figurer, nyckelringar och samlarföremål direkt från Japan — hämta i Uppsala eller få hemleverans i Sverige",
+    "heroTitle": "Kurerade samlarföremål från Japan till Sverige.",
+    "heroSubtitle": "",
     "browseAll": "Utforska kollektionen",
+    "showcaseTitle": "Upptäck våra figurer",
+    "showcaseDescription": "Från pålitliga secondhand-butiker i Japan — varje figur noggrant utvald och kvalitetskontrollerad.",
+    "shopNow": "Handla nu",
     "featuredTitle": "Nyinkommet",
     "viewAll": "Visa alla"
   },

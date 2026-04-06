@@ -50,7 +50,7 @@ export function ProductGridSkeleton({ count = 6 }: { count?: number }) {
  */
 export function ProductDetailSkeleton() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24 lg:px-8">
       <Skeleton className="mb-6 h-4 w-24" />
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
         <Skeleton className="aspect-square w-full rounded-lg" />

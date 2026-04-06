@@ -40,29 +40,24 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* ページヘッダー */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">{t("products.title")}</h1>
-        <p className="mt-1 text-sm text-muted">
-          {total} {t("products.items")}
-        </p>
-      </div>
-
-      {/* 検索・フィルター */}
-      <div className="mb-8 space-y-4">
-        <Suspense fallback={<Skeleton className="h-10 w-full rounded-lg" />}>
-          <ProductSearch />
-        </Suspense>
+    <div className="mx-auto max-w-6xl px-6 py-6 sm:py-10 lg:px-8">
+      {/* フィルターバー: カテゴリアイコン + 検索 + 件数を1行に */}
+      <div className="mb-6 flex items-center gap-2">
         <Suspense fallback={
-          <div className="flex gap-2">
+          <div className="flex gap-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-8 w-24 rounded-full" />
+              <Skeleton key={i} className="h-7 w-7 rounded-full sm:w-20" />
             ))}
           </div>
         }>
           <CategoryFilter />
         </Suspense>
+        <div className="ml-auto hidden items-center gap-2 sm:flex">
+          <span className="text-xs text-muted whitespace-nowrap">{total} {t("products.items")}</span>
+          <Suspense fallback={<Skeleton className="h-8 w-8 rounded-full" />}>
+            <ProductSearch />
+          </Suspense>
+        </div>
       </div>
 
       {/* 商品グリッド */}

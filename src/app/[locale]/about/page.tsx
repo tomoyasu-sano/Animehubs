@@ -29,9 +29,9 @@ export default async function AboutPage() {
   const t = await getTranslations("about");
 
   return (
-    <div>
-      {/* ヒーロー — ダーク、ヘッダーと同トーン */}
-      <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden bg-neutral-900 sm:min-h-[55vh]">
+    <div className="-mt-16">
+      {/* ヒーロー — ダーク、ヘッダーと同トーン（ヘッダーの裏に潜り込む） */}
+      <section className="relative flex min-h-[45vh] items-center justify-center overflow-hidden bg-neutral-900 pt-16 sm:min-h-[55vh]">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,255,255,0.06)_0%,_transparent_50%)]" />
         <div className="relative z-10 mx-auto max-w-2xl px-6 text-center">
           <p className="mb-4 text-xs font-medium uppercase tracking-[0.25em] text-neutral-500">

@@ -79,7 +79,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-6 py-16 sm:py-24 lg:px-8">
       {/* JSON-LD 構造化データ */}
       <script
         type="application/ld+json"
@@ -97,7 +97,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         {t("common.products")}
       </Link>
 
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-16">
         {/* 画像ギャラリー */}
         <ProductGallery images={images} alt={name} />
 

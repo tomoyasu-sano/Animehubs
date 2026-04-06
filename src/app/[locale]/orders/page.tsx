@@ -40,8 +40,8 @@ export default async function OrdersPage({ params, searchParams }: OrdersPagePro
   const t = await getTranslations("orders");
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
-      <h1 className="mb-6 text-2xl font-bold text-foreground">{t("title")}</h1>
+    <div className="mx-auto max-w-3xl px-6 py-16 sm:py-24 lg:px-8">
+      <h1 className="mb-10 text-2xl font-bold text-foreground">{t("title")}</h1>
       <OrderList initialData={data} />
     </div>
   );

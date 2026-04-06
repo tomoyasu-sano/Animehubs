@@ -111,7 +111,7 @@ export default function OrderDetail({ initialOrder }: OrderDetailProps) {
     : null;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-2xl px-6 py-16 sm:py-24 lg:px-8">
       {/* ヘッダー */}
       <div className="mb-8 text-center">
         {order.status === "paid" || order.status === "completed" ? (

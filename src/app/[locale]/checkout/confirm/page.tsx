@@ -87,7 +87,7 @@ export default function ConfirmPage() {
   const timeSlotName = getTimeSlotName(reservation.timeSlot, locale);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-2xl px-6 py-16 sm:py-24 lg:px-8">
       {/* 成功アイコン */}
       <div className="mb-8 text-center">
         <CheckCircle className="mx-auto h-16 w-16 text-green-500" />

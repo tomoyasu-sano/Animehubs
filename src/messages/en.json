@@ -21,9 +21,12 @@
     "tryAgain": "Try again"
   },
   "home": {
-    "heroTitle": "Your Anime Goods Store in Uppsala",
-    "heroSubtitle": "Hand-picked figures, keychains, and collectibles straight from Japan — available for pickup or delivery in Sweden",
+    "heroTitle": "Curated anime collectibles from Japan to Sweden.",
+    "heroSubtitle": "",
     "browseAll": "Browse Collection",
+    "showcaseTitle": "Discover our figures",
+    "showcaseDescription": "Sourced from trusted second-hand shops in Japan — each figure carefully selected and inspected for quality.",
+    "shopNow": "Shop now",
     "featuredTitle": "New Arrivals",
     "viewAll": "View All"
   },

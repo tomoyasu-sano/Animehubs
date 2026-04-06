@@ -36,8 +36,8 @@ export default async function FavoritesPage({ params }: FavoritesPageProps) {
   const t = await getTranslations("favorites");
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="mb-8 text-2xl font-bold text-foreground">{t("title")}</h1>
+    <div className="mx-auto max-w-6xl px-6 py-16 sm:py-24 lg:px-8">
+      <h1 className="mb-12 text-2xl font-bold text-foreground">{t("title")}</h1>
       <FavoriteList initialFavorites={favorites} />
     </div>
   );
