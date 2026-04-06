@@ -88,8 +88,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
         }}
       />
 
-      {/* モバイル: フルブリード画像（ヘッダー裏まで広がる） */}
-      <div className="-mt-16 md:hidden">
+      {/* モバイル: フルブリード画像（ヘッダー下から表示、白背景で一体感を保持） */}
+      <div className="md:hidden">
         <ProductGallery images={images} alt={name} fullBleed />
       </div>
 
