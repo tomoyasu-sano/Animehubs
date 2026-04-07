@@ -47,3 +47,6 @@ next-env.d.ts
 /public/uploads/*
 .wrangler/
 .open-next/
+
+# personal Claude settings (each developer customizes locally)
+.claude/CLAUDE.md
