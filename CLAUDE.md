@@ -17,6 +17,15 @@
 - コミットメッセージは Conventional Commits 形式（feat:, fix:, docs: 等）
 - main, staging ブランチへの直接 push は禁止
 
+## ブランチ運用ルール
+
+- `main` への直接 push は禁止（GitHub Rulesets で強制）
+- すべての変更は作業ブランチを作成し、Pull Request 経由で main にマージする
+- ブランチ名: `feature/`, `fix/`, `refactor/`, `docs/` のプレフィックスを付ける
+- **main への PR マージは GitHub 上で人間が手動で行う**（Claude が `git push` や自動マージをしない）
+- Claude はブランチ作成・コミット・プッシュまでを担当し、PR 作成後は人間に引き渡す
+- 詳細は `docs/collaboration/` を参照
+
 ## 禁止事項
 
 - .env, credentials, 秘密鍵などの機密ファイルを読まない・コミットしない
