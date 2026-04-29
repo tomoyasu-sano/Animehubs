@@ -1,6 +1,7 @@
 import { getDb } from "./index";
 import { products } from "./schema";
-import { eq, like, and, or, sql } from "drizzle-orm";
+import { eq, like, and, or, ne, sql, desc } from "drizzle-orm";
+import { CATEGORIES } from "../constants";
 import type { Product } from "./schema";
 
 interface GetProductsOptions {
@@ -69,6 +70,63 @@ export async function getProducts(options: GetProductsOptions = {}): Promise<{
   const items = await query.all();
 
   return { items, total };
+}
+
+export async function getRecommendedProducts(
+  excludeId: string,
+  category: string,
+  limit?: number,
+): Promise<Product[]> {
+  if (!excludeId) {
+    return [];
+  }
+
+  const effectiveLimit =
+    limit === undefined ? 4 : Math.max(1, Math.min(20, limit));
+
+  const db = await getDb();
+
+  const isValidCategory = (CATEGORIES as readonly string[]).includes(category);
+  const stockPriority = sql`CASE WHEN (${products.stock} - ${products.reservedStock}) > 0 THEN 0 ELSE 1 END ASC`;
+
+  let sameCategoryResults: Product[] = [];
+
+  // Phase 1: 同カテゴリから取得（有効なカテゴリの場合のみ）
+  if (isValidCategory) {
+    sameCategoryResults = await db
+      .select()
+      .from(products)
+      .where(and(ne(products.id, excludeId), eq(products.category, category)))
+      .orderBy(stockPriority, desc(products.createdAt))
+      .limit(effectiveLimit)
+      .all();
+  }
+
+  if (sameCategoryResults.length >= effectiveLimit) {
+    return sameCategoryResults;
+  }
+
+  // Phase 2: 他カテゴリから不足分を補充
+  const remaining = effectiveLimit - sameCategoryResults.length;
+  const excludeIds = [excludeId, ...sameCategoryResults.map((p) => p.id)];
+  const notInExcluded = sql`${products.id} NOT IN (${sql.join(
+    excludeIds.map((id) => sql`${id}`),
+    sql`, `,
+  )})`;
+
+  const phase2Where = isValidCategory
+    ? and(notInExcluded, ne(products.category, category))
+    : notInExcluded;
+
+  const otherCategoryResults = await db
+    .select()
+    .from(products)
+    .where(phase2Where)
+    .orderBy(stockPriority, desc(products.likesCount), desc(products.createdAt))
+    .limit(remaining)
+    .all();
+
+  return [...sameCategoryResults, ...otherCategoryResults];
 }
 
 export async function getProductById(id: string): Promise<Product | undefined> {

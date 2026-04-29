@@ -22,7 +22,7 @@
     "tryAgain": "Try again"
   },
   "home": {
-    "heroTitle": "Curated anime collectibles from Japan to Sweden.",
+    "heroTitle": "Anime collectibles from Japan, delivered to Sweden",
     "heroSubtitle": "",
     "browseAll": "Browse Collection",
     "showcaseTitle": "Discover our figures",
@@ -48,7 +48,8 @@
     "description": "Description",
     "gallery": "Gallery",
     "items": "items",
-    "onlyLeft": "Only {count} left"
+    "onlyLeft": "Only {count} left",
+    "recommendedTitle": "You might also like"
   },
   "cart": {
     "title": "Shopping Cart",
@@ -287,10 +288,10 @@
     "backToHome": "Back to Home",
     "storyTitle": "Our Story",
     "storyParagraph1": "AnimeHubs was started by two Japanese people living in Uppsala, Sweden, with a simple wish — to share the world of Japanese anime with more people here.",
-    "storyParagraph2": "Sweden has a wonderful culture of caring about interior design and making living spaces feel personal. We'd love for Japanese anime to become part of that — bringing unique, beautifully crafted goods into your home.",
-    "storyParagraph3": "We hope you'll enjoy the incredible craftsmanship and design that Japanese anime goods have to offer!",
+    "storyParagraph2": "People in Sweden really care about how their homes look and feel. We think Japanese anime goods fit right in — unique pieces that add something special to any space.",
+    "storyParagraph3": "We hope you find something you love!",
     "commitmentsTitle": "What We Stand For",
-    "commitmentsSubtitle": "Three things we care about most when bringing anime goods to you.",
+    "commitmentsSubtitle": "Here's how we do things.",
     "commitment1Title": "Straight from Japan",
     "commitment1Description": "All our items are sourced directly from Japan. We hunt through second-hand shops and specialty stores to find quality pieces at great prices.",
     "commitment2Title": "Your Wish, Our Mission",
