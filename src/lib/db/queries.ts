@@ -88,16 +88,18 @@ export async function getRecommendedProducts(
 
   const isValidCategory = (CATEGORIES as readonly string[]).includes(category);
   const stockPriority = sql`CASE WHEN (${products.stock} - ${products.reservedStock}) > 0 THEN 0 ELSE 1 END ASC`;
+  const random = sql`RANDOM()`;
 
   let sameCategoryResults: Product[] = [];
 
   // Phase 1: 同カテゴリから取得（有効なカテゴリの場合のみ）
+  // 在庫あり優先、同じ在庫状況内ではランダム
   if (isValidCategory) {
     sameCategoryResults = await db
       .select()
       .from(products)
       .where(and(ne(products.id, excludeId), eq(products.category, category)))
-      .orderBy(stockPriority, desc(products.createdAt))
+      .orderBy(stockPriority, random)
       .limit(effectiveLimit)
       .all();
   }
@@ -107,6 +109,7 @@ export async function getRecommendedProducts(
   }
 
   // Phase 2: 他カテゴリから不足分を補充
+  // 在庫あり優先、同じ在庫状況内ではランダム
   const remaining = effectiveLimit - sameCategoryResults.length;
   const excludeIds = [excludeId, ...sameCategoryResults.map((p) => p.id)];
   const notInExcluded = sql`${products.id} NOT IN (${sql.join(
@@ -122,7 +125,7 @@ export async function getRecommendedProducts(
     .select()
     .from(products)
     .where(phase2Where)
-    .orderBy(stockPriority, desc(products.likesCount), desc(products.createdAt))
+    .orderBy(stockPriority, random)
     .limit(remaining)
     .all();
 
