@@ -48,7 +48,8 @@
     "description": "Beskrivning",
     "gallery": "Galleri",
     "items": "artiklar",
-    "onlyLeft": "Bara {count} kvar"
+    "onlyLeft": "Bara {count} kvar",
+    "recommendedTitle": "Du kanske också gillar"
   },
   "cart": {
     "title": "Varukorg",

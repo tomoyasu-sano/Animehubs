@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
@@ -8,6 +9,8 @@ import { formatPrice, getLocalizedField, parseImages } from "@/lib/utils";
 import { CATEGORY_LABELS, CONDITION_LABELS, type Category, type Condition } from "@/lib/constants";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductDetailActions from "./ProductDetailActions";
+import RecommendedProducts from "@/components/products/RecommendedProducts";
+import RecommendedSkeleton from "@/components/products/RecommendedSkeleton";
 import { generatePageMetadata, generateProductJsonLd, getSiteUrl } from "@/lib/seo";
 import type { Metadata } from "next";
 
@@ -157,6 +160,11 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
             </Link>
           </div>
         </div>
+
+        {/* おすすめ商品セクション */}
+        <Suspense fallback={<RecommendedSkeleton />}>
+          <RecommendedProducts productId={id} category={product.category} />
+        </Suspense>
       </div>
     </>
   );

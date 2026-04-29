@@ -48,7 +48,8 @@
     "description": "Description",
     "gallery": "Gallery",
     "items": "items",
-    "onlyLeft": "Only {count} left"
+    "onlyLeft": "Only {count} left",
+    "recommendedTitle": "You might also like"
   },
   "cart": {
     "title": "Shopping Cart",
