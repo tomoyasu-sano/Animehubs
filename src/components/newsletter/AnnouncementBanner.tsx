@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { Bell, Check } from "lucide-react";
+import { Bell, Check, X } from "lucide-react";
 
 interface AnnouncementBannerProps {
   announcement: {
+    id: string;
     messageEn: string;
     messageSv: string;
   } | null;
@@ -19,11 +20,35 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
   const router = useRouter();
   const { status } = useSession();
 
+  const [dismissed, setDismissed] = useState(false);
   const [subscribed, setSubscribed] = useState<boolean | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const [justSubscribed, setJustSubscribed] = useState(false);
   const [error, setError] = useState("");
+
+  // localStorage で閉じたアナウンスを記録
+  useEffect(() => {
+    if (!announcement) return;
+    const dismissedIds: string[] = JSON.parse(
+      localStorage.getItem("dismissedAnnouncements") ?? "[]",
+    );
+    if (dismissedIds.includes(announcement.id)) {
+      setDismissed(true);
+    }
+  }, [announcement]);
+
+  const handleDismiss = useCallback(() => {
+    if (!announcement) return;
+    const dismissedIds: string[] = JSON.parse(
+      localStorage.getItem("dismissedAnnouncements") ?? "[]",
+    );
+    localStorage.setItem(
+      "dismissedAnnouncements",
+      JSON.stringify([...dismissedIds, announcement.id]),
+    );
+    setDismissed(true);
+  }, [announcement]);
 
   // 購読状態を取得
   useEffect(() => {
@@ -87,15 +112,24 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
     setShowConfirm(true);
   }, [status, locale, router]);
 
-  if (!announcement) return null;
+  if (!announcement || dismissed) return null;
 
   const message = locale === "sv" ? announcement.messageSv : announcement.messageEn;
 
   return (
     <>
-      {/* バナー */}
-      <div className="bg-gradient-to-r from-violet-700 to-purple-500 px-4 py-3">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
+      {/* バナー（ヘッダー z-50 の直下に固定） */}
+      <div className="fixed top-16 z-40 w-full bg-gradient-to-r from-violet-700 to-purple-500 px-4 py-3">
+        <div className="mx-auto flex max-w-7xl items-center gap-3">
+          {/* ×ボタン（左端、目立つ白丸） */}
+          <button
+            onClick={handleDismiss}
+            className="cursor-pointer flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/25 text-white transition-all hover:scale-110 hover:bg-white/40"
+            aria-label="Close announcement"
+          >
+            <X className="h-4 w-4" strokeWidth={3} />
+          </button>
+          <div className="flex flex-1 flex-col items-center gap-3 sm:flex-row sm:justify-between">
           <p className="text-sm font-medium text-white">{message}</p>
           {subscribed ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-4 py-1.5 text-sm font-medium text-white">
@@ -114,6 +148,7 @@ export default function AnnouncementBanner({ announcement }: AnnouncementBannerP
                 : t("bannerButton")}
             </button>
           )}
+          </div>
         </div>
         {/* 登録成功フィードバック */}
         {justSubscribed && (
