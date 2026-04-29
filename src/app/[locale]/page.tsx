@@ -36,7 +36,7 @@ export default async function HomePage() {
 
   return (
     <div className="-mt-16">
-      {/* 告知バナー */}
+      {/* 告知バナー（ヘッダーの直下に固定配置） */}
       <AnnouncementBanner announcement={announcement} />
 
       {/* ヒーローセクション（ヘッダーの裏に潜り込む） */}
