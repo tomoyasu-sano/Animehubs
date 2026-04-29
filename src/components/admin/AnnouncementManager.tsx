@@ -15,6 +15,7 @@ export default function AnnouncementManager() {
     messageSv: "",
     active: false,
   });
+  const [originalMessage, setOriginalMessage] = useState<{ en: string; sv: string }>({ en: "", sv: "" });
   const [subscriberCount, setSubscriberCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -38,6 +39,7 @@ export default function AnnouncementManager() {
             messageSv: data.announcement.messageSv,
             active: true,
           });
+          setOriginalMessage({ en: data.announcement.messageEn, sv: data.announcement.messageSv });
         } else {
           setAnnouncement((prev) => ({ ...prev, active: false }));
         }
@@ -63,11 +65,15 @@ export default function AnnouncementManager() {
     setMessage(null);
 
     try {
+      const textChanged =
+        announcement.messageEn !== originalMessage.en ||
+        announcement.messageSv !== originalMessage.sv;
+
       const res = await fetch("/api/admin/announcements", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: announcement.id,
+          id: textChanged ? undefined : announcement.id,
           messageEn: announcement.messageEn,
           messageSv: announcement.messageSv,
           active: announcement.active,
@@ -82,6 +88,7 @@ export default function AnnouncementManager() {
 
       setMessage({ type: "success", text: "Saved successfully" });
       setTimeout(() => setMessage(null), 3000);
+      await fetchData();
     } catch {
       setMessage({ type: "error", text: "Failed to save announcement" });
     } finally {
