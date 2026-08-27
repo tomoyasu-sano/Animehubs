@@ -19,7 +19,7 @@ npm install
 ```bash
 # .env.local
 DATABASE_URL=./data/animehubs.db
-NEXT_PUBLIC_SITE_URL=https://animehubs.se
+NEXT_PUBLIC_SITE_URL=https://anime-hubs.com
 NEXT_PUBLIC_BASE_URL=https://anime-hubs.com
 NEXT_PUBLIC_INSTAGRAM_URL=https://www.instagram.com/animehubs_swe/
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx  # オーナーから受け取る
