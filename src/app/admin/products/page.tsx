@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { Plus, Search, Pencil, Trash2 } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, PackageX, PackageCheck } from "lucide-react";
 import type { Product } from "@/lib/db/schema";
 import { CATEGORIES, CATEGORY_LABELS, type Category } from "@/lib/constants";
 
@@ -18,6 +18,8 @@ export default function AdminProductsPage() {
   const [category, setCategory] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [soldTarget, setSoldTarget] = useState<Product | null>(null);
+  const [updatingStockId, setUpdatingStockId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const fetchProducts = useCallback(async () => {
@@ -64,6 +66,36 @@ export default function AdminProductsPage() {
       setDeleteId(null);
       setDeleting(false);
     }
+  };
+
+  const updateStock = async (productId: string, stock: number) => {
+    setUpdatingStockId(productId);
+    try {
+      setError("");
+      const res = await fetch(`/api/admin/products/${productId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stock }),
+      });
+      if (!res.ok) {
+        setError("Failed to update stock.");
+        return;
+      }
+      setProducts((prev) =>
+        prev.map((p) => (p.id === productId ? { ...p, stock } : p))
+      );
+    } catch {
+      setError("Failed to update stock.");
+    } finally {
+      setUpdatingStockId(null);
+    }
+  };
+
+  const handleMarkSold = async () => {
+    if (!soldTarget) return;
+    const id = soldTarget.id;
+    setSoldTarget(null);
+    await updateStock(id, 0);
   };
 
   return (
@@ -187,7 +219,7 @@ export default function AdminProductsPage() {
                       <span
                         className={`font-medium ${product.stock === 0 ? "text-red-600" : "text-gray-900"}`}
                       >
-                        {product.stock}
+                        {product.stock === 0 ? "Sold out" : product.stock}
                       </span>
                     </td>
                     <td className="px-4 py-3">
@@ -205,6 +237,25 @@ export default function AdminProductsPage() {
                         >
                           <Pencil className="h-4 w-4" />
                         </Link>
+                        {product.stock === 0 ? (
+                          <button
+                            onClick={() => updateStock(product.id, 1)}
+                            disabled={updatingStockId === product.id}
+                            title="Restock (set stock to 1)"
+                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600 disabled:opacity-50"
+                          >
+                            <PackageCheck className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setSoldTarget(product)}
+                            disabled={updatingStockId === product.id}
+                            title="Mark as Sold"
+                            className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-600 disabled:opacity-50"
+                          >
+                            <PackageX className="h-4 w-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => setDeleteId(product.id)}
                           className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -218,6 +269,36 @@ export default function AdminProductsPage() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Sold確認ダイアログ */}
+      {soldTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Mark as Sold
+            </h3>
+            <p className="mt-2 text-sm text-gray-500">
+              Mark &quot;{soldTarget.nameEn}&quot; as sold? The product page will stay
+              online with a Sold Out badge, and customers will no longer be able
+              to buy it. You can restock it anytime.
+            </p>
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setSoldTarget(null)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMarkSold}
+                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+              >
+                Mark as Sold
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
