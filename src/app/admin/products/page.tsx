@@ -22,6 +22,20 @@ export default function AdminProductsPage() {
   const [updatingStockId, setUpdatingStockId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
+  // Mark as Sold ダイアログの入力（SEK文字列）
+  const [saleChannel, setSaleChannel] = useState<"site" | "vinted" | "other">("vinted");
+  const [salePrice, setSalePrice] = useState("");
+  const [saleFee, setSaleFee] = useState("");
+  const [saleShipping, setSaleShipping] = useState("");
+
+  const openSoldDialog = (product: Product) => {
+    setSaleChannel("vinted");
+    setSalePrice(String(product.price / 100));
+    setSaleFee("");
+    setSaleShipping("");
+    setSoldTarget(product);
+  };
+
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams();
@@ -93,9 +107,43 @@ export default function AdminProductsPage() {
 
   const handleMarkSold = async () => {
     if (!soldTarget) return;
-    const id = soldTarget.id;
+    const target = soldTarget;
+    const priceOre = Math.round(parseFloat(salePrice) * 100);
+    if (isNaN(priceOre) || priceOre < 0) {
+      setError("Invalid sale price.");
+      return;
+    }
+    const feeOre = saleFee ? Math.round(parseFloat(saleFee) * 100) : 0;
+    const shippingOre = saleShipping ? Math.round(parseFloat(saleShipping) * 100) : 0;
+
     setSoldTarget(null);
-    await updateStock(id, 0);
+    setUpdatingStockId(target.id);
+    try {
+      const res = await fetch("/api/admin/sales", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: target.id,
+          nameEn: target.nameEn,
+          channel: saleChannel,
+          soldPrice: priceOre,
+          costSek: target.costSek ?? null,
+          sellerFee: feeOre,
+          sellerShipping: shippingOre,
+        }),
+      });
+      if (!res.ok) {
+        setError("Failed to record sale.");
+        return;
+      }
+      setProducts((prev) =>
+        prev.map((p) => (p.id === target.id ? { ...p, stock: 0 } : p)),
+      );
+    } catch {
+      setError("Failed to record sale.");
+    } finally {
+      setUpdatingStockId(null);
+    }
   };
 
   return (
@@ -268,7 +316,7 @@ export default function AdminProductsPage() {
                           </button>
                         ) : (
                           <button
-                            onClick={() => setSoldTarget(product)}
+                            onClick={() => openSoldDialog(product)}
                             disabled={updatingStockId === product.id}
                             title="Mark as Sold"
                             className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-600 disabled:opacity-50"
@@ -292,35 +340,124 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {/* Sold確認ダイアログ */}
-      {soldTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Mark as Sold
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              Mark &quot;{soldTarget.nameEn}&quot; as sold? The product page will stay
-              online with a Sold Out badge, and customers will no longer be able
-              to buy it. You can restock it anytime.
-            </p>
-            <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={() => setSoldTarget(null)}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleMarkSold}
-                className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
-              >
-                Mark as Sold
-              </button>
+      {/* Sold記録ダイアログ（チャネル・実売価格・利益プレビュー） */}
+      {soldTarget &&
+        (() => {
+          const priceOre = Math.round((parseFloat(salePrice) || 0) * 100);
+          const feeOre = Math.round((parseFloat(saleFee) || 0) * 100);
+          const shippingOre = Math.round((parseFloat(saleShipping) || 0) * 100);
+          const cost = soldTarget.costSek;
+          const profit = priceOre - (cost ?? 0) - feeOre - shippingOre;
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+              <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-lg">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Mark as Sold
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">{soldTarget.nameEn}</p>
+
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600">
+                      Channel
+                    </label>
+                    <select
+                      value={saleChannel}
+                      onChange={(e) =>
+                        setSaleChannel(e.target.value as "site" | "vinted" | "other")
+                      }
+                      className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900"
+                    >
+                      <option value="vinted">Vinted</option>
+                      <option value="site">Site (Stripe)</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600">
+                        Price
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={salePrice}
+                        onChange={(e) => setSalePrice(e.target.value)}
+                        className="mt-1 block w-full rounded-lg border border-gray-300 px-2 py-2 text-sm text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600">
+                        Fee
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        value={saleFee}
+                        onChange={(e) => setSaleFee(e.target.value)}
+                        className="mt-1 block w-full rounded-lg border border-gray-300 px-2 py-2 text-sm text-gray-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600">
+                        Shipping
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        value={saleShipping}
+                        onChange={(e) => setSaleShipping(e.target.value)}
+                        className="mt-1 block w-full rounded-lg border border-gray-300 px-2 py-2 text-sm text-gray-900"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400">
+                    Vinted は手数料・送料とも買い手負担のため通常 0。単位は SEK。
+                  </p>
+
+                  {/* 利益プレビュー */}
+                  <div className="rounded-lg bg-gray-50 p-3 text-sm">
+                    {cost == null ? (
+                      <p className="text-amber-600">
+                        原価未設定。先に商品編集で Cost を入れると利益が出ます（今は売値=利益扱い）。
+                      </p>
+                    ) : (
+                      <p className="text-gray-600">
+                        原価 {formatSEK(cost)} →{" "}
+                        <span className="font-semibold text-green-600">
+                          純利益 {formatSEK(profit)}
+                        </span>{" "}
+                        <span className="text-gray-400">
+                          / 友達分 {formatSEK(Math.round(profit / 2))}
+                        </span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-5 flex justify-end gap-3">
+                  <button
+                    onClick={() => setSoldTarget(null)}
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleMarkSold}
+                    className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700"
+                  >
+                    Record Sale
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          );
+        })()}
 
       {/* 削除確認ダイアログ */}
       {deleteId && (

@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { TrendingUp, BarChart3 } from "lucide-react";
-import type { DashboardStats } from "@/lib/db/admin-queries";
+import type { DashboardStats, SalesSummary } from "@/lib/db/admin-queries";
 import { CATEGORY_LABELS, type Category } from "@/lib/constants";
+
+const CHANNEL_LABELS: Record<string, string> = {
+  site: "Site",
+  vinted: "Vinted",
+  other: "Other",
+};
 
 function formatSEK(amount: number): string {
   return `${(amount / 100).toLocaleString("sv-SE")} SEK`;
@@ -11,6 +17,7 @@ function formatSEK(amount: number): string {
 
 export default function AdminSalesPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [ledger, setLedger] = useState<SalesSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,6 +31,13 @@ export default function AdminSalesPage() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    fetch("/api/admin/sales")
+      .then((res) => (res.ok ? (res.json() as Promise<SalesSummary>) : null))
+      .then((data) => {
+        if (data) setLedger(data);
+      })
+      .catch(console.error);
   }, []);
 
   if (loading) {
@@ -76,6 +90,104 @@ export default function AdminSalesPage() {
           <p className="mt-1 text-xs text-gray-400">Per paid order</p>
         </div>
       </div>
+
+      {/* 利益台帳（原価ベース・全チャネル） */}
+      {ledger && (
+        <div className="rounded-xl bg-white p-6 shadow-sm">
+          <div className="mb-6 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-gray-400" />
+            <h2 className="text-lg font-semibold text-gray-900">
+              Profit Ledger（原価ベース・全チャネル）
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div>
+              <p className="text-xs text-gray-500">実現利益</p>
+              <p className="mt-1 text-2xl font-bold text-green-600">
+                {formatSEK(ledger.totalProfit)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">友達分 (50%)</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">
+                {formatSEK(ledger.friendShare)}
+              </p>
+              <p className="text-xs text-gray-400">Swish 精算額</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">売上</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">
+                {formatSEK(ledger.totalRevenue)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">売却数</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">
+                {ledger.totalCount}
+              </p>
+            </div>
+          </div>
+
+          {ledger.byChannel.length > 0 && (
+            <div className="mt-6">
+              <h3 className="mb-2 text-sm font-medium text-gray-500">
+                チャネル別
+              </h3>
+              <div className="space-y-1">
+                {ledger.byChannel.map((c) => (
+                  <div
+                    key={c.channel}
+                    className="flex items-center justify-between border-b border-gray-100 py-1.5 text-sm"
+                  >
+                    <span className="font-medium text-gray-700">
+                      {CHANNEL_LABELS[c.channel] || c.channel}
+                      <span className="ml-2 text-xs text-gray-400">
+                        {c.count} 点
+                      </span>
+                    </span>
+                    <span className="text-gray-600">
+                      売上 {formatSEK(c.revenue)}
+                      <span className="ml-3 font-semibold text-green-600">
+                        利益 {formatSEK(c.profit)}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {ledger.recent.length > 0 && (
+            <div className="mt-6">
+              <h3 className="mb-2 text-sm font-medium text-gray-500">
+                直近の売却
+              </h3>
+              <div className="space-y-1">
+                {ledger.recent.map((s) => (
+                  <div
+                    key={s.id}
+                    className="flex items-center justify-between border-b border-gray-100 py-1.5 text-sm"
+                  >
+                    <span className="truncate pr-3 text-gray-700">
+                      {s.nameEn}
+                      <span className="ml-2 text-xs text-gray-400">
+                        {CHANNEL_LABELS[s.channel] || s.channel}
+                      </span>
+                    </span>
+                    <span className="whitespace-nowrap text-gray-600">
+                      {formatSEK(s.soldPrice)}
+                      <span className="ml-3 font-semibold text-green-600">
+                        +{formatSEK(s.profit)}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 月別売上グラフ */}
       <div className="rounded-xl bg-white p-6 shadow-sm">

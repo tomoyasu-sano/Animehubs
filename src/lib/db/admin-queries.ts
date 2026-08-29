@@ -1,8 +1,15 @@
 import { getDb } from "./index";
-import { products, reservations, orders } from "./schema";
+import { products, reservations, orders, sales } from "./schema";
 import { eq, like, and, or, sql, desc, asc, gte } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import type { Product, NewProduct, Reservation, Order } from "./schema";
+import type {
+  Product,
+  NewProduct,
+  Reservation,
+  Order,
+  Sale,
+  SalesChannel,
+} from "./schema";
 
 // ==================== 商品管理 ====================
 
@@ -100,6 +107,92 @@ export async function deleteProduct(id: string): Promise<boolean> {
 
   await db.delete(products).where(eq(products.id, id)).run();
   return true;
+}
+
+// ==================== 売上台帳 ====================
+
+export interface CreateSaleInput {
+  productId: string | null;
+  nameEn: string;
+  channel: SalesChannel;
+  soldPrice: number; // öre
+  costSek: number | null; // öre
+  sellerFee?: number; // öre
+  sellerShipping?: number; // öre
+  note?: string | null;
+}
+
+export async function createSale(input: CreateSaleInput): Promise<Sale> {
+  const db = await getDb();
+  const now = new Date().toISOString();
+  const id = uuidv4();
+  const fee = input.sellerFee ?? 0;
+  const shipping = input.sellerShipping ?? 0;
+  const profit = input.soldPrice - (input.costSek ?? 0) - fee - shipping;
+
+  await db
+    .insert(sales)
+    .values({
+      id,
+      productId: input.productId,
+      nameEn: input.nameEn,
+      channel: input.channel,
+      soldPrice: input.soldPrice,
+      costSek: input.costSek,
+      sellerFee: fee,
+      sellerShipping: shipping,
+      profit,
+      soldAt: now,
+      note: input.note ?? null,
+      createdAt: now,
+    })
+    .run();
+
+  return (await db.select().from(sales).where(eq(sales.id, id)).get())!;
+}
+
+export interface SalesChannelSummary {
+  channel: string;
+  count: number;
+  revenue: number; // öre
+  profit: number; // öre
+}
+
+export interface SalesSummary {
+  totalCount: number;
+  totalRevenue: number; // öre (sum soldPrice)
+  totalProfit: number; // öre (sum profit)
+  friendShare: number; // öre = totalProfit / 2（純利益の50%）
+  byChannel: SalesChannelSummary[];
+  recent: Sale[];
+}
+
+export async function getSalesSummary(): Promise<SalesSummary> {
+  const db = await getDb();
+  const all = await db.select().from(sales).orderBy(desc(sales.soldAt)).all();
+
+  const totalRevenue = all.reduce((s, r) => s + r.soldPrice, 0);
+  const totalProfit = all.reduce((s, r) => s + r.profit, 0);
+
+  const byChannelMap = new Map<string, SalesChannelSummary>();
+  for (const r of all) {
+    const c =
+      byChannelMap.get(r.channel) ??
+      { channel: r.channel, count: 0, revenue: 0, profit: 0 };
+    c.count += 1;
+    c.revenue += r.soldPrice;
+    c.profit += r.profit;
+    byChannelMap.set(r.channel, c);
+  }
+
+  return {
+    totalCount: all.length,
+    totalRevenue,
+    totalProfit,
+    friendShare: Math.round(totalProfit / 2),
+    byChannel: Array.from(byChannelMap.values()),
+    recent: all.slice(0, 10),
+  };
 }
 
 // ==================== 予約管理 ====================
