@@ -54,7 +54,8 @@ export default function AdminSalesPage() {
 
   const totalPaidCount =
     stats.paidOrders + stats.shippedOrders + stats.completedOrders +
-    stats.confirmedReservations + stats.completedReservations;
+    stats.confirmedReservations + stats.completedReservations +
+    stats.channelSalesCount;
 
   return (
     <div className="space-y-8">
@@ -68,16 +69,17 @@ export default function AdminSalesPage() {
             {formatSEK(stats.totalRevenue)}
           </p>
           <p className="mt-1 text-xs text-gray-400">
-            From paid orders and confirmed reservations
+            サイト注文・予約 + 全チャネル売却（Vinted等）を合算
           </p>
         </div>
         <div className="rounded-xl bg-white p-6 shadow-sm">
           <p className="text-sm text-gray-500">Total Orders</p>
           <p className="mt-1 text-3xl font-bold text-gray-900">
-            {stats.totalOrders + stats.totalReservations}
+            {stats.totalOrders + stats.totalReservations + stats.channelSalesCount}
           </p>
           <p className="mt-1 text-xs text-gray-400">
-            {stats.totalOrders} orders + {stats.totalReservations} reservations
+            {stats.totalOrders} orders + {stats.totalReservations} reservations +{" "}
+            {stats.channelSalesCount} channel sales
           </p>
         </div>
         <div className="rounded-xl bg-white p-6 shadow-sm">
@@ -87,7 +89,7 @@ export default function AdminSalesPage() {
               ? formatSEK(Math.round(stats.totalRevenue / totalPaidCount))
               : "0 SEK"}
           </p>
-          <p className="mt-1 text-xs text-gray-400">Per paid order</p>
+          <p className="mt-1 text-xs text-gray-400">Per paid order / sale</p>
         </div>
       </div>
 
