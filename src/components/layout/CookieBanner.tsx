@@ -18,6 +18,8 @@ export default function CookieBanner() {
 
   const handleAccept = () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    // PostHogProvider に同意を通知して計測を開始させる（GDPR: 同意後のみ計測）
+    window.dispatchEvent(new Event("cookie-consent-accepted"));
     setVisible(false);
   };
 

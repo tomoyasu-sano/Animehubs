@@ -7,6 +7,7 @@ import { useCart } from "@/hooks/useCart";
 import { useRouter } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/utils";
 import { AlertTriangle, MapPin } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 
 export default function InspectionForm() {
   const t = useTranslations("checkout");
@@ -14,6 +15,7 @@ export default function InspectionForm() {
   const { data: session } = useSession();
   const { items, totalAmount, clearCart } = useCart();
   const router = useRouter();
+  const posthog = usePostHog();
 
   const [agreed, setAgreed] = useState(false);
   const [email, setEmail] = useState(session?.user?.email ?? "");
@@ -66,6 +68,13 @@ export default function InspectionForm() {
         }
         return;
       }
+
+      // 北極星（注文数）: Inspection 予約成立を CV として計測
+      posthog?.capture("order_completed", {
+        type: "inspection",
+        order_number: data.orderNumber,
+        amount_sek: totalAmount,
+      });
 
       clearCart();
       localStorage.setItem("hasNewReservation", "true");

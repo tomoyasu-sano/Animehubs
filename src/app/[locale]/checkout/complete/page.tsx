@@ -8,6 +8,7 @@ import { CheckCircle, Loader2, AlertCircle, Copy, Check } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { INSTAGRAM_URL } from "@/lib/constants";
 import { useCart } from "@/hooks/useCart";
+import { usePostHog } from "posthog-js/react";
 import type { OrderItem, SwedishAddress } from "@/lib/db/schema";
 
 interface OrderData {
@@ -32,9 +33,11 @@ export default function CheckoutCompletePage() {
   const sessionId = searchParams.get("session_id");
   const { clearCart } = useCart();
 
+  const posthog = usePostHog();
   const [state, setState] = useState<PageState>("loading");
   const [order, setOrder] = useState<OrderData | null>(null);
   const [cartCleared, setCartCleared] = useState(false);
+  const [tracked, setTracked] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const fetchOrder = useCallback(async (): Promise<OrderData | null> => {
@@ -101,6 +104,19 @@ export default function CheckoutCompletePage() {
       setCartCleared(true);
     }
   }, [state, cartCleared, clearCart]);
+
+  // 北極星（注文数）: Delivery 購入完了を CV として計測（1回だけ）。
+  // Inspection の予約は予約時に計測済みなので、ここでは delivery のみ発火して二重計上を防ぐ。
+  useEffect(() => {
+    if (state === "complete" && order?.type === "delivery" && !tracked) {
+      posthog?.capture("order_completed", {
+        type: "delivery",
+        order_number: order.orderNumber,
+        amount_sek: order.totalAmount,
+      });
+      setTracked(true);
+    }
+  }, [state, order, tracked, posthog]);
 
   if (state === "loading" || state === "processing") {
     return (
