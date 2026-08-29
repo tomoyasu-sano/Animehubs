@@ -313,7 +313,10 @@ export interface DashboardStats {
   shippedOrders: number;
   completedOrders: number;
   recentOrders: Order[];
-  // 統合集計
+  // チャネル売上 (sales テーブル：Vinted等サイト外含む全チャネル)
+  channelSalesCount: number;
+  channelRevenue: number;
+  // 統合集計（サイト注文/予約 + チャネル売上を合算）
   totalRevenue: number;
   salesByCategory: { category: string; total: number; count: number }[];
   salesByMonth: { month: string; total: number; count: number }[];
@@ -393,9 +396,14 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         .get()
     )?.total || 0;
 
-  const totalRevenue = reservationRevenue + orderRevenue;
+  // --- チャネル売上（sales テーブル：Vinted等の全チャネル） ---
+  const channelSalesList = await db.select().from(sales).all();
+  const channelRevenue = channelSalesList.reduce((sum, s) => sum + s.soldPrice, 0);
+  const channelSalesCount = channelSalesList.length;
 
-  // カテゴリ別・月別集計（reservations + orders）
+  const totalRevenue = reservationRevenue + orderRevenue + channelRevenue;
+
+  // カテゴリ別・月別集計（reservations + orders + channel sales）
   const categoryMap = new Map<string, { total: number; count: number }>();
   const monthMap = new Map<string, { total: number; count: number }>();
 
@@ -468,6 +476,13 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     }
   }
 
+  // channel sales の月別集計（カテゴリは sales に無いため月別のみ）
+  for (const s of channelSalesList) {
+    const month = s.soldAt.substring(0, 7);
+    const mExisting = monthMap.get(month) || { total: 0, count: 0 };
+    monthMap.set(month, { total: mExisting.total + s.soldPrice, count: mExisting.count + 1 });
+  }
+
   const salesByCategory = Array.from(categoryMap.entries()).map(([category, data]) => ({
     category,
     total: data.total,
@@ -508,6 +523,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     shippedOrders,
     completedOrders,
     recentOrders,
+    channelSalesCount,
+    channelRevenue,
     totalRevenue,
     salesByCategory,
     salesByMonth,
