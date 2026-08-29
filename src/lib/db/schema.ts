@@ -66,6 +66,29 @@ export const products = sqliteTable("products", {
 });
 
 // ============================================================
+// 売上台帳テーブル（全チャネル共通の"売れた記録"）
+// サイト(Stripe)・Vinted・その他を横断して利益・分配を集計する。
+// 金額はすべて öre 単位。profit = soldPrice - costSek - sellerFee - sellerShipping
+// ============================================================
+
+export type SalesChannel = "site" | "vinted" | "other";
+
+export const sales = sqliteTable("sales", {
+  id: text("id").primaryKey(),
+  productId: text("product_id"), // NULL可（商品削除後も記録を残す）
+  nameEn: text("name_en").notNull(), // 販売時点の商品名スナップショット
+  channel: text("channel").notNull(), // SalesChannel
+  soldPrice: integer("sold_price").notNull(), // 実売価格(öre)
+  costSek: integer("cost_sek"), // 販売時点の着地原価(öre)スナップショット・NULL可
+  sellerFee: integer("seller_fee").notNull().default(0), // 自分負担の販売手数料(öre)
+  sellerShipping: integer("seller_shipping").notNull().default(0), // 自分負担の送料(öre)
+  profit: integer("profit").notNull(), // 純利益(öre)
+  soldAt: text("sold_at").notNull(),
+  note: text("note"),
+  createdAt: text("created_at").notNull(),
+});
+
+// ============================================================
 // 予約テーブル（v1互換、Phase 1-4でarchiveにリネーム）
 // ============================================================
 
@@ -278,3 +301,5 @@ export type SiteAnnouncement = typeof siteAnnouncements.$inferSelect;
 export type NewSiteAnnouncement = typeof siteAnnouncements.$inferInsert;
 export type NewsletterSend = typeof newsletterSends.$inferSelect;
 export type NewNewsletterSend = typeof newsletterSends.$inferInsert;
+export type Sale = typeof sales.$inferSelect;
+export type NewSale = typeof sales.$inferInsert;
