@@ -23,23 +23,28 @@ for r in conn.execute(
           f"（新規 {r['new_items']}）{err}")
 
 print()
-print("=== 直近で売れた（と判定された）商品 ===")
+print("=== 消えた商品（売れた/取り下げ推定） ===")
 rows = conn.execute(
-    """SELECT i.id, i.title, i.status, i.listed_at, i.status_checked_at,
+    """SELECT i.title, i.listed_at, i.gone_at,
               (SELECT favourite_count FROM snapshots s WHERE s.item_id = i.id
                ORDER BY run_date DESC LIMIT 1) fav,
               (SELECT price FROM snapshots s WHERE s.item_id = i.id
                ORDER BY run_date DESC LIMIT 1) price
-       FROM items i WHERE i.status IN ('sold', 'reserved')
-       ORDER BY i.status_checked_at DESC LIMIT 15""").fetchall()
+       FROM items i WHERE i.status = 'gone'
+       ORDER BY i.gone_at DESC, fav DESC""").fetchall()
 if not rows:
-    print("（まだなし — 売却チェックは観測開始3日後から動きます）")
-for r in rows:
-    days = ""
-    if r["listed_at"] and r["status_checked_at"]:
-        d0 = dt.datetime.fromisoformat(r["listed_at"])
-        d1 = dt.datetime.fromisoformat(r["status_checked_at"])
-        days = f" {round((d1 - d0).days)}日で"
-    print(f"[{r['status']}]{days} {r['price']} SEK fav={r['fav']} {r['title'][:50]}")
+    print("（まだなし — 2日目の収集から検出が始まります）")
+else:
+    with_fav = [r for r in rows if (r["fav"] or 0) >= 1]
+    print(f"計 {len(rows)} 件 — うち いいね≥1 (売れた可能性が高い): {len(with_fav)} 件, "
+          f"いいね0 (不明): {len(rows) - len(with_fav)} 件")
+    print()
+    for r in with_fav[:15]:
+        days = ""
+        if r["listed_at"] and r["gone_at"]:
+            d0 = dt.datetime.fromisoformat(r["listed_at"])
+            d1 = dt.datetime.fromisoformat(r["gone_at"])
+            days = f"{max((d1 - d0).days, 0)}日で消滅 "
+        print(f"{days}{r['price']} SEK fav={r['fav']} {r['title'][:50]}")
 
 conn.close()

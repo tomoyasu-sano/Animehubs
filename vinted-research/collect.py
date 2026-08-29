@@ -90,6 +90,8 @@ def download_images(session, conn, cfg, new_images) -> int:
             conn.execute("UPDATE items SET image_file = ? WHERE id = ?",
                          (dest.name, item_id))
             ok += 1
+            if ok % 50 == 0:
+                conn.commit()
         sleep_range(cfg["image_delay_range"])
     conn.commit()
     return ok
@@ -115,7 +117,8 @@ def main() -> int:
     parser.add_argument("--jitter", action="store_true",
                         help="開始前にランダム待機（定時実行のパターン化を避ける）")
     parser.add_argument("--no-images", action="store_true", help="画像DLをスキップ")
-    parser.add_argument("--no-sold-check", action="store_true", help="売却チェックをスキップ")
+    parser.add_argument("--sold-check", action="store_true",
+                        help="個別ページの売却チェックを実行（通常はオフ。2週間後の検証用）")
     args = parser.parse_args()
 
     cfg = json.loads((ROOT / "config.json").read_text())
@@ -140,11 +143,14 @@ def main() -> int:
         log(f"{search['key']}: {seen} 件（新規 {new}）")
         sleep_range(cfg["page_delay_range"])
 
+    gone = db.mark_gone(conn, run_date)
+    log(f"消えた商品（売れた/取り下げ推定）: {gone} 件")
+
     if not args.no_images:
         ok = download_images(session, conn, cfg, all_new_images)
         log(f"画像DL: {ok} 件")
 
-    if not args.no_sold_check:
+    if args.sold_check:
         counts = check_sold(session, conn, cfg, run_date)
         log(f"売却チェック: {counts or 'なし（対象0件）'}")
 

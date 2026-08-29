@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS items (
     promoted INTEGER DEFAULT 0,
     status TEXT DEFAULT 'active',
     status_http INTEGER,
-    status_checked_at TEXT
+    status_checked_at TEXT,
+    gone_at TEXT
 );
 CREATE TABLE IF NOT EXISTS snapshots (
     item_id INTEGER NOT NULL,
@@ -56,7 +57,12 @@ CREATE INDEX IF NOT EXISTS idx_items_first_seen ON items(first_seen);
 def connect(db_path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA busy_timeout = 10000")
     conn.executescript(SCHEMA)
+    cols = {r["name"] for r in conn.execute("PRAGMA table_info(items)")}
+    if "gone_at" not in cols:
+        conn.execute("ALTER TABLE items ADD COLUMN gone_at TEXT")
+        conn.commit()
     return conn
 
 
@@ -86,7 +92,8 @@ def upsert_item(conn, item: dict, run_date: str, listed_at_iso: str | None,
         )
     else:
         conn.execute(
-            "UPDATE items SET last_seen = ?, title = ?, status = 'active' WHERE id = ?",
+            """UPDATE items SET last_seen = ?, title = ?, status = 'active', gone_at = NULL
+               WHERE id = ?""",
             (run_date, item.get("title") or "", item["id"]),
         )
     total = (item.get("total_item_price") or {})
@@ -126,6 +133,37 @@ def sold_check_candidates(conn, run_date: str, ages_days: list[int], limit: int)
             ORDER BY RANDOM() LIMIT ?""",
         (run_date, *ages_days, limit),
     ).fetchall()
+
+
+def mark_gone(conn, run_date: str) -> int:
+    """「まだ検索窓に残っているはずなのに消えた」商品を gone にする。
+
+    各検索の窓の下限（今日見えた中で最も古い出品時刻）より新しい商品が
+    今日見えなかった場合、売れた/取り下げ/予約のどれかで消えたと推定できる。
+    窓から自然に押し出されただけの古い商品は対象外。
+    境界の揺れ対策で 2 時間のマージンを取る。
+    """
+    marked = 0
+    for row in conn.execute(
+            """SELECT search_key FROM runs
+               WHERE run_date = ? AND error IS NULL AND pages > 0""", (run_date,)):
+        key = row["search_key"]
+        wmin = conn.execute(
+            """SELECT MIN(i.listed_at) FROM items i
+               JOIN item_searches s ON s.item_id = i.id
+               WHERE s.search_key = ? AND i.last_seen = ? AND i.listed_at IS NOT NULL""",
+            (key, run_date)).fetchone()[0]
+        if not wmin:
+            continue
+        cur = conn.execute(
+            """UPDATE items SET status = 'gone', gone_at = ?
+               WHERE status = 'active' AND last_seen < ?
+                 AND listed_at > datetime(?, '+2 hours')
+                 AND id IN (SELECT item_id FROM item_searches WHERE search_key = ?)""",
+            (run_date, run_date, wmin, key))
+        marked += cur.rowcount
+    conn.commit()
+    return marked
 
 
 def record_status(conn, item_id: int, status: str, http_code: int, checked_at: str) -> None:
