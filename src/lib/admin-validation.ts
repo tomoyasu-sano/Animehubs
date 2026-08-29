@@ -13,6 +13,7 @@ export interface CreateProductInput {
   condition: string;
   stock?: number;
   heightCm?: number | null;
+  costSek?: number | null;
   images?: string;
   featured?: boolean;
 }
@@ -27,6 +28,7 @@ export interface UpdateProductInput {
   condition?: string;
   stock?: number;
   heightCm?: number | null;
+  costSek?: number | null;
   images?: string;
   featured?: boolean;
 }
@@ -75,6 +77,14 @@ function validateHeightCm(value: unknown, errors: ValidationError[]): void {
   }
 }
 
+function validateCostSek(value: unknown, errors: ValidationError[]): void {
+  if (value == null) return; // optional
+  const num = Number(value);
+  if (!Number.isFinite(num) || num < 0 || !Number.isInteger(num) || num > MAX_PRICE) {
+    errors.push({ field: "costSek", message: `Cost must be an integer between 0 and ${MAX_PRICE}` });
+  }
+}
+
 function validateCategory(value: unknown, errors: ValidationError[]): void {
   if (typeof value !== "string" || !(CATEGORIES as readonly string[]).includes(value)) {
     errors.push({ field: "category", message: `Invalid category. Must be one of: ${CATEGORIES.join(", ")}` });
@@ -99,6 +109,7 @@ export function validateCreateProduct(input: Record<string, unknown>): Validatio
   validateCondition(input.condition, errors);
   validateStock(input.stock, errors);
   validateHeightCm(input.heightCm, errors);
+  validateCostSek(input.costSek, errors);
 
   return errors;
 }
@@ -115,6 +126,7 @@ export function validateUpdateProduct(input: Record<string, unknown>): Validatio
   if (input.condition !== undefined) validateCondition(input.condition, errors);
   if (input.stock !== undefined) validateStock(input.stock, errors);
   if (input.heightCm !== undefined) validateHeightCm(input.heightCm, errors);
+  if (input.costSek !== undefined) validateCostSek(input.costSek, errors);
 
   return errors;
 }

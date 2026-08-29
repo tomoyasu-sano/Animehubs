@@ -171,6 +171,9 @@ export default function AdminProductsPage() {
                   Price
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-gray-500">
+                  Cost / Margin
+                </th>
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
                   Stock
                 </th>
                 <th className="px-4 py-3 text-left font-medium text-gray-500">
@@ -214,6 +217,23 @@ export default function AdminProductsPage() {
                     </td>
                     <td className="px-4 py-3 text-gray-900">
                       {formatSEK(product.price)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {product.costSek != null ? (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-gray-900">
+                            {formatSEK(product.costSek)}
+                          </span>
+                          <span className="text-xs font-medium text-green-600">
+                            +{formatSEK(product.price - product.costSek)}
+                            {product.price > 0
+                              ? ` (${Math.round(((product.price - product.costSek) / product.price) * 100)}%)`
+                              : ""}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-300">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span

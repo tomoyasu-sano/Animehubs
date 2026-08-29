@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
       category: body.category as string,
       condition: body.condition as string,
       heightCm: body.heightCm != null ? Number(body.heightCm) : null,
+      costSek: body.costSek != null ? Number(body.costSek) : null,
       images: (body.images as string) || "[]",
       featured: isFeatured,
       featuredOrder,

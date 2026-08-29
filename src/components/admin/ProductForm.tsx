@@ -23,6 +23,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
   const [category, setCategory] = useState(product?.category || CATEGORIES[0]);
   const [condition, setCondition] = useState(product?.condition || CONDITIONS[0]);
   const [heightCm, setHeightCm] = useState(product?.heightCm != null ? String(product.heightCm) : "");
+  const [costSek, setCostSek] = useState(product?.costSek != null ? String(product.costSek / 100) : "");
   const [featured, setFeatured] = useState(product?.featured === 1);
   const [images, setImages] = useState<string[]>(
     product ? JSON.parse(product.images || "[]") : []
@@ -151,6 +152,7 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
       category,
       condition,
       heightCm: heightCm ? parseInt(heightCm) : null,
+      costSek: costSek ? Math.round(parseFloat(costSek) * 100) : null,
       featured,
       images: JSON.stringify(images),
     };
@@ -309,6 +311,25 @@ export default function ProductForm({ product, mode }: ProductFormProps) {
           className="mt-1 block w-40 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
         />
         <p className="mt-1 text-xs text-gray-400">Optional — shown on product page if set</p>
+      </div>
+
+      {/* 着地原価（管理用・任意） */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Cost / 着地原価 (SEK)
+        </label>
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value={costSek}
+          onChange={(e) => setCostSek(e.target.value)}
+          placeholder="e.g. 150.58"
+          className="mt-1 block w-40 rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500"
+        />
+        <p className="mt-1 text-xs text-gray-400">
+          管理用・非公開。仕入+関税+送料按分の個単価。利益計算に使用
+        </p>
       </div>
 
       {/* カテゴリ・コンディション */}
