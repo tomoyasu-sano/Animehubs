@@ -56,6 +56,7 @@ export const products = sqliteTable("products", {
   category: text("category").notNull(),
   condition: text("condition").notNull(),
   heightCm: integer("height_cm"),
+  costSek: integer("cost_sek"), // 着地原価（öre単位・NULL可）。仕入+関税+送料按分の個単価
   images: text("images").notNull().default("[]"),
   featured: integer("featured").notNull().default(0),
   featuredOrder: integer("featured_order").notNull().default(0),

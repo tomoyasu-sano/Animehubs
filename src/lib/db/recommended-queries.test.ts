@@ -39,6 +39,7 @@ function createProduct(overrides: Partial<Product> & { id: string }): Product {
     category: overrides.category ?? "figures",
     condition: overrides.condition ?? "new",
     heightCm: overrides.heightCm ?? null,
+    costSek: overrides.costSek ?? null,
     images: overrides.images ?? "[]",
     featured: overrides.featured ?? 0,
     featuredOrder: overrides.featuredOrder ?? 0,
