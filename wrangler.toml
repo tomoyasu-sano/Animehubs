@@ -3,6 +3,12 @@ compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 main = ".open-next/worker.js"
 
+# @vercel/og(resvg.wasm 等 ~1.3MiB)は未使用だが Next 内部の import 分岐経由で
+# バンドルされるため、スタブに差し替えて Worker サイズを 3MiB 以下に抑える
+[alias]
+"next/dist/compiled/@vercel/og/index.node.js" = "./src/lib/stub-vercel-og.mjs"
+"next/dist/compiled/@vercel/og/index.edge.js" = "./src/lib/stub-vercel-og.mjs"
+
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
