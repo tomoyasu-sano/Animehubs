@@ -105,23 +105,23 @@ export default function AdminSalesPage() {
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div>
-              <p className="text-xs text-gray-500">実現利益</p>
-              <p className="mt-1 text-2xl font-bold text-green-600">
-                {formatSEK(ledger.totalProfit)}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">友達分 (50%)</p>
-              <p className="mt-1 text-2xl font-bold text-gray-900">
-                {formatSEK(ledger.friendShare)}
-              </p>
-              <p className="text-xs text-gray-400">Swish 精算額</p>
-            </div>
-            <div>
-              <p className="text-xs text-gray-500">売上</p>
+              <p className="text-xs text-gray-500">売上（販売価格）</p>
               <p className="mt-1 text-2xl font-bold text-gray-900">
                 {formatSEK(ledger.totalRevenue)}
               </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">原価</p>
+              <p className="mt-1 text-2xl font-bold text-gray-900">
+                {formatSEK(ledger.totalCost)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">純利益</p>
+              <p className="mt-1 text-2xl font-bold text-green-600">
+                {formatSEK(ledger.totalProfit)}
+              </p>
+              <p className="text-xs text-gray-400">売上 − 原価 − 手数料</p>
             </div>
             <div>
               <p className="text-xs text-gray-500">売却数</p>
@@ -129,6 +129,30 @@ export default function AdminSalesPage() {
                 {ledger.totalCount}
               </p>
             </div>
+          </div>
+
+          {/* 精算（1回目 = 売上折半） */}
+          <div className="mt-4 rounded-lg border border-amber-100 bg-amber-50 p-4">
+            <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+              <div>
+                <span className="text-xs text-gray-500">
+                  友達へ Swish（売上の50%）
+                </span>
+                <span className="ml-2 text-2xl font-bold text-amber-700">
+                  {formatSEK(ledger.revenueSplit)}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500">
+                参考: 利益の50% ={" "}
+                <span className="font-medium text-gray-700">
+                  {formatSEK(ledger.friendShare)}
+                </span>
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-gray-500">
+              1回目の輸入は仕入コストを現地2人で折半済みのため、精算は<b>売上を50/50</b>
+              （＝各自の元手回収 ＋ 利益折半 と等価）。
+            </p>
           </div>
 
           {ledger.byChannel.length > 0 && (
@@ -178,9 +202,14 @@ export default function AdminSalesPage() {
                       </span>
                     </span>
                     <span className="whitespace-nowrap text-gray-600">
-                      {formatSEK(s.soldPrice)}
-                      <span className="ml-3 font-semibold text-green-600">
-                        +{formatSEK(s.profit)}
+                      販売 {formatSEK(s.soldPrice)}
+                      {s.costSek != null && (
+                        <span className="text-gray-400">
+                          {" "}− 原価 {formatSEK(s.costSek)}
+                        </span>
+                      )}
+                      <span className="ml-2 font-semibold text-green-600">
+                        = 利益 {formatSEK(s.profit)}
                       </span>
                     </span>
                   </div>

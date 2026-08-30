@@ -161,8 +161,10 @@ export interface SalesChannelSummary {
 export interface SalesSummary {
   totalCount: number;
   totalRevenue: number; // öre (sum soldPrice)
+  totalCost: number; // öre (sum cost_sek)
   totalProfit: number; // öre (sum profit)
-  friendShare: number; // öre = totalProfit / 2（純利益の50%）
+  friendShare: number; // öre = totalProfit / 2（純利益の50%・参考）
+  revenueSplit: number; // öre = totalRevenue / 2（売上の50%＝1回目の精算基準）
   byChannel: SalesChannelSummary[];
   recent: Sale[];
 }
@@ -172,6 +174,7 @@ export async function getSalesSummary(): Promise<SalesSummary> {
   const all = await db.select().from(sales).orderBy(desc(sales.soldAt)).all();
 
   const totalRevenue = all.reduce((s, r) => s + r.soldPrice, 0);
+  const totalCost = all.reduce((s, r) => s + (r.costSek ?? 0), 0);
   const totalProfit = all.reduce((s, r) => s + r.profit, 0);
 
   const byChannelMap = new Map<string, SalesChannelSummary>();
@@ -188,8 +191,10 @@ export async function getSalesSummary(): Promise<SalesSummary> {
   return {
     totalCount: all.length,
     totalRevenue,
+    totalCost,
     totalProfit,
     friendShare: Math.round(totalProfit / 2),
+    revenueSplit: Math.round(totalRevenue / 2),
     byChannel: Array.from(byChannelMap.values()),
     recent: all.slice(0, 10),
   };
