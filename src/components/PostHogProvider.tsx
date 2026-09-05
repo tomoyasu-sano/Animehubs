@@ -16,12 +16,32 @@ const POSTHOG_HOST =
 const COOKIE_CONSENT_KEY = "animehubs-cookie-consent";
 const CONSENT_EVENT = "cookie-consent-accepted";
 
+const PRODUCTION_HOSTNAME = "animehubs.se";
+const OPT_OUT_KEY = "ph_opt_out";
+
 function hasConsent(): boolean {
   try {
     return localStorage.getItem(COOKIE_CONSENT_KEY) === "accepted";
   } catch {
     return false;
   }
+}
+
+// ?no_track=1 を一度開いたブラウザは以後計測しない（?no_track=0 で解除）
+function isOptedOut(): boolean {
+  try {
+    const flag = new URLSearchParams(window.location.search).get("no_track");
+    if (flag === "1") localStorage.setItem(OPT_OUT_KEY, "1");
+    if (flag === "0") localStorage.removeItem(OPT_OUT_KEY);
+    return localStorage.getItem(OPT_OUT_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+// 本番ドメイン以外（localhost・プレビュー）と opt-out 済みブラウザは自己アクセスのため計測しない
+function isTrackingAllowed(): boolean {
+  return window.location.hostname === PRODUCTION_HOSTNAME && !isOptedOut();
 }
 
 interface PostHogProviderProps {
@@ -41,12 +61,16 @@ export default function PostHogProvider({ children }: PostHogProviderProps) {
       });
     }
 
-    if (hasConsent()) {
+    if (!isTrackingAllowed()) {
+      // 過去に localhost 等で opt-in した状態が PostHog 側に永続していても打ち消す
+      posthog.opt_out_capturing();
+    } else if (hasConsent()) {
       posthog.opt_in_capturing();
     }
 
     // CookieBanner で「同意」した瞬間に計測を開始し、初回ページビューを送る
     const onConsent = () => {
+      if (!isTrackingAllowed()) return;
       posthog.opt_in_capturing();
       posthog.capture("$pageview");
     };
