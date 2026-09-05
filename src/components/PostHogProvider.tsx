@@ -16,7 +16,7 @@ const POSTHOG_HOST =
 const COOKIE_CONSENT_KEY = "animehubs-cookie-consent";
 const CONSENT_EVENT = "cookie-consent-accepted";
 
-const PRODUCTION_HOSTNAME = "animehubs.se";
+const PRODUCTION_HOSTNAME = "anime-hubs.com";
 const OPT_OUT_KEY = "ph_opt_out";
 
 function hasConsent(): boolean {
@@ -40,8 +40,12 @@ function isOptedOut(): boolean {
 }
 
 // 本番ドメイン以外（localhost・プレビュー）と opt-out 済みブラウザは自己アクセスのため計測しない
+// www あり/なし両方で 200 を返すため両ホスト名を本番として扱う
 function isTrackingAllowed(): boolean {
-  return window.location.hostname === PRODUCTION_HOSTNAME && !isOptedOut();
+  const { hostname } = window.location;
+  const isProduction =
+    hostname === PRODUCTION_HOSTNAME || hostname === `www.${PRODUCTION_HOSTNAME}`;
+  return isProduction && !isOptedOut();
 }
 
 interface PostHogProviderProps {
